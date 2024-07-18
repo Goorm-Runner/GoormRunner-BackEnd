@@ -37,7 +37,7 @@ jobs:
 
       - name: 빌드 아티팩트 ZIP 압축 📦
         run: |
-          JAR_NAME=$(ls build/libs | grep '.jar$')
+          JAR_NAME=$(ls build/libs | grep -v 'plain' | grep '.jar$')
           echo "발견된 JAR 파일: $JAR_NAME"
           zip -r backend.zip build/libs/$JAR_NAME appspec.yml scripts/
           ls -lh backend.zip
