@@ -1,20 +1,27 @@
 package goorm_runner.backend.post.application;
 
 import goorm_runner.backend.post.domain.Post;
+import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.dto.PostCreateRequest;
+import goorm_runner.backend.post.dto.PostUpdateRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest
+@Transactional
 class PostServiceTest {
 
     @Autowired
     private PostService postService;
+
+    @Autowired
+    private PostRepository postRepository;
 
     @Test
     void save_success() {
@@ -44,7 +51,7 @@ class PostServiceTest {
     }
 
     @Test
-    void empty_title_failure() {
+    void save_empty_title_failure() {
         //given
         String title = "";
         String content = "<h1>Example</h1> Insert content here.";
@@ -61,7 +68,7 @@ class PostServiceTest {
     }
 
     @Test
-    void empty_content_failure() {
+    void save_empty_content_failure() {
         //given
         String title = "Example title";
         String content = "";
@@ -78,7 +85,7 @@ class PostServiceTest {
     }
 
     @Test
-    void invalid_category() {
+    void save_invalid_category() {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
@@ -92,5 +99,34 @@ class PostServiceTest {
         assertThatThrownBy(() -> postService.create(request, authorId, categoryName))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("유효하지 않은 카테고리: " + categoryName);
+    }
+
+    @Test
+    void update_success() {
+        //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest createRequest = new PostCreateRequest(title, content);
+
+        Long authorId = 1L;
+
+        String categoryName = "GENERAL";
+
+        Post post = postService.create(createRequest, authorId, categoryName);
+
+        //when
+        String updatedTitle = "UpdatedTitle";
+        String updatedContent = "UpdatedContent";
+        PostUpdateRequest updateRequest = new PostUpdateRequest(updatedTitle, updatedContent);
+
+        Post updated = postService.update(updateRequest, post.getId());
+        postRepository.flush();
+
+        //then
+        assertAll(
+                () -> assertThat(updated.getTitle()).isEqualTo(updatedTitle),
+                () -> assertThat(updated.getContent()).isEqualTo(updatedContent),
+                () -> assertThat(updated.getUpdatedAt()).isAfter(updated.getCreatedAt())
+        );
     }
 }

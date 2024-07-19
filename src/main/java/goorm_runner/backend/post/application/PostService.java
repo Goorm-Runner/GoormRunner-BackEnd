@@ -4,6 +4,7 @@ import goorm_runner.backend.post.domain.Category;
 import goorm_runner.backend.post.domain.Post;
 import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.dto.PostCreateRequest;
+import goorm_runner.backend.post.dto.PostUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +18,7 @@ public class PostService {
     private final PostRepository postRepository;
 
     public Post create(PostCreateRequest request, Long authorId, String categoryName) {
-        validateTitleAndContent(request);
+        validateTitleAndContent(request.getTitle(), request.getContent());
 
         Category category = toCategory(categoryName);
         Post post = getPost(request, authorId, category);
@@ -25,12 +26,22 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    private void validateTitleAndContent(PostCreateRequest request) {
-        if (!StringUtils.hasText(request.getTitle())) {
+    public Post update(PostUpdateRequest request, Long postId) {
+        validateTitleAndContent(request.getTitle(), request.getContent());
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+
+        post.update(request.getTitle(), request.getContent());
+        return post;
+    }
+
+    private void validateTitleAndContent(String title, String content) {
+        if (!StringUtils.hasText(title)) {
             throw new IllegalArgumentException("제목을 입력해주세요.");
         }
 
-        if (!StringUtils.hasText(request.getContent())) {
+        if (!StringUtils.hasText(content)) {
             throw new IllegalArgumentException("본문 내용을 입력해주세요.");
         }
     }
