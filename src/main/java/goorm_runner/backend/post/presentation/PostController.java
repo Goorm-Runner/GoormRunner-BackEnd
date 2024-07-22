@@ -1,12 +1,10 @@
 package goorm_runner.backend.post.presentation;
 
 import goorm_runner.backend.member.MemberDetails;
+import goorm_runner.backend.post.application.PostReadService;
 import goorm_runner.backend.post.application.PostService;
 import goorm_runner.backend.post.domain.Post;
-import goorm_runner.backend.post.dto.PostCreateRequest;
-import goorm_runner.backend.post.dto.PostCreateResponse;
-import goorm_runner.backend.post.dto.PostUpdateRequest;
-import goorm_runner.backend.post.dto.PostUpdateResponse;
+import goorm_runner.backend.post.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,6 +18,7 @@ import java.net.URI;
 public class PostController {
 
     private final PostService postService;
+    private final PostReadService postReadService;
 
     @PostMapping("/categories/{categoryName}/posts")
     public ResponseEntity<PostCreateResponse> createPost(
@@ -29,7 +28,7 @@ public class PostController {
 
         Long authorId = memberDetails.getId();
         Post post = postService.create(request, authorId, categoryName);
-        PostCreateResponse response = getResponse(post);
+        PostCreateResponse response = getCreateResponse(post);
 
         URI location = newUri(response);
 
@@ -37,17 +36,26 @@ public class PostController {
                 .body(response);
     }
 
+    @GetMapping("/categories/{categoryName}/posts/{postId}")
+    public ResponseEntity<PostReadResponse> readPost(@PathVariable String categoryName, @PathVariable Long postId) {
+
+        Post post = postReadService.readPost(postId);
+        PostReadResponse response = getReadResponse(categoryName, postId, post);
+
+        return ResponseEntity.ok(response);
+    }
+
     @PutMapping("/categories/{categoryName}/posts/{postId}")
     public ResponseEntity<PostUpdateResponse> updatePost(
             @PathVariable String categoryName, @PathVariable Long postId, @RequestBody PostUpdateRequest request) {
 
         Post post = postService.update(request, postId);
-        PostUpdateResponse response = getResponse(categoryName, postId, post);
+        PostUpdateResponse response = getUpdateResponse(categoryName, postId, post);
 
         return ResponseEntity.ok(response);
     }
 
-    private PostCreateResponse getResponse(Post post) {
+    private PostCreateResponse getCreateResponse(Post post) {
         return PostCreateResponse.builder()
                 .categoryName(post.getCategory().name())
                 .postId(post.getId())
@@ -57,7 +65,19 @@ public class PostController {
                 .build();
     }
 
-    private PostUpdateResponse getResponse(String categoryName, Long postId, Post post) {
+    private PostReadResponse getReadResponse(String categoryName, Long postId, Post post) {
+        return PostReadResponse.builder()
+                .categoryName(categoryName)
+                .postId(postId)
+                .title(post.getTitle())
+                .content(post.getContent())
+                .likeCount(post.getLikeCount())
+                .createdAt(post.getCreatedAt())
+                .updatedAt(post.getUpdatedAt())
+                .build();
+    }
+
+    private PostUpdateResponse getUpdateResponse(String categoryName, Long postId, Post post) {
         return PostUpdateResponse.builder()
                 .categoryName(categoryName)
                 .postId(postId)
