@@ -6,12 +6,15 @@ import goorm_runner.backend.post.application.PostService;
 import goorm_runner.backend.post.domain.Post;
 import goorm_runner.backend.post.dto.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -42,6 +45,21 @@ public class PostController {
         Post post = postReadService.readPost(postId);
         PostReadResponse response = getReadResponse(categoryName, postId, post);
 
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/categories/{categoryName}/posts")
+    public ResponseEntity<PostReadPageResponse> readPage(@PathVariable String categoryName, @RequestParam int pageNumber, @RequestParam int pageSize) {
+
+        Page<Post> posts = postReadService.readPage(categoryName, PageRequest.of(pageNumber, pageSize));
+
+        List<PostOverview> overviews = posts.stream()
+                .map(post -> PostOverview.from(post, postService.getAuthorName(post.getId())))
+                .toList();
+
+        ResponseMetaData responseMetaData = ResponseMetaData.of(posts);
+
+        PostReadPageResponse response = new PostReadPageResponse(overviews, responseMetaData);
         return ResponseEntity.ok(response);
     }
 
