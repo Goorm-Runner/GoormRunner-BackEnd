@@ -73,6 +73,12 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
+    @DeleteMapping("/categories/{ignoredCategoryName}/posts/{postId}")
+    public ResponseEntity<Void> deletePost(@PathVariable String ignoredCategoryName, @PathVariable Long postId) {
+        postService.delete(postId);
+        return ResponseEntity.noContent().build();
+    }
+
     private PostCreateResponse getCreateResponse(Post post) {
         return PostCreateResponse.builder()
                 .categoryName(post.getCategory().name())

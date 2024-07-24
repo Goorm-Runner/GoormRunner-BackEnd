@@ -39,6 +39,10 @@ public class PostService {
         return post;
     }
 
+    public void delete(Long postId) {
+        postRepository.deleteById(postId);
+    }
+
     public String getAuthorName(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
