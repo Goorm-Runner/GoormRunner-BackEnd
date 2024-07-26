@@ -47,7 +47,15 @@ echo "발견된 JAR 파일: $JAR_NAME" >> /home/ec2-user/start_server.log
 echo "실행 명령: nohup java -jar /home/ec2-user/build/libs/$JAR_NAME" >> /home/ec2-user/start_server.log
 
 # 애플리케이션 시작
-nohup java -jar /home/ec2-user/build/libs/$JAR_NAME > /home/ec2-user/application.log 2> /home/ec2-user/error.log &
+nohup java -jar /home/ec2-user/build/libs/$JAR_NAME \
+    --DB_URL=$DB_URL \
+    --DB_USERNAME=$DB_USERNAME \
+    --DB_PASSWORD=$DB_PASSWORD \
+    --AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+    --AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+    --AWS_S3_BUCKET_NAME=$AWS_S3_BUCKET_NAME \
+    --JWT_SECRET=$JWT_SECRET \
+    > /home/ec2-user/application.log 2> /home/ec2-user/error.log &
 
 # 새로운 프로세스 ID 캡처
 NEW_PID=$(pgrep -f $JAR_NAME)
