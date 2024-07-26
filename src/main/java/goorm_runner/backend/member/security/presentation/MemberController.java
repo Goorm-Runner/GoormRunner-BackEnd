@@ -1,6 +1,7 @@
-package goorm_runner.backend.domain.member;
+package goorm_runner.backend.member.security.presentation;
 
-import goorm_runner.backend.domain.dto.MemberSignupRequest;
+import goorm_runner.backend.member.security.application.AuthService;
+import goorm_runner.backend.member.security.dto.MemberSignupRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,13 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/members")
 //회원가입 Controller 구성
 public class MemberController {
-    private final MemberService memberService;
+    private final AuthService authService;
 
 
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody @Validated MemberSignupRequest request)
     {
-        memberService.signup(request);
+        authService.signup(request);
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered success");
     }
 

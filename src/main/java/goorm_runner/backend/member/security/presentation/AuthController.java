@@ -1,11 +1,11 @@
-package goorm_runner.backend.domain.auth;
+package goorm_runner.backend.member.security.presentation;
 
-import goorm_runner.backend.domain.config.jwt.JwtTokenProvider;
-import goorm_runner.backend.domain.dto.ApiResponse;
-import goorm_runner.backend.domain.dto.LoginRequest;
-import goorm_runner.backend.domain.dto.LoginResponse;
-import goorm_runner.backend.domain.dto.MemberSignupRequest;
-import goorm_runner.backend.domain.member.MemberService;
+import goorm_runner.backend.member.security.application.AuthService;
+import goorm_runner.backend.member.security.config.jwt.JwtTokenProvider;
+import goorm_runner.backend.member.security.dto.ApiResponse;
+import goorm_runner.backend.member.security.dto.LoginRequest;
+import goorm_runner.backend.member.security.dto.LoginResponse;
+import goorm_runner.backend.member.security.dto.MemberSignupRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,20 +19,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthController {
-    private final MemberService memberService;
+    private final AuthService authService;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
 
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<String>> signup(@Validated @RequestBody MemberSignupRequest request) {
-        memberService.signup(request);
+        authService.signup(request);
         return ResponseEntity.ok(new ApiResponse<>("회원 가입이 완료 되었습니다"));
     }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Validated @RequestBody LoginRequest request) {
-        String token = memberService.login(request);
+        String token = authService.login(request);
         return ResponseEntity.ok(new LoginResponse(token));
     }
 

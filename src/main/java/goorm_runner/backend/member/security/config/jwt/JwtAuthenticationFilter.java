@@ -1,4 +1,4 @@
-package goorm_runner.backend.domain.config.jwt;
+package goorm_runner.backend.member.security.config.jwt;
 
 
 import jakarta.servlet.FilterChain;

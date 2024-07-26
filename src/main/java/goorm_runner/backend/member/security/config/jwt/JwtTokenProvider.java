@@ -1,26 +1,26 @@
-package goorm_runner.backend.domain.config.jwt;
+package goorm_runner.backend.member.security.config.jwt;
 
-import goorm_runner.backend.domain.member.Role;
+import goorm_runner.backend.member.domain.Role;
+import goorm_runner.backend.member.security.application.JpaUserDetailsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
-import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class JwtTokenProvider {
     @Value("${jwt.secret}")
     private String secretKey;
@@ -29,12 +29,15 @@ public class JwtTokenProvider {
     private long tokenValidityInMilliseconds;
 
     private Key key;
+
+    private final JpaUserDetailsService userDetailsService;
+
     @PostConstruct
     protected void init() {
         if (secretKey == null || secretKey.isEmpty()) {
             this.key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         } else {
-            this.key = Keys.hmacShaKeyFor(Base64.getEncoder().encode(secretKey.getBytes()));
+            this.key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secretKey.getBytes()));
         }
 
     }
@@ -50,16 +53,18 @@ public class JwtTokenProvider {
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(validity)
-                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public Authentication getAuthentication(String token) {
-        Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
-        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + claims.get("role")));
+        Claims claims = Jwts.parserBuilder().setSigningKey(secretKey).build()
+                .parseClaimsJws(token).getBody();
 
-        User principal = new User(claims.getSubject(), "", authorities);
-        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+        String username = claims.getSubject();
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+        return new UsernamePasswordAuthenticationToken(userDetails, token, userDetails.getAuthorities());
     }
 
     public String resolveToken(HttpServletRequest req) {
@@ -69,7 +74,8 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(secretKey).build()
+                    .parseClaimsJws(token);
             return true;
         } catch (Exception e) {
             throw new RuntimeException("Invalid JWT token");

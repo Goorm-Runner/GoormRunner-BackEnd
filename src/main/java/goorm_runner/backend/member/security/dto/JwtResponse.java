@@ -1,4 +1,4 @@
-package goorm_runner.backend.domain.dto;
+package goorm_runner.backend.member.security.dto;
 
 import lombok.Data;
 

@@ -1,15 +1,15 @@
-package goorm_runner.backend.domain.dto;
+package goorm_runner.backend.member.security.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-@Setter
+@RequiredArgsConstructor
 public class LoginRequest {
     @NotBlank(message = "Login ID is required")
-    private String loginId;
+    private final String loginId;
     @NotBlank(message = "Password is required")
-    private String password;
+    private final String password;
 
 }

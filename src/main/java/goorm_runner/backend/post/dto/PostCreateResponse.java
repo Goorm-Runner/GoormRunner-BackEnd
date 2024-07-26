@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Builder
+@Getter
 public class PostCreateResponse {
     private final String categoryName;
 
-    @Getter
     private final Long postId;
 
     private final String title;

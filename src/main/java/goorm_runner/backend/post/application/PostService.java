@@ -1,7 +1,7 @@
 package goorm_runner.backend.post.application;
 
-import goorm_runner.backend.domain.member.Member;
-import goorm_runner.backend.domain.member.MemberRepository;
+import goorm_runner.backend.member.application.MemberRepository;
+import goorm_runner.backend.member.domain.Member;
 import goorm_runner.backend.post.domain.Category;
 import goorm_runner.backend.post.domain.Post;
 import goorm_runner.backend.post.domain.PostRepository;

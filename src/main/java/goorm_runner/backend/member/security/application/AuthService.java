@@ -1,8 +1,15 @@
-package goorm_runner.backend.domain.member;
+package goorm_runner.backend.member.security.application;
 
-import goorm_runner.backend.domain.config.jwt.JwtTokenProvider;
-import goorm_runner.backend.domain.dto.LoginRequest;
-import goorm_runner.backend.domain.dto.MemberSignupRequest;
+import goorm_runner.backend.member.application.AuthorityRepository;
+import goorm_runner.backend.member.application.MemberAuthorityRepository;
+import goorm_runner.backend.member.application.MemberRepository;
+import goorm_runner.backend.member.domain.Authority;
+import goorm_runner.backend.member.domain.Member;
+import goorm_runner.backend.member.domain.MemberAuthority;
+import goorm_runner.backend.member.domain.Role;
+import goorm_runner.backend.member.security.config.jwt.JwtTokenProvider;
+import goorm_runner.backend.member.security.dto.LoginRequest;
+import goorm_runner.backend.member.security.dto.MemberSignupRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,13 +21,15 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class MemberService {
+public class AuthService {
     private final MemberRepository memberRepository;
+    private final AuthorityRepository authorityRepository;
+    private final MemberAuthorityRepository memberAuthorityRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public Member signup(MemberSignupRequest request) {
+    public void signup(MemberSignupRequest request) {
         Member member = Member.builder()
                 .loginId(request.getLoginId())
                 .username(request.getUsername())
@@ -30,7 +39,14 @@ public class MemberService {
                 .birth(LocalDate.parse(request.getBirth(), DateTimeFormatter.ISO_DATE))
                 .build();
 
-        return memberRepository.save(member);
+        Authority authority = authorityRepository.findByName("read")
+                .orElseThrow(() -> new IllegalArgumentException("Authority not found"));
+
+        MemberAuthority memberAuthority = new MemberAuthority(member, authority);
+        memberAuthority.authorize(member, authority);
+
+        memberAuthorityRepository.save(memberAuthority);
+        memberRepository.save(member);
     }
 
     @Transactional

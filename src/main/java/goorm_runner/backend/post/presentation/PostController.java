@@ -1,6 +1,7 @@
 package goorm_runner.backend.post.presentation;
 
-import goorm_runner.backend.member.MemberDetails;
+import goorm_runner.backend.member.application.MemberService;
+import goorm_runner.backend.member.security.SecurityMember;
 import goorm_runner.backend.post.application.PostReadService;
 import goorm_runner.backend.post.application.PostService;
 import goorm_runner.backend.post.domain.Post;
@@ -22,14 +23,17 @@ public class PostController {
 
     private final PostService postService;
     private final PostReadService postReadService;
+    private final MemberService memberService;
 
     @PostMapping("/categories/{categoryName}/posts")
     public ResponseEntity<PostCreateResponse> createPost(
-            @AuthenticationPrincipal MemberDetails memberDetails,
+            @AuthenticationPrincipal SecurityMember securityMember,
             @PathVariable String categoryName,
-            PostCreateRequest request) {
+            @RequestBody PostCreateRequest request) {
 
-        Long authorId = memberDetails.getId();
+        String username = securityMember.getUsername();
+        Long authorId = memberService.getMemberIdByUsername(username);
+
         Post post = postService.create(request, authorId, categoryName);
         PostCreateResponse response = getCreateResponse(post);
 

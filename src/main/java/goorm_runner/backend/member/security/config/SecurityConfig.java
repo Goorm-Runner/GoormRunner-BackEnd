@@ -1,7 +1,7 @@
-package goorm_runner.backend.domain.config;
+package goorm_runner.backend.member.security.config;
 
-import goorm_runner.backend.domain.config.jwt.JwtAuthenticationFilter;
-import goorm_runner.backend.domain.config.jwt.JwtTokenProvider;
+import goorm_runner.backend.member.security.config.jwt.JwtAuthenticationFilter;
+import goorm_runner.backend.member.security.config.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,7 +40,4 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-
-
 }

@@ -1,19 +1,19 @@
-package goorm_runner.backend.domain.member;
+package goorm_runner.backend.member.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Entity
 @Getter
-@Setter
-@NoArgsConstructor
-@Table(name="member")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,8 +42,11 @@ public class Member {
 
     private String profilePictureUrl;
 
+    @OneToMany(mappedBy = "member")
+    private Set<MemberAuthority> memberAuthorities = new HashSet<>();
+
     @Builder
-    public Member(String loginId, String username, String password, Role role, String sex, LocalDate birth, Long teamId, String profilePictureUrl) {
+    public Member(String loginId, String username, String password, Role role, String sex, LocalDate birth, Long teamId, String profilePictureUrl, Set<MemberAuthority> memberAuthorities) {
         this.loginId = loginId;
         this.username = username;
         this.password = password;
@@ -52,6 +55,10 @@ public class Member {
         this.birth = birth;
         this.teamId = teamId;
         this.profilePictureUrl = profilePictureUrl;
+    }
+
+    public void addMemberAuthority(MemberAuthority memberAuthority) {
+        memberAuthorities.add(memberAuthority);
     }
 }
 
