@@ -3,10 +3,7 @@ package goorm_runner.backend.member.security.application;
 import goorm_runner.backend.member.application.AuthorityRepository;
 import goorm_runner.backend.member.application.MemberAuthorityRepository;
 import goorm_runner.backend.member.application.MemberRepository;
-import goorm_runner.backend.member.domain.Authority;
-import goorm_runner.backend.member.domain.Member;
-import goorm_runner.backend.member.domain.MemberAuthority;
-import goorm_runner.backend.member.domain.Role;
+import goorm_runner.backend.member.domain.*;
 import goorm_runner.backend.member.security.config.jwt.JwtTokenProvider;
 import goorm_runner.backend.member.security.dto.LoginRequest;
 import goorm_runner.backend.member.security.dto.MemberSignupRequest;
@@ -35,7 +32,7 @@ public class AuthService {
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.valueOf(request.getRole().toUpperCase()))
-                .sex(request.getSex())
+                .sex(Sex.valueOf(request.getSex().toUpperCase()))
                 .birth(LocalDate.parse(request.getBirth(), DateTimeFormatter.ISO_DATE))
                 .build();
 
@@ -60,7 +57,5 @@ public class AuthService {
         }
         throw new RuntimeException("Invalid login credentials");
     }
-
-
 
 }

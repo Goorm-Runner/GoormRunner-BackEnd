@@ -23,7 +23,7 @@ public class MemberSignupRequest {
     private final String role; // USER or ADMIN
 
     @NotBlank(message = "Sex is required")
-    private final String sex; // M or F
+    private final String sex; // male or female
 
     @NotBlank(message = "Birthdate is required")
     private final String birth; // Format: yyyy-MM-dd

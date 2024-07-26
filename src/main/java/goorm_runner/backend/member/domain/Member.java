@@ -31,9 +31,8 @@ public class Member {
     @Enumerated(EnumType.STRING)//역할군 열거형으로 표현
     private Role role;
 
-    @Column(nullable = false,length =1)
-    private String sex;
-
+    @Column(nullable = false, length = 1)
+    private Sex sex;
 
     @Column(nullable = false)
     private LocalDate birth;
@@ -46,7 +45,7 @@ public class Member {
     private Set<MemberAuthority> memberAuthorities = new HashSet<>();
 
     @Builder
-    public Member(String loginId, String username, String password, Role role, String sex, LocalDate birth, Long teamId, String profilePictureUrl, Set<MemberAuthority> memberAuthorities) {
+    public Member(String loginId, String username, String password, Role role, Sex sex, LocalDate birth, Long teamId, String profilePictureUrl, Set<MemberAuthority> memberAuthorities) {
         this.loginId = loginId;
         this.username = username;
         this.password = password;
