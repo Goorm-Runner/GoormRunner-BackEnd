@@ -18,13 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
     private final AuthService authService;
 
-
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody @Validated MemberSignupRequest request)
     {
         authService.signup(request);
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered success");
     }
-
 
 }

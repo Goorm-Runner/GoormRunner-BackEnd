@@ -1,31 +1,20 @@
 package goorm_runner.backend.post.dto;
 
+import lombok.Builder;
 import org.springframework.data.domain.Page;
 
-public class ResponseMetaData {
-
-    private final int number;
-
-    private final int size;
-
-    private final boolean isFirst;
-
-    private final boolean isLast;
-
-    private final boolean hasNext;
-
-    private final boolean hasPrevious;
-
-    private ResponseMetaData(Page<?> page) {
-        number = page.getNumber();
-        size = page.getSize();
-        isFirst = page.isFirst();
-        isLast = page.isLast();
-        hasNext = page.hasNext();
-        hasPrevious = page.hasPrevious();
-    }
+@Builder
+public record ResponseMetaData(int number, int size, boolean isFirst, boolean isLast, boolean hasNext,
+                               boolean hasPrevious) {
 
     public static ResponseMetaData of(Page<?> page) {
-        return new ResponseMetaData(page);
+        return ResponseMetaData.builder()
+                .number(page.getNumber())
+                .size(page.getSize())
+                .isFirst(page.isFirst())
+                .isLast(page.isLast())
+                .hasNext(page.hasNext())
+                .hasPrevious(page.hasPrevious())
+                .build();
     }
 }

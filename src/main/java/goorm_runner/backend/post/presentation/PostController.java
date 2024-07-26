@@ -120,7 +120,7 @@ public class PostController {
         return ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(response.getPostId())
+                .buildAndExpand(response.postId())
                 .toUri();
     }
 }

@@ -21,7 +21,7 @@ public class PostService {
     private final MemberRepository memberRepository;
 
     public Post create(PostCreateRequest request, Long authorId, String categoryName) {
-        validateTitleAndContent(request.getTitle(), request.getContent());
+        validateTitleAndContent(request.title(), request.content());
 
         Category category = toCategory(categoryName);
         Post post = getPost(request, authorId, category);
@@ -30,12 +30,12 @@ public class PostService {
     }
 
     public Post update(PostUpdateRequest request, Long postId) {
-        validateTitleAndContent(request.getTitle(), request.getContent());
+        validateTitleAndContent(request.title(), request.content());
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
 
-        post.update(request.getTitle(), request.getContent());
+        post.update(request.title(), request.content());
         return post;
     }
 
@@ -75,8 +75,8 @@ public class PostService {
     private Post getPost(PostCreateRequest request, Long authorId, Category category) {
         return Post.builder()
                 .authorId(authorId)
-                .title(request.getTitle())
-                .content(request.getContent())
+                .title(request.title())
+                .content(request.content())
                 .likeCount((short) 0)
                 .category(category)
                 .build();
