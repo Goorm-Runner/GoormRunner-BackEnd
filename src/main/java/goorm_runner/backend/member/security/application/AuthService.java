@@ -26,7 +26,7 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public void signup(MemberSignupRequest request) {
+    public Member signup(MemberSignupRequest request) {
         Member member = Member.builder()
                 .loginId(request.getLoginId())
                 .username(request.getUsername())
@@ -43,7 +43,7 @@ public class AuthService {
         memberAuthority.authorize(member, authority);
 
         memberAuthorityRepository.save(memberAuthority);
-        memberRepository.save(member);
+        return memberRepository.save(member);
     }
 
     @Transactional
