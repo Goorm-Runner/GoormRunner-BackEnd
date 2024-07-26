@@ -2,6 +2,9 @@
 
 echo "Start server 스크립트 시작" > /home/ec2-user/start_server.log
 
+# 환경 변수 로드
+source /etc/environment
+
 # 홈 디렉토리로 이동
 cd /home/ec2-user
 
