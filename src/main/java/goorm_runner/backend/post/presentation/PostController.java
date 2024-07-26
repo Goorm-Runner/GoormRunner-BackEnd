@@ -34,7 +34,7 @@ public class PostController {
         String username = securityMember.getUsername();
         Long authorId = memberService.getMemberIdByUsername(username);
 
-        Post post = postService.create(request, authorId, categoryName);
+        Post post = postService.create(request, authorId, categoryName.toUpperCase());
         PostCreateResponse response = getCreateResponse(post);
 
         URI location = newUri(response);
@@ -47,7 +47,7 @@ public class PostController {
     public ResponseEntity<PostReadResponse> readPost(@PathVariable String categoryName, @PathVariable Long postId) {
 
         Post post = postReadService.readPost(postId);
-        PostReadResponse response = getReadResponse(categoryName, postId, post);
+        PostReadResponse response = getReadResponse(categoryName.toUpperCase(), postId, post);
 
         return ResponseEntity.ok(response);
     }
@@ -55,7 +55,7 @@ public class PostController {
     @GetMapping("/categories/{categoryName}/posts")
     public ResponseEntity<PostReadPageResponse> readPage(@PathVariable String categoryName, @RequestParam int pageNumber, @RequestParam int pageSize) {
 
-        Page<Post> posts = postReadService.readPage(categoryName, PageRequest.of(pageNumber, pageSize));
+        Page<Post> posts = postReadService.readPage(categoryName.toUpperCase(), PageRequest.of(pageNumber, pageSize));
 
         List<PostOverview> overviews = posts.stream()
                 .map(post -> PostOverview.from(post, postService.getAuthorName(post.getId())))
@@ -72,7 +72,7 @@ public class PostController {
             @PathVariable String categoryName, @PathVariable Long postId, @RequestBody PostUpdateRequest request) {
 
         Post post = postService.update(request, postId);
-        PostUpdateResponse response = getUpdateResponse(categoryName, postId, post);
+        PostUpdateResponse response = getUpdateResponse(categoryName.toUpperCase(), postId, post);
 
         return ResponseEntity.ok(response);
     }

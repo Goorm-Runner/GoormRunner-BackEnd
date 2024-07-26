@@ -47,8 +47,8 @@ class PostControllerTest {
         authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        //then
-        mockMvc.perform(post("/categories/GENERAL/posts")
+        //when-then
+        mockMvc.perform(post("/categories/general/posts")
                         .header("Authorization", "Bearer " + token)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
