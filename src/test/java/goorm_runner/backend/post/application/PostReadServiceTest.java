@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static goorm_runner.backend.post.application.exception.ErrorCode.INVALID_CATEGORY;
-import static goorm_runner.backend.post.application.exception.ErrorCode.POST_NOT_FOUND;
+import static goorm_runner.backend.global.ErrorCode.INVALID_CATEGORY;
+import static goorm_runner.backend.global.ErrorCode.POST_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;

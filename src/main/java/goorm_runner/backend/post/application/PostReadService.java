@@ -1,6 +1,6 @@
 package goorm_runner.backend.post.application;
 
-import goorm_runner.backend.post.application.exception.ErrorCode;
+import goorm_runner.backend.global.ErrorCode;
 import goorm_runner.backend.post.application.exception.PostException;
 import goorm_runner.backend.post.domain.Category;
 import goorm_runner.backend.post.domain.Post;

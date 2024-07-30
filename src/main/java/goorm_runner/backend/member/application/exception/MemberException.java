@@ -1,12 +1,12 @@
-package goorm_runner.backend.post.application.exception;
+package goorm_runner.backend.member.application.exception;
 
 import goorm_runner.backend.global.ErrorCode;
 
-public class PostException extends IllegalArgumentException {
+public class MemberException extends IllegalArgumentException {
 
     private final ErrorCode errorCode;
 
-    public PostException(ErrorCode errorCode) {
+    public MemberException(ErrorCode errorCode) {
         this.errorCode = errorCode;
     }
 

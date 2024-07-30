@@ -1,6 +1,8 @@
 package goorm_runner.backend.member.security.application;
 
+import goorm_runner.backend.global.ErrorCode;
 import goorm_runner.backend.member.application.MemberRepository;
+import goorm_runner.backend.member.application.exception.MemberException;
 import goorm_runner.backend.member.security.SecurityMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,6 +22,6 @@ public class JpaUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return memberRepository.findByUsername(username)
                 .map(SecurityMember::new)
-                .orElseThrow(() -> new UsernameNotFoundException("username not found" + username));
+                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
     }
 }

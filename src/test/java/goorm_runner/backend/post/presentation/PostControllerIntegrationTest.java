@@ -1,6 +1,7 @@
 package goorm_runner.backend.post.presentation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import goorm_runner.backend.global.ErrorCode;
 import goorm_runner.backend.member.application.AuthorityRepository;
 import goorm_runner.backend.member.domain.Authority;
 import goorm_runner.backend.member.domain.Member;
@@ -8,7 +9,6 @@ import goorm_runner.backend.member.security.application.AuthService;
 import goorm_runner.backend.member.security.dto.LoginRequest;
 import goorm_runner.backend.member.security.dto.MemberSignupRequest;
 import goorm_runner.backend.post.application.PostService;
-import goorm_runner.backend.post.application.exception.ErrorCode;
 import goorm_runner.backend.post.domain.Post;
 import goorm_runner.backend.post.dto.PostCreateRequest;
 import goorm_runner.backend.post.dto.PostUpdateRequest;
@@ -213,7 +213,7 @@ class PostControllerIntegrationTest {
     }
 
     @Test
-    void updatePageTest() throws Exception {
+    void update_success() throws Exception {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
