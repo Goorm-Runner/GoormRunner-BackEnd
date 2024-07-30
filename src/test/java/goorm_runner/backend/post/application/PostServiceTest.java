@@ -1,5 +1,6 @@
 package goorm_runner.backend.post.application;
 
+import goorm_runner.backend.post.application.exception.PostException;
 import goorm_runner.backend.post.domain.Post;
 import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.dto.PostCreateRequest;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import static goorm_runner.backend.post.application.exception.ErrorCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -64,7 +66,7 @@ class PostServiceTest {
         //when-then
         assertThatThrownBy(() -> postService.create(request, authorId, categoryName))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("제목을 입력해주세요.");
+                .hasMessage(EMPTY_TITLE.getMessage());
     }
 
     @Test
@@ -80,8 +82,8 @@ class PostServiceTest {
 
         //when-then
         assertThatThrownBy(() -> postService.create(request, authorId, categoryName))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("본문 내용을 입력해주세요.");
+                .isInstanceOf(PostException.class)
+                .hasMessage(EMPTY_CONTENT.getMessage());
     }
 
     @Test
@@ -97,8 +99,8 @@ class PostServiceTest {
 
         //when
         assertThatThrownBy(() -> postService.create(request, authorId, categoryName))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("유효하지 않은 카테고리: " + categoryName);
+                .isInstanceOf(PostException.class)
+                .hasMessage(INVALID_CATEGORY.getMessage());
     }
 
     @Test

@@ -2,6 +2,8 @@ package goorm_runner.backend.post.application;
 
 import goorm_runner.backend.member.application.MemberRepository;
 import goorm_runner.backend.member.domain.Member;
+import goorm_runner.backend.post.application.exception.ErrorCode;
+import goorm_runner.backend.post.application.exception.PostException;
 import goorm_runner.backend.post.domain.Category;
 import goorm_runner.backend.post.domain.Post;
 import goorm_runner.backend.post.domain.PostRepository;
@@ -33,7 +35,7 @@ public class PostService {
         validateTitleAndContent(request.title(), request.content());
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+                .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
 
         post.update(request.title(), request.content());
         return post;
@@ -45,7 +47,7 @@ public class PostService {
 
     public String getAuthorName(Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+                .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
 
         Long authorId = post.getAuthorId();
         Member author = memberRepository.findById(authorId)
@@ -56,11 +58,11 @@ public class PostService {
 
     private void validateTitleAndContent(String title, String content) {
         if (!StringUtils.hasText(title)) {
-            throw new IllegalArgumentException("제목을 입력해주세요.");
+            throw new PostException(ErrorCode.EMPTY_TITLE);
         }
 
         if (!StringUtils.hasText(content)) {
-            throw new IllegalArgumentException("본문 내용을 입력해주세요.");
+            throw new PostException(ErrorCode.EMPTY_CONTENT);
         }
     }
 
@@ -68,7 +70,7 @@ public class PostService {
         try {
             return Category.valueOf(category);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("유효하지 않은 카테고리: " + category);
+            throw new PostException(ErrorCode.INVALID_CATEGORY);
         }
     }
 
