@@ -1,7 +1,6 @@
 package goorm_runner.backend.post.presentation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import goorm_runner.backend.global.ErrorCode;
 import goorm_runner.backend.member.application.AuthorityRepository;
 import goorm_runner.backend.member.domain.Authority;
 import goorm_runner.backend.member.domain.Member;
@@ -9,6 +8,7 @@ import goorm_runner.backend.member.security.application.AuthService;
 import goorm_runner.backend.member.security.dto.LoginRequest;
 import goorm_runner.backend.member.security.dto.MemberSignupRequest;
 import goorm_runner.backend.post.application.PostService;
+import goorm_runner.backend.post.domain.Category;
 import goorm_runner.backend.post.domain.Post;
 import goorm_runner.backend.post.dto.PostCreateRequest;
 import goorm_runner.backend.post.dto.PostUpdateRequest;
@@ -20,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import static goorm_runner.backend.global.ErrorCode.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -95,8 +96,8 @@ class PostControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.title").value(ErrorCode.EMPTY_TITLE.name()))
-                .andExpect(jsonPath("$.message").value(ErrorCode.EMPTY_TITLE.getMessage()));
+                .andExpect(jsonPath("$.title").value(EMPTY_TITLE.name()))
+                .andExpect(jsonPath("$.message").value(EMPTY_TITLE.getMessage()));
     }
 
     @Test
@@ -121,8 +122,8 @@ class PostControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.title").value(ErrorCode.EMPTY_CONTENT.name()))
-                .andExpect(jsonPath("$.message").value(ErrorCode.EMPTY_CONTENT.getMessage()));
+                .andExpect(jsonPath("$.title").value(EMPTY_CONTENT.name()))
+                .andExpect(jsonPath("$.message").value(EMPTY_CONTENT.getMessage()));
     }
 
     @Test
@@ -147,12 +148,12 @@ class PostControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.title").value(ErrorCode.INVALID_CATEGORY.name()))
-                .andExpect(jsonPath("$.message").value(ErrorCode.INVALID_CATEGORY.getMessage()));
+                .andExpect(jsonPath("$.title").value(INVALID_CATEGORY.name()))
+                .andExpect(jsonPath("$.message").value(INVALID_CATEGORY.getMessage()));
     }
 
     @Test
-    void readTest() throws Exception {
+    void read_success() throws Exception {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
@@ -161,7 +162,7 @@ class PostControllerIntegrationTest {
         String loginId = "test";
         String password = "password";
 
-        String categoryName = "general";
+        String categoryName = Category.GENERAL.name();
 
         //when
         authorityRepository.save(new Authority(1L, "read"));
@@ -185,7 +186,7 @@ class PostControllerIntegrationTest {
     }
 
     @Test
-    void readPageTest() throws Exception {
+    void read_failure() throws Exception {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
@@ -194,7 +195,7 @@ class PostControllerIntegrationTest {
         String loginId = "test";
         String password = "password";
 
-        String categoryName = "general";
+        String categoryName = Category.GENERAL.name();
 
         //when
         authorityRepository.save(new Authority(1L, "read"));
@@ -202,6 +203,34 @@ class PostControllerIntegrationTest {
         String token = authService.login(new LoginRequest(loginId, password));
 
         Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+
+        //then
+        mockMvc.perform(get("/categories/general/posts/" + post.getId() + 1)
+                        .header("Authorization", "Bearer " + token)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value(POST_NOT_FOUND.name()))
+                .andExpect(jsonPath("$.message").value(POST_NOT_FOUND.getMessage()));
+    }
+
+    @Test
+    void readPage_success() throws Exception {
+        //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest createRequest = new PostCreateRequest(title, content);
+
+        String loginId = "test";
+        String password = "password";
+
+        String categoryName = Category.GENERAL.name();
+
+        //when
+        authorityRepository.save(new Authority(1L, "read"));
+        Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        String token = authService.login(new LoginRequest(loginId, password));
+
+        postService.create(createRequest, member.getId(), categoryName.toUpperCase());
 
         //then
         mockMvc.perform(get("/categories/general/posts?pageNumber=0&pageSize=10")
@@ -213,6 +242,34 @@ class PostControllerIntegrationTest {
     }
 
     @Test
+    void readPage_with_wrong_categoryName_failure() throws Exception {
+        //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest createRequest = new PostCreateRequest(title, content);
+
+        String loginId = "test";
+        String password = "password";
+
+        String categoryName = Category.GENERAL.name();
+
+        //when
+        authorityRepository.save(new Authority(1L, "read"));
+        Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        String token = authService.login(new LoginRequest(loginId, password));
+
+        postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+
+        //then
+        mockMvc.perform(get("/categories/generall/posts?pageNumber=0&pageSize=10") // wrong categoryName: generall
+                        .header("Authorization", "Bearer " + token)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value(INVALID_CATEGORY.name()))
+                .andExpect(jsonPath("$.message").value(INVALID_CATEGORY.getMessage()));
+    }
+
+    @Test
     void update_success() throws Exception {
         //given
         String title = "Example title";
@@ -221,7 +278,7 @@ class PostControllerIntegrationTest {
 
         String loginId = "test";
         String password = "password";
-        String categoryName = "general";
+        String categoryName = Category.GENERAL.name();
 
         authorityRepository.save(new Authority(1L, "read"));
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
@@ -247,6 +304,105 @@ class PostControllerIntegrationTest {
                 .andExpect(jsonPath("$.content").value(updatedContent))
                 .andExpect(jsonPath("$.createdAt").isNotEmpty())
                 .andExpect(jsonPath("$.updatedAt").isNotEmpty());
+    }
+
+    @Test
+    void update_success_with_invalid_postId_failure() throws Exception {
+        //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest createRequest = new PostCreateRequest(title, content);
+
+        String loginId = "test";
+        String password = "password";
+        String categoryName = Category.GENERAL.name();
+
+        authorityRepository.save(new Authority(1L, "read"));
+        Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        String token = authService.login(new LoginRequest(loginId, password));
+
+        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+
+        //when
+        String updatedTitle = "Updated title";
+        String updatedContent = "<h1>Example</h1> updated.";
+        PostUpdateRequest request = new PostUpdateRequest(updatedTitle, updatedContent);
+
+        //then
+        mockMvc.perform(put("/categories/general/posts/" + post.getId() + 1)
+                        .header("Authorization", "Bearer " + token)
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value(POST_NOT_FOUND.name()))
+                .andExpect(jsonPath("$.message").value(POST_NOT_FOUND.getMessage()));
+    }
+
+    @Test
+    void update_success_with_empty_title_failure() throws Exception {
+        //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest createRequest = new PostCreateRequest(title, content);
+
+        String loginId = "test";
+        String password = "password";
+        String categoryName = Category.GENERAL.name();
+
+        authorityRepository.save(new Authority(1L, "read"));
+        Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        String token = authService.login(new LoginRequest(loginId, password));
+
+        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+
+        //when
+        String emptyTitle = "";
+        String updatedContent = "<h1>Example</h1> updated.";
+        PostUpdateRequest request = new PostUpdateRequest(emptyTitle, updatedContent);
+
+        //then
+        mockMvc.perform(put("/categories/general/posts/" + post.getId())
+                        .header("Authorization", "Bearer " + token)
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value(EMPTY_TITLE.name()))
+                .andExpect(jsonPath("$.message").value(EMPTY_TITLE.getMessage()));
+    }
+
+    @Test
+    void update_success_with_empty_content_failure() throws Exception {
+        //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest createRequest = new PostCreateRequest(title, content);
+
+        String loginId = "test";
+        String password = "password";
+        String categoryName = Category.GENERAL.name();
+
+        authorityRepository.save(new Authority(1L, "read"));
+        Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        String token = authService.login(new LoginRequest(loginId, password));
+
+        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+
+        //when
+        String updatedTitle = "Updated title";
+        String emptyContent = "";
+        PostUpdateRequest request = new PostUpdateRequest(updatedTitle, emptyContent);
+
+        //then
+        mockMvc.perform(put("/categories/general/posts/" + post.getId())
+                        .header("Authorization", "Bearer " + token)
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value(EMPTY_CONTENT.name()))
+                .andExpect(jsonPath("$.message").value(EMPTY_CONTENT.getMessage()));
     }
 
     @Test

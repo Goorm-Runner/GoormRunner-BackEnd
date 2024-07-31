@@ -97,7 +97,7 @@ class PostServiceTest {
 
         String categoryName = "INVALID";
 
-        //when
+        //when-then
         assertThatThrownBy(() -> postService.create(request, authorId, categoryName))
                 .isInstanceOf(PostException.class)
                 .hasMessage(INVALID_CATEGORY.getMessage());
@@ -130,5 +130,77 @@ class PostServiceTest {
                 () -> assertThat(updated.getContent()).isEqualTo(updatedContent),
                 () -> assertThat(updated.getUpdatedAt()).isAfter(updated.getCreatedAt())
         );
+    }
+
+    @Test
+    void update_with_invalid_postId_failure() {
+        //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest createRequest = new PostCreateRequest(title, content);
+
+        Long authorId = 1L;
+
+        String categoryName = "GENERAL";
+
+        Post post = postService.create(createRequest, authorId, categoryName);
+
+        //when
+        String updatedTitle = "UpdatedTitle";
+        String updatedContent = "UpdatedContent";
+        PostUpdateRequest updateRequest = new PostUpdateRequest(updatedTitle, updatedContent);
+
+        //then
+        assertThatThrownBy(() -> postService.update(updateRequest, post.getId() + 1))
+                .isInstanceOf(PostException.class)
+                .hasMessage(POST_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void update_with_empty_title_failure() {
+        //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest createRequest = new PostCreateRequest(title, content);
+
+        Long authorId = 1L;
+
+        String categoryName = "GENERAL";
+
+        Post post = postService.create(createRequest, authorId, categoryName);
+
+        //when
+        String emptyTitle = "";
+        String updatedContent = "UpdatedContent";
+        PostUpdateRequest updateRequest = new PostUpdateRequest(emptyTitle, updatedContent);
+
+        //then
+        assertThatThrownBy(() -> postService.update(updateRequest, post.getId()))
+                .isInstanceOf(PostException.class)
+                .hasMessage(EMPTY_TITLE.getMessage());
+    }
+
+    @Test
+    void update_with_empty_content_failure() {
+        //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest createRequest = new PostCreateRequest(title, content);
+
+        Long authorId = 1L;
+
+        String categoryName = "GENERAL";
+
+        Post post = postService.create(createRequest, authorId, categoryName);
+
+        //when
+        String emptyTitle = "UpdatedTitle";
+        String updatedContent = "";
+        PostUpdateRequest updateRequest = new PostUpdateRequest(emptyTitle, updatedContent);
+
+        //then
+        assertThatThrownBy(() -> postService.update(updateRequest, post.getId()))
+                .isInstanceOf(PostException.class)
+                .hasMessage(EMPTY_CONTENT.getMessage());
     }
 }

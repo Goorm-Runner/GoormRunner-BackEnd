@@ -1,6 +1,7 @@
 package goorm_runner.backend.post.application;
 
 import goorm_runner.backend.post.application.exception.PostException;
+import goorm_runner.backend.post.domain.Category;
 import goorm_runner.backend.post.domain.Post;
 import goorm_runner.backend.post.dto.PostCreateRequest;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,7 @@ class PostReadServiceTest {
 
         Long authorId = 1L;
 
-        String categoryName = "GENERAL";
+        String categoryName = Category.GENERAL.name();
 
         Post post = postService.create(createRequest, authorId, categoryName);
 
@@ -56,7 +57,7 @@ class PostReadServiceTest {
 
         Long authorId = 1L;
 
-        String categoryName = "GENERAL";
+        String categoryName = Category.GENERAL.name();
 
         Post post = postService.create(createRequest, authorId, categoryName);
 
@@ -78,7 +79,7 @@ class PostReadServiceTest {
 
         Long authorId = 1L;
 
-        String categoryName = "GENERAL";
+        String categoryName = Category.GENERAL.name();
 
         Post post = postService.create(createRequest, authorId, categoryName);
 
@@ -107,7 +108,7 @@ class PostReadServiceTest {
 
         Long authorId = 1L;
 
-        String categoryName = "GENERAL";
+        String categoryName = Category.GENERAL.name();
 
         Post post = postService.create(createRequest, authorId, categoryName);
 

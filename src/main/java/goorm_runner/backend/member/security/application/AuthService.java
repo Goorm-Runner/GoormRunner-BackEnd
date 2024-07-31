@@ -1,9 +1,11 @@
 package goorm_runner.backend.member.security.application;
 
+import goorm_runner.backend.global.ErrorCode;
 import goorm_runner.backend.member.application.AuthorityRepository;
 import goorm_runner.backend.member.application.MemberAuthorityRepository;
 import goorm_runner.backend.member.application.MemberRepository;
 import goorm_runner.backend.member.domain.*;
+import goorm_runner.backend.member.security.application.exception.AuthException;
 import goorm_runner.backend.member.security.config.jwt.JwtTokenProvider;
 import goorm_runner.backend.member.security.dto.LoginRequest;
 import goorm_runner.backend.member.security.dto.MemberSignupRequest;
@@ -37,7 +39,7 @@ public class AuthService {
                 .build();
 
         Authority authority = authorityRepository.findByName("read")
-                .orElseThrow(() -> new IllegalArgumentException("Authority not found"));
+                .orElseThrow(() -> new AuthException(ErrorCode.REQUIRED_AUTHORITY_NOT_FOUND));
 
         MemberAuthority memberAuthority = new MemberAuthority(member, authority);
         memberAuthority.authorize(member, authority);
@@ -55,7 +57,7 @@ public class AuthService {
                 return jwtTokenProvider.createToken(member.getLoginId(), member.getRole());
             }
         }
-        throw new RuntimeException("Invalid login credentials");
+        throw new AuthException(ErrorCode.INVALID_LOGIN_CREDENTIALS);
     }
 
 }

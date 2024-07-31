@@ -1,7 +1,7 @@
 package goorm_runner.backend.post.application;
 
-import goorm_runner.backend.global.ErrorCode;
 import goorm_runner.backend.member.application.MemberRepository;
+import goorm_runner.backend.member.application.exception.MemberException;
 import goorm_runner.backend.member.domain.Member;
 import goorm_runner.backend.post.application.exception.PostException;
 import goorm_runner.backend.post.domain.Category;
@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import static goorm_runner.backend.global.ErrorCode.*;
 
 @RequiredArgsConstructor
 @Service
@@ -35,7 +37,7 @@ public class PostService {
         validateTitleAndContent(request.title(), request.content());
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
+                .orElseThrow(() -> new PostException(POST_NOT_FOUND));
 
         post.update(request.title(), request.content());
         return post;
@@ -47,22 +49,22 @@ public class PostService {
 
     public String getAuthorName(Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
+                .orElseThrow(() -> new PostException(POST_NOT_FOUND));
 
         Long authorId = post.getAuthorId();
         Member author = memberRepository.findById(authorId)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
 
         return author.getUsername();
     }
 
     private void validateTitleAndContent(String title, String content) {
         if (!StringUtils.hasText(title)) {
-            throw new PostException(ErrorCode.EMPTY_TITLE);
+            throw new PostException(EMPTY_TITLE);
         }
 
         if (!StringUtils.hasText(content)) {
-            throw new PostException(ErrorCode.EMPTY_CONTENT);
+            throw new PostException(EMPTY_CONTENT);
         }
     }
 
@@ -70,7 +72,7 @@ public class PostService {
         try {
             return Category.valueOf(category);
         } catch (IllegalArgumentException e) {
-            throw new PostException(ErrorCode.INVALID_CATEGORY);
+            throw new PostException(INVALID_CATEGORY);
         }
     }
 

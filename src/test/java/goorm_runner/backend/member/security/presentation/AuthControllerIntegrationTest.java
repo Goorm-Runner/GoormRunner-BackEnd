@@ -91,4 +91,21 @@ class AuthControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").isNotEmpty());
     }
+
+    @Test
+    void login_without_signup_failure() throws Exception {
+        //given
+        String id = "id";
+        String password = "password";
+
+        //when
+        LoginRequest loginRequest = new LoginRequest(id, password);
+
+        //then
+        mockMvc.perform(post("/api/auth/login")
+                        .content(objectMapper.writeValueAsString(loginRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest());
+    }
 }
