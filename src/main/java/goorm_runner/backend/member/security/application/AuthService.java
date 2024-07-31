@@ -30,12 +30,12 @@ public class AuthService {
     @Transactional
     public Member signup(MemberSignupRequest request) {
         Member member = Member.builder()
-                .loginId(request.getLoginId())
-                .nickname(request.getNickname())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.valueOf(request.getRole().toUpperCase()))
-                .sex(Sex.valueOf(request.getSex().toUpperCase()))
-                .birth(LocalDate.parse(request.getBirth(), DateTimeFormatter.ISO_DATE))
+                .loginId(request.loginId())
+                .nickname(request.nickname())
+                .password(passwordEncoder.encode(request.password()))
+                .role(Role.valueOf(request.role().toUpperCase()))
+                .sex(Sex.valueOf(request.sex().toUpperCase()))
+                .birth(LocalDate.parse(request.birth(), DateTimeFormatter.ISO_DATE))
                 .build();
 
         Authority authority = authorityRepository.findByName("read")
@@ -50,10 +50,10 @@ public class AuthService {
 
     @Transactional
     public String login(LoginRequest request) {
-        Optional<Member> optionalMember = memberRepository.findByLoginId(request.getLoginId());
+        Optional<Member> optionalMember = memberRepository.findByLoginId(request.loginId());
         if (optionalMember.isPresent()) {
             Member member = optionalMember.get();
-            if (passwordEncoder.matches(request.getPassword(), member.getPassword())) {
+            if (passwordEncoder.matches(request.password(), member.getPassword())) {
                 return jwtTokenProvider.createToken(member.getLoginId(), member.getRole());
             }
         }
