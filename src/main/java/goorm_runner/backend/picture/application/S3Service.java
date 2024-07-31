@@ -10,8 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Slf4j
@@ -23,15 +25,22 @@ public class S3Service {
 
     public String uploadFile(MultipartFile file, Long memberId) throws IOException {
         try {
-            String fileExtension = getFileExtension(file.getOriginalFilename());
+            String fileExtension = getFileExtension(Objects.requireNonNull(file.getOriginalFilename()));
             if (!isValidFileExtension(fileExtension)) {
                 throw new IllegalArgumentException("Invalid file extension");
             }
             String fileName = "member/" + memberId + "-" + UUID.randomUUID() + "." + fileExtension;
+            log.debug("Uploading file {}", fileName);
             ObjectMetadata objectMetadata = new ObjectMetadata();
             objectMetadata.setContentLength(file.getSize());
+            objectMetadata.setContentType(file.getContentType());
             amazonS3.putObject(bucketName, fileName, file.getInputStream(), objectMetadata);
-            return amazonS3.getUrl(bucketName, fileName).toString();
+            URL fileUrl = amazonS3.getUrl(bucketName, fileName);
+            log.debug("Generated file URL: {}", fileUrl);
+            if (fileUrl == null) {
+                throw new IllegalStateException("The file URL is null");
+            }
+            return fileUrl.toString();
         } catch (AmazonServiceException e) {
             log.error("AmazonServiceException: {}", e.getErrorMessage());
             throw e;
