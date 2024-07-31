@@ -3,6 +3,7 @@ package goorm_runner.backend.member.security.presentation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import goorm_runner.backend.member.application.AuthorityRepository;
 import goorm_runner.backend.member.domain.Authority;
+import goorm_runner.backend.member.domain.AuthorityType;
 import goorm_runner.backend.member.security.application.AuthService;
 import goorm_runner.backend.member.security.dto.LoginRequest;
 import goorm_runner.backend.member.security.dto.MemberSignupRequest;
@@ -39,7 +40,7 @@ class AuthControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        authorityRepository.save(new Authority(1L, "read"));
+        authorityRepository.save(new Authority(1L, AuthorityType.ROLE_USER));
     }
 
     @AfterEach

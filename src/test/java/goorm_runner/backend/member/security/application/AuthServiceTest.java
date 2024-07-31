@@ -1,10 +1,7 @@
 package goorm_runner.backend.member.security.application;
 
 import goorm_runner.backend.member.application.AuthorityRepository;
-import goorm_runner.backend.member.domain.Authority;
-import goorm_runner.backend.member.domain.Member;
-import goorm_runner.backend.member.domain.Role;
-import goorm_runner.backend.member.domain.Sex;
+import goorm_runner.backend.member.domain.*;
 import goorm_runner.backend.member.security.dto.LoginRequest;
 import goorm_runner.backend.member.security.dto.MemberSignupRequest;
 import org.junit.jupiter.api.AfterEach;
@@ -30,7 +27,7 @@ class AuthServiceTest {
 
     @BeforeEach
     void setUp() {
-        authorityRepository.save(new Authority(1L, "read"));
+        authorityRepository.save(new Authority(1L, AuthorityType.ROLE_USER));
     }
 
     @AfterEach

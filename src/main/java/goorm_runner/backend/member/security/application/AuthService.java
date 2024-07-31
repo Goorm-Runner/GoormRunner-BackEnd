@@ -38,7 +38,7 @@ public class AuthService {
                 .birth(LocalDate.parse(request.birth(), DateTimeFormatter.ISO_DATE))
                 .build();
 
-        Authority authority = authorityRepository.findByName("read")
+        Authority authority = authorityRepository.findByType(AuthorityType.ROLE_USER)
                 .orElseThrow(() -> new AuthException(ErrorCode.REQUIRED_AUTHORITY_NOT_FOUND));
 
         MemberAuthority memberAuthority = new MemberAuthority(member, authority);

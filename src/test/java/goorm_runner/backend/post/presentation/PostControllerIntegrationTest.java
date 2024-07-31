@@ -3,6 +3,7 @@ package goorm_runner.backend.post.presentation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import goorm_runner.backend.member.application.AuthorityRepository;
 import goorm_runner.backend.member.domain.Authority;
+import goorm_runner.backend.member.domain.AuthorityType;
 import goorm_runner.backend.member.domain.Member;
 import goorm_runner.backend.member.security.application.AuthService;
 import goorm_runner.backend.member.security.dto.LoginRequest;
@@ -12,6 +13,7 @@ import goorm_runner.backend.post.domain.Category;
 import goorm_runner.backend.post.domain.Post;
 import goorm_runner.backend.post.dto.PostCreateRequest;
 import goorm_runner.backend.post.dto.PostUpdateRequest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -45,6 +47,10 @@ class PostControllerIntegrationTest {
     @Autowired
     private AuthorityRepository authorityRepository;
 
+    @BeforeEach
+    void setUp() {
+        authorityRepository.save(new Authority(1L, AuthorityType.ROLE_USER));
+    }
     @Test
     void create_success() throws Exception {
         //given
@@ -56,7 +62,6 @@ class PostControllerIntegrationTest {
         String password = "password";
 
         //when
-        authorityRepository.save(new Authority(1L, "read"));
         authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
@@ -85,7 +90,6 @@ class PostControllerIntegrationTest {
         String password = "password";
 
         //when
-        authorityRepository.save(new Authority(1L, "read"));
         authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
@@ -111,7 +115,6 @@ class PostControllerIntegrationTest {
         String password = "password";
 
         //when
-        authorityRepository.save(new Authority(1L, "read"));
         authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
@@ -137,7 +140,6 @@ class PostControllerIntegrationTest {
         String password = "password";
 
         //when
-        authorityRepository.save(new Authority(1L, "read"));
         authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
@@ -165,7 +167,6 @@ class PostControllerIntegrationTest {
         String categoryName = Category.GENERAL.name();
 
         //when
-        authorityRepository.save(new Authority(1L, "read"));
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
@@ -198,7 +199,6 @@ class PostControllerIntegrationTest {
         String categoryName = Category.GENERAL.name();
 
         //when
-        authorityRepository.save(new Authority(1L, "read"));
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
@@ -226,7 +226,6 @@ class PostControllerIntegrationTest {
         String categoryName = Category.GENERAL.name();
 
         //when
-        authorityRepository.save(new Authority(1L, "read"));
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
@@ -254,7 +253,6 @@ class PostControllerIntegrationTest {
         String categoryName = Category.GENERAL.name();
 
         //when
-        authorityRepository.save(new Authority(1L, "read"));
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
@@ -280,7 +278,6 @@ class PostControllerIntegrationTest {
         String password = "password";
         String categoryName = Category.GENERAL.name();
 
-        authorityRepository.save(new Authority(1L, "read"));
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
@@ -317,7 +314,6 @@ class PostControllerIntegrationTest {
         String password = "password";
         String categoryName = Category.GENERAL.name();
 
-        authorityRepository.save(new Authority(1L, "read"));
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
@@ -350,7 +346,6 @@ class PostControllerIntegrationTest {
         String password = "password";
         String categoryName = Category.GENERAL.name();
 
-        authorityRepository.save(new Authority(1L, "read"));
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
@@ -383,7 +378,6 @@ class PostControllerIntegrationTest {
         String password = "password";
         String categoryName = Category.GENERAL.name();
 
-        authorityRepository.save(new Authority(1L, "read"));
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
@@ -418,7 +412,6 @@ class PostControllerIntegrationTest {
         String categoryName = "general";
 
         //when
-        authorityRepository.save(new Authority(1L, "read"));
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
