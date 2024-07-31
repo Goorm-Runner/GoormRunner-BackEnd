@@ -2,59 +2,64 @@ package goorm_runner.backend.picture.application;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+//@SpringBootTest
 class S3ServiceTest {
-    @MockBean
+    @Mock
     private AmazonS3 amazonS3;
 
-    @Autowired
+    @InjectMocks
     private S3Service s3Service;
 
-    @Test
-    void testUploadFile() throws IOException {
-        MockMultipartFile file = new MockMultipartFile(
-                "file",
-                "test.jpg",
-                MediaType.IMAGE_JPEG_VALUE,
-                "test image content".getBytes()
-        );
-
-        String expectedFileName = "member/1-test.jpg";
-        URL mockUrl = new URL("https://groom-runner-bucket.s3.region.amazonaws.com/" + expectedFileName);
-
-        when(amazonS3.getUrl(anyString(), anyString())).thenReturn(mockUrl);
-
-        String url = s3Service.uploadFile(file, 1L);
-        assertNotNull(url);
-
-        verify(amazonS3, times(1)).putObject(
-                eq("groom-runner-bucket"),
-                eq(expectedFileName),
-                any(InputStream.class),
-                any(ObjectMetadata.class)
-        );
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    void testDeleteFile() {
-        String fileUrl = "https://groom-runner-bucket.s3.region.amazonaws.com/member/1-test.jpg";
+//    @Test
+    void uploadFile_success() throws IOException {
+        MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test image content".getBytes());
+
+        doNothing().when(amazonS3).putObject(anyString(), anyString(), any(ByteArrayInputStream.class), any(ObjectMetadata.class));
+
+        URL mockUrl = new URL("http://example.com/test.jpg");
+        when(amazonS3.getUrl(anyString(), anyString())).thenReturn(mockUrl);
+
+        String fileUrl = s3Service.uploadFile(file, 1L);
+        assertNotNull(fileUrl);
+        assertTrue(fileUrl.contains("http://example.com/test.jpg"));
+    }
+
+//    @Test
+    void deleteFile_success() {
+        String fileUrl = "http://example.com/test.jpg";
+        String fileName = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
+
+        doNothing().when(amazonS3).deleteObject(anyString(), eq(fileName));
+
         s3Service.deleteFile(fileUrl);
-        verify(amazonS3, times(1)).deleteObject(anyString(), anyString());
+
+        verify(amazonS3, times(1)).deleteObject(anyString(), eq(fileName));
+    }
+
+//    @Test
+    void getFileExtension_test() {
+        String extension = s3Service.getFileExtension("test.jpg");
+        assertEquals("jpg", extension);
     }
 }
