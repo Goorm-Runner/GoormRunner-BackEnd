@@ -32,7 +32,7 @@ public class PostController {
             @RequestBody PostCreateRequest request) {
 
         String username = securityMember.getUsername();
-        Long authorId = memberService.getMemberIdByUsername(username);
+        Long authorId = memberService.findMemberIdByUsername(username);
 
         Post post = postService.create(request, authorId, categoryName.toUpperCase());
         PostCreateResponse response = getCreateResponse(post);

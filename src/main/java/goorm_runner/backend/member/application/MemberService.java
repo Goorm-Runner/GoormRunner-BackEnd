@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class MemberService {
     private final MemberRepository memberRepository;
 
-    public Long getMemberIdByUsername(String username) {
+    public Long findMemberIdByUsername(String username) {
         Member member = memberRepository.findByLoginId(username)
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
         return member.getId();
