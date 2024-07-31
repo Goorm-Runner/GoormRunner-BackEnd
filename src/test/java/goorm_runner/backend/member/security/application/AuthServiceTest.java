@@ -1,11 +1,10 @@
 package goorm_runner.backend.member.security.application;
 
-import goorm_runner.backend.member.application.AuthorityRepository;
-import goorm_runner.backend.member.domain.*;
+import goorm_runner.backend.member.domain.Member;
+import goorm_runner.backend.member.domain.Role;
+import goorm_runner.backend.member.domain.Sex;
 import goorm_runner.backend.member.security.dto.LoginRequest;
 import goorm_runner.backend.member.security.dto.MemberSignupRequest;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,19 +20,6 @@ class AuthServiceTest {
 
     @Autowired
     private AuthService authService;
-
-    @Autowired
-    private AuthorityRepository authorityRepository;
-
-    @BeforeEach
-    void setUp() {
-        authorityRepository.save(new Authority(1L, AuthorityType.ROLE_USER));
-    }
-
-    @AfterEach
-    void tearDown() {
-        authorityRepository.deleteAll();
-    }
 
     @Test
     void signup_success() {

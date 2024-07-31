@@ -1,14 +1,9 @@
 package goorm_runner.backend.member.security.presentation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import goorm_runner.backend.member.application.AuthorityRepository;
-import goorm_runner.backend.member.domain.Authority;
-import goorm_runner.backend.member.domain.AuthorityType;
 import goorm_runner.backend.member.security.application.AuthService;
 import goorm_runner.backend.member.security.dto.LoginRequest;
 import goorm_runner.backend.member.security.dto.MemberSignupRequest;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -34,19 +29,6 @@ class AuthControllerIntegrationTest {
 
     @Autowired
     private AuthService authService;
-
-    @Autowired
-    private AuthorityRepository authorityRepository;
-
-    @BeforeEach
-    void setUp() {
-        authorityRepository.save(new Authority(1L, AuthorityType.ROLE_USER));
-    }
-
-    @AfterEach
-    void tearDown() {
-        authorityRepository.deleteAll();
-    }
 
     @Test
     void signup_success() throws Exception {
