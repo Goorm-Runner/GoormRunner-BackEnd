@@ -81,7 +81,7 @@ class PostReadServiceTest {
 
         String categoryName = Category.GENERAL.name();
 
-        Post post = postService.create(createRequest, authorId, categoryName);
+        postService.create(createRequest, authorId, categoryName);
 
         //when
         PageRequest pageRequest = PageRequest.of(0, 10);
@@ -110,7 +110,7 @@ class PostReadServiceTest {
 
         String categoryName = Category.GENERAL.name();
 
-        Post post = postService.create(createRequest, authorId, categoryName);
+        postService.create(createRequest, authorId, categoryName);
 
         //when
         PageRequest pageRequest = PageRequest.of(0, 10);
