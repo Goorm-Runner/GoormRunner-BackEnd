@@ -55,7 +55,7 @@ class AuthServiceTest {
         //then
         assertAll(
                 () -> assertThat(member.getLoginId()).isEqualTo(id),
-                () -> assertThat(member.getUsername()).isEqualTo(username),
+                () -> assertThat(member.getNickname()).isEqualTo(username),
                 () -> assertThat(member.getPassword()).isNotBlank(), //password와 다름(암호화)
                 () -> assertThat(member.getRole()).isEqualTo(Role.valueOf(role.toUpperCase())),
                 () -> assertThat(member.getSex()).isEqualTo(Sex.valueOf(sex.toUpperCase())),

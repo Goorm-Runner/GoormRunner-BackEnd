@@ -12,8 +12,8 @@ public class MemberSignupRequest {
     @NotBlank(message = "Login ID is required")
     private final String loginId;
 
-    @NotBlank(message = "Username is required")
-    private final String username;
+    @NotBlank(message = "Nickname is required")
+    private final String nickname;
 
     @NotBlank(message = "Password is required")
     @Size(min = 6, message = "Password must be at least 6 characters")

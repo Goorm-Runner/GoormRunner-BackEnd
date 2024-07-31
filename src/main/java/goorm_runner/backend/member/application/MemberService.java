@@ -12,8 +12,9 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     public Long getMemberIdByUsername(String username) {
-        Member member = memberRepository.findByUsername(username)
+        Member member = memberRepository.findByLoginId(username)
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
         return member.getId();
     }
+
 }

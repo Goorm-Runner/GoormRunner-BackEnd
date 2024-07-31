@@ -55,7 +55,7 @@ public class PostService {
         Member author = memberRepository.findById(authorId)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
 
-        return author.getUsername();
+        return author.getNickname();
     }
 
     private void validateTitleAndContent(String title, String content) {

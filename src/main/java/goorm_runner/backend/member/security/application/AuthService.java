@@ -31,7 +31,7 @@ public class AuthService {
     public Member signup(MemberSignupRequest request) {
         Member member = Member.builder()
                 .loginId(request.getLoginId())
-                .username(request.getUsername())
+                .nickname(request.getNickname())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.valueOf(request.getRole().toUpperCase()))
                 .sex(Sex.valueOf(request.getSex().toUpperCase()))

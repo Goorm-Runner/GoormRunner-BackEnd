@@ -29,6 +29,6 @@ public class SecurityMember implements UserDetails {
 
     @Override
     public String getUsername() {
-        return member.getUsername();
+        return member.getLoginId();
     }
 }
