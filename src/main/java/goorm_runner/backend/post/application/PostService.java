@@ -44,7 +44,9 @@ public class PostService {
     }
 
     public void delete(Long postId) {
-        postRepository.deleteById(postId);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostException(POST_NOT_FOUND));
+        post.delete();
     }
 
     public String getAuthorName(Long postId) {

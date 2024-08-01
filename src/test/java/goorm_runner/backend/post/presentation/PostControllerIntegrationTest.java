@@ -10,6 +10,7 @@ import goorm_runner.backend.post.domain.Category;
 import goorm_runner.backend.post.domain.Post;
 import goorm_runner.backend.post.dto.PostCreateRequest;
 import goorm_runner.backend.post.dto.PostUpdateRequest;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -39,6 +40,9 @@ class PostControllerIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private EntityManager em;
 
     @Test
     void create_success() throws Exception {
@@ -389,7 +393,7 @@ class PostControllerIntegrationTest {
     }
 
     @Test
-    void deleteTest() throws Exception {
+    void delete_success() throws Exception {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
@@ -411,5 +415,100 @@ class PostControllerIntegrationTest {
                         .header("Authorization", "Bearer " + token)
                 )
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void delete_failure() throws Exception {
+        //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest createRequest = new PostCreateRequest(title, content);
+
+        String loginId = "test";
+        String password = "password";
+
+        String categoryName = "general";
+
+        //when
+        Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        String token = authService.login(new LoginRequest(loginId, password));
+
+        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+
+        //then
+        mockMvc.perform(delete("/categories/general/posts/" + post.getId() + 1)
+                        .header("Authorization", "Bearer " + token)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value(POST_NOT_FOUND.name()))
+                .andExpect(jsonPath("$.message").value(POST_NOT_FOUND.getMessage()));
+    }
+
+    @Test
+    void delete_then_read_failure() throws Exception {
+        //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest createRequest = new PostCreateRequest(title, content);
+
+        String loginId = "test";
+        String password = "password";
+
+        String categoryName = "general";
+
+        //when
+        Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        String token = authService.login(new LoginRequest(loginId, password));
+
+        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        postService.delete(post.getId());
+        em.flush();
+        em.clear();
+
+        //then
+        mockMvc.perform(get("/categories/general/posts/" + post.getId())
+                        .header("Authorization", "Bearer " + token)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value(POST_NOT_FOUND.name()))
+                .andExpect(jsonPath("$.message").value(POST_NOT_FOUND.getMessage()));
+    }
+
+    @Test
+    void delete_then_read_page() throws Exception {
+        //given
+        String title1 = "title1";
+        String content1 = "content1";
+        PostCreateRequest createRequest1 = new PostCreateRequest(title1, content1);
+
+        String title2 = "title1";
+        String content2 = "content1";
+        PostCreateRequest createRequest2 = new PostCreateRequest(title2, content2);
+
+        String loginId = "test";
+        String password = "password";
+
+        String categoryName = "general";
+
+        //when
+        Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        String token = authService.login(new LoginRequest(loginId, password));
+
+        Post post1 = postService.create(createRequest1, member.getId(), categoryName.toUpperCase());
+        postService.create(createRequest2, member.getId(), categoryName.toUpperCase());
+
+        postService.delete(post1.getId()); // post2만 남아있다.
+        em.flush();
+        em.clear();
+
+        //then
+        mockMvc.perform(get("/categories/general/posts?pageNumber=0&pageSize=10")
+                        .header("Authorization", "Bearer " + token)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.overviews").isNotEmpty())
+                .andExpect(jsonPath("$.responseMetaData").isNotEmpty())
+                .andExpect(jsonPath("$.overviews.size()").value(1))
+                .andExpect(jsonPath("$.overviews[0].title").value(title2));
     }
 }
