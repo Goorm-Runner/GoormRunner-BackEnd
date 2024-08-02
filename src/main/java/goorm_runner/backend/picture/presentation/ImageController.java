@@ -44,9 +44,7 @@ public class ImageController {
 
             responseDTO.setStatus("success");
             responseDTO.setMessage("Image uploaded successfully");
-            Map<String, Object> data = new HashMap<>();
-            data.put("fileUrl", fileUrl);
-            responseDTO.setData(data);
+            responseDTO.addData("fileUrl", fileUrl);
 
             return ResponseEntity.ok(responseDTO);
         } catch (IOException e) {
@@ -134,9 +132,7 @@ public class ImageController {
 
             responseDTO.setStatus("success");
             responseDTO.setMessage("Profile picture fetched successfully");
-            Map<String, Object> data = new HashMap<>();
-            data.put("fileUrl", fileUrl);
-            responseDTO.setData(data);
+            responseDTO.addData("fileUrl", fileUrl);
 
             return ResponseEntity.ok(responseDTO);
         } catch (RuntimeException e) {
