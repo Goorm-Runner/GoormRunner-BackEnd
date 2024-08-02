@@ -3,6 +3,7 @@ package goorm_runner.backend.picture.presentation;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
 import goorm_runner.backend.member.domain.Member;
+import goorm_runner.backend.member.security.SecurityMember;
 import goorm_runner.backend.picture.application.S3Service;
 import goorm_runner.backend.picture.application.UpdateMemberService;
 import goorm_runner.backend.picture.dto.UpdateMemberRequestDTO;
@@ -11,8 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -28,12 +28,13 @@ public class ImageController {
     private final UpdateMemberService updateMemberService;
 
     @PostMapping("/upload")
-    public ResponseEntity<UpdateMemberResponseDTO> uploadImage(@ModelAttribute UpdateMemberRequestDTO requestDTO) {
+    public ResponseEntity<UpdateMemberResponseDTO> uploadImage(@ModelAttribute UpdateMemberRequestDTO requestDTO,
+                                                               @AuthenticationPrincipal SecurityMember securityMember) {
         UpdateMemberResponseDTO responseDTO = new UpdateMemberResponseDTO();
         try {
-            String username = getCurrentMemberUsername();
-            log.info("Uploading image for username: {}", username);
-            Long memberId = updateMemberService.getMemberIdByUsername(username);
+            String loginId = securityMember.getUsername();
+            log.info("Uploading image for username: {}", loginId);
+            Long memberId = updateMemberService.getMemberIdByLoginId(loginId);
             log.info("Found memberId: {}", memberId);
             String fileUrl = s3Service.uploadFile(requestDTO.getFile(), memberId);
             updateMemberService.updateMemberProfileImage(memberId, fileUrl);
@@ -64,12 +65,13 @@ public class ImageController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<UpdateMemberResponseDTO> deleteImage(@RequestParam("fileUrl") String fileUrl) {
+    public ResponseEntity<UpdateMemberResponseDTO> deleteImage(@RequestParam("fileUrl") String fileUrl,
+                                                               @AuthenticationPrincipal SecurityMember securityMember) {
         UpdateMemberResponseDTO responseDTO = new UpdateMemberResponseDTO();
         try {
-            String username = getCurrentMemberUsername();
-            log.info("Deleting image for username: {}", username);
-            Long memberId = updateMemberService.getMemberIdByUsername(username);
+            String loginId = securityMember.getUsername();
+            log.info("Deleting image for username: {}", loginId);
+            Long memberId = updateMemberService.getMemberIdByLoginId(loginId);
 
             s3Service.deleteFile(fileUrl);
             updateMemberService.removeMemberProfileImage(memberId);
@@ -103,13 +105,15 @@ public class ImageController {
     }
 
     @GetMapping("/profile-picture")
-    public ResponseEntity<UpdateMemberResponseDTO> getProfilePictureUrl() {
+    public ResponseEntity<UpdateMemberResponseDTO> getProfilePictureUrl(
+            @AuthenticationPrincipal SecurityMember securityMember
+    ) {
         UpdateMemberResponseDTO responseDTO = new UpdateMemberResponseDTO();
         try {
-            String username = getCurrentMemberUsername();
-            log.info("Fetching profile picture for username: {}", username);
+            String loginId = securityMember.getUsername();
+            log.info("Fetching profile picture for username: {}", loginId);
 
-            Long memberId = updateMemberService.getMemberIdByUsername(username);
+            Long memberId = updateMemberService.getMemberIdByLoginId(loginId);
             Member member = updateMemberService.getMemberById(memberId);
             String fileUrl = member.getProfilePictureUrl();
 
@@ -136,15 +140,4 @@ public class ImageController {
         }
     }
 
-    private String getCurrentMemberUsername() {
-        try {
-            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            log.info("Current member username: {}", userDetails.getUsername());
-
-            return userDetails.getUsername();
-        } catch (Exception e) {
-            log.error("Error getting current member username: {}", e.getMessage());
-            throw new SecurityException("Invalid or expired JWT token");
-        }
-    }
 }
