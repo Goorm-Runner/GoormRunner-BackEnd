@@ -27,6 +27,9 @@ public class ImageController {
     private final S3Service s3Service;
     private final UpdateMemberService updateMemberService;
 
+    /**
+     * 회원이 프로필 사진을 업로드합니다.
+     */
     @PostMapping("/upload")
     public ResponseEntity<UpdateMemberResponseDTO> uploadImage(@ModelAttribute UpdateMemberRequestDTO requestDTO,
                                                                @AuthenticationPrincipal SecurityMember securityMember) {
@@ -64,6 +67,9 @@ public class ImageController {
         }
     }
 
+    /**
+     *  회원이 프로필 사진을 삭제합니다.
+     */
     @DeleteMapping("/delete")
     public ResponseEntity<UpdateMemberResponseDTO> deleteImage(@RequestParam("fileUrl") String fileUrl,
                                                                @AuthenticationPrincipal SecurityMember securityMember) {
@@ -104,6 +110,9 @@ public class ImageController {
         }
     }
 
+    /**
+     *  프로필 사진을 조회합니다.
+     */
     @GetMapping("/profile-picture")
     public ResponseEntity<UpdateMemberResponseDTO> getProfilePictureUrl(
             @AuthenticationPrincipal SecurityMember securityMember
