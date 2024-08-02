@@ -1,8 +1,9 @@
 package goorm_runner.backend.post.application;
 
+import goorm_runner.backend.post.application.exception.PostException;
+import goorm_runner.backend.post.domain.Category;
 import goorm_runner.backend.post.domain.Post;
 import goorm_runner.backend.post.dto.PostCreateRequest;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static goorm_runner.backend.global.ErrorCode.INVALID_CATEGORY;
+import static goorm_runner.backend.global.ErrorCode.POST_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -35,7 +38,7 @@ class PostReadServiceTest {
 
         Long authorId = 1L;
 
-        String categoryName = "GENERAL";
+        String categoryName = Category.GENERAL.name();
 
         Post post = postService.create(createRequest, authorId, categoryName);
 
@@ -54,7 +57,7 @@ class PostReadServiceTest {
 
         Long authorId = 1L;
 
-        String categoryName = "GENERAL";
+        String categoryName = Category.GENERAL.name();
 
         Post post = postService.create(createRequest, authorId, categoryName);
 
@@ -63,8 +66,8 @@ class PostReadServiceTest {
 
         //then
         assertThatThrownBy(() -> postReadService.readPost(wrongId))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessage("게시글을 찾을 수 없습니다.");
+                .isInstanceOf(PostException.class)
+                .hasMessage(POST_NOT_FOUND.getMessage());
     }
 
     @Test
@@ -76,9 +79,9 @@ class PostReadServiceTest {
 
         Long authorId = 1L;
 
-        String categoryName = "GENERAL";
+        String categoryName = Category.GENERAL.name();
 
-        Post post = postService.create(createRequest, authorId, categoryName);
+        postService.create(createRequest, authorId, categoryName);
 
         //when
         PageRequest pageRequest = PageRequest.of(0, 10);
@@ -105,9 +108,9 @@ class PostReadServiceTest {
 
         Long authorId = 1L;
 
-        String categoryName = "GENERAL";
+        String categoryName = Category.GENERAL.name();
 
-        Post post = postService.create(createRequest, authorId, categoryName);
+        postService.create(createRequest, authorId, categoryName);
 
         //when
         PageRequest pageRequest = PageRequest.of(0, 10);
@@ -115,7 +118,7 @@ class PostReadServiceTest {
 
         //then
         assertThatThrownBy(() -> postReadService.readPage(wrongCategoryName, pageRequest))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("유효하지 않은 카테고리: " + wrongCategoryName);
+                .isInstanceOf(PostException.class)
+                .hasMessage(INVALID_CATEGORY.getMessage());
     }
 }

@@ -61,8 +61,8 @@ public class JwtTokenProvider {
         Claims claims = Jwts.parserBuilder().setSigningKey(secretKey).build()
                 .parseClaimsJws(token).getBody();
 
-        String username = claims.getSubject();
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        String loginId = claims.getSubject();
+        UserDetails userDetails = userDetailsService.loadUserByUsername(loginId);
 
         return new UsernamePasswordAuthenticationToken(userDetails, token, userDetails.getAuthorities());
     }

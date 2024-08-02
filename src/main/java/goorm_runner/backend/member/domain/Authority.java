@@ -17,14 +17,15 @@ public class Authority {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    @Enumerated(EnumType.STRING)
+    private AuthorityType type;
 
     @OneToMany(mappedBy = "authority")
     private Set<MemberAuthority> memberAuthorities = new HashSet<>();
 
-    public Authority(Long id, String name) {
+    public Authority(Long id, AuthorityType type) {
         this.id = id;
-        this.name = name;
+        this.type = type;
     }
 
     public void addMemberAuthority(MemberAuthority memberAuthority) {

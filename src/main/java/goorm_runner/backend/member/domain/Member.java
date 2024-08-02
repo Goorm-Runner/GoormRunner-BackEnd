@@ -23,7 +23,7 @@ public class Member {
     private String loginId;
 
     @Column(nullable = false)
-    private String username;
+    private String nickname;
 
     private String password;
 
@@ -45,9 +45,9 @@ public class Member {
     private Set<MemberAuthority> memberAuthorities = new HashSet<>();
 
     @Builder
-    public Member(String loginId, String username, String password, Role role, Sex sex, LocalDate birth, Long teamId, String profilePictureUrl, Set<MemberAuthority> memberAuthorities) {
+    public Member(String loginId, String nickname, String password, Role role, Sex sex, LocalDate birth, Long teamId, String profilePictureUrl, Set<MemberAuthority> memberAuthorities) {
         this.loginId = loginId;
-        this.username = username;
+        this.nickname = nickname;
         this.password = password;
         this.role = role;
         this.sex = sex;
