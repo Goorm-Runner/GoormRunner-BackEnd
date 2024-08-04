@@ -25,7 +25,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Gradle로 빌드 🚧
-        run: ./gradlew clean build
+        run: ./gradlew clean build --debug
         id: gradle_build
         env:
           DB_URL: ${{ secrets.DB_URL }}
