@@ -30,7 +30,7 @@ public class RecruitmentController {
      */
     @PostMapping("/create")
     public ResponseEntity<RecruitmentResponse> createRecruitment(
-            @RequestBody @Valid RecruitmentRequest request,
+            @RequestBody RecruitmentRequest request,
             @AuthenticationPrincipal SecurityMember securityMember) {
         if (securityMember == null) {
             throw new AccessDeniedException("Authentication failed");
@@ -86,7 +86,7 @@ public class RecruitmentController {
     @PutMapping("/{recruitmentId}")
     public ResponseEntity<RecruitmentResponse> updateRecruitment(
             @PathVariable Long recruitmentId,
-            @RequestBody @Valid RecruitmentRequest request,
+            @RequestBody RecruitmentRequest request,
             @AuthenticationPrincipal SecurityMember securityMember) {
 
         if (securityMember == null) {
