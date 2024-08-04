@@ -12,6 +12,7 @@ import goorm_runner.backend.team.domain.TeamRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,23 +35,18 @@ public class RecruitmentService {
      * 모집 글을 생성한다.
      */
     public RecruitmentResponse createRecruitment(RecruitmentRequest request, Long authorId) {
-        log.trace("Create recruitment request: {}", request);
 
         if (authorId == null) {
             throw new IllegalArgumentException("Author ID is null");
         }
 
-        Member host = memberRepository.findById(authorId)
-                .orElseThrow(() -> new EntityNotFoundException("Host not found with id " + authorId));
+        Member host = findByIdEntity(memberRepository, authorId, "Host");
 
         Gathering gathering = new Gathering(host);
         gatheringRepository.save(gathering);
 
-        Team team = teamRepository.findById(request.getTeamId())
-                .orElseThrow(() -> new EntityNotFoundException("Team not found with id " + request.getTeamId()));
-
-        Ballpark ballpark = ballparkRepository.findById(request.getBallparkId())
-                .orElseThrow(() -> new EntityNotFoundException("Ballpark not found with id " + request.getBallparkId()));
+        Team team = findByIdEntity(teamRepository, request.getTeamId(), "Team");
+        Ballpark ballpark = findByIdEntity(ballparkRepository, request.getBallparkId(), "Ballpark");
 
         Recruitment recruitment = Recruitment.builder()
                 .gathering(gathering)
@@ -65,16 +61,7 @@ public class RecruitmentService {
 
         recruitmentRepository.save(recruitment);
 
-        return new RecruitmentResponse(
-                recruitment.getId(),
-                recruitment.getTitle(),
-                recruitment.getContent(),
-                recruitment.getAddress(),
-                recruitment.getMeetTime(),
-                recruitment.getMaxParticipants(),
-                recruitment.getTeam(),
-                recruitment.getBallpark()
-        );
+        return creativeRecruitmentResponse(recruitment);
     }
 
     /**
@@ -82,16 +69,7 @@ public class RecruitmentService {
      */
     public List<RecruitmentResponse> findAllRecruitments() {
         return recruitmentRepository.findByDeletedAtIsNull().stream()
-                .map(recruitment -> new RecruitmentResponse(
-                        recruitment.getId(),
-                        recruitment.getTitle(),
-                        recruitment.getContent(),
-                        recruitment.getAddress(),
-                        recruitment.getMeetTime(),
-                        recruitment.getMaxParticipants(),
-                        recruitment.getTeam(),
-                        recruitment.getBallpark()
-                ))
+                .map(this::creativeRecruitmentResponse)
                 .collect(Collectors.toList());
     }
 
@@ -102,16 +80,7 @@ public class RecruitmentService {
         Recruitment recruitment = recruitmentRepository.findByIdAndDeletedAtIsNull(recruitmentId)
                 .orElseThrow(() -> new EntityNotFoundException("Recruitment not found with id " + recruitmentId));
 
-        return new RecruitmentResponse(
-                recruitment.getId(),
-                recruitment.getTitle(),
-                recruitment.getContent(),
-                recruitment.getAddress(),
-                recruitment.getMeetTime(),
-                recruitment.getMaxParticipants(),
-                recruitment.getTeam(),
-                recruitment.getBallpark()
-        );
+        return creativeRecruitmentResponse(recruitment);
     }
 
     /**
@@ -126,20 +95,10 @@ public class RecruitmentService {
      * 특정 팀의 모집 글을 조회한다.
      */
     public List<RecruitmentResponse> findRecruitmentsByTeam(Long teamId) {
-        Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new EntityNotFoundException("Team not found with id " + teamId));
+        Team team = findByIdEntity(teamRepository, teamId, "Team");
 
         return recruitmentRepository.findByTeamAndDeletedAtIsNull(team).stream()
-                .map(recruitment -> new RecruitmentResponse(
-                        recruitment.getId(),
-                        recruitment.getTitle(),
-                        recruitment.getContent(),
-                        recruitment.getAddress(),
-                        recruitment.getMeetTime(),
-                        recruitment.getMaxParticipants(),
-                        recruitment.getTeam(),
-                        recruitment.getBallpark()
-                ))
+                .map(this::creativeRecruitmentResponse)
                 .collect(Collectors.toList());
     }
 
@@ -163,18 +122,8 @@ public class RecruitmentService {
 
         recruitmentRepository.save(recruitment);
 
-        return new RecruitmentResponse(
-                recruitment.getId(),
-                recruitment.getTitle(),
-                recruitment.getContent(),
-                recruitment.getAddress(),
-                recruitment.getMeetTime(),
-                recruitment.getMaxParticipants(),
-                recruitment.getTeam(),
-                recruitment.getBallpark()
-        );
+        return creativeRecruitmentResponse(recruitment);
     }
-
 
     /**
      * 회원이 모집 글에 참여한다.
@@ -182,8 +131,7 @@ public class RecruitmentService {
     public MemberGathering joinRecruitment(Long recruitmentId, Long memberId) {
         Recruitment recruitment = findRecruitmentByIdEntity(recruitmentId);
 
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new EntityNotFoundException("Member not found with id " + memberId));
+        Member member = findByIdEntity(memberRepository, memberId, "Member");
 
         if (isMemberAlreadyJoined(recruitment, member)) {
             throw new IllegalStateException("Member already joined this recruitment.");
@@ -209,8 +157,7 @@ public class RecruitmentService {
     public void approveParticipation(Long recruitmentId, Long memberId, Long hostId) {
         Recruitment recruitment = findRecruitmentByIdEntity(recruitmentId);
 
-        Member host = gatheringRepository.findById(hostId)
-                .orElseThrow(() -> new EntityNotFoundException("Host not found with id " + hostId)).getHost();
+        Member host = findByIdEntity(memberRepository, hostId, "Host");
 
         if (!recruitment.getGathering().getHost().equals(host)) {
             throw new SecurityException("You are not authorized to approve this participation.");
@@ -229,8 +176,7 @@ public class RecruitmentService {
     public void deleteRecruitment(Long recruitmentId, Long hostId) {
         Recruitment recruitment = findRecruitmentByIdEntity(recruitmentId);
 
-        Member host = gatheringRepository.findById(hostId)
-                .orElseThrow(() -> new EntityNotFoundException("Host not found with id " + hostId)).getHost();
+        Member host = findByIdEntity(memberRepository, hostId, "Host");
 
         if (!recruitment.getGathering().getHost().equals(host)) {
             throw new SecurityException("You are not authorized to delete this recruitment.");
@@ -246,8 +192,7 @@ public class RecruitmentService {
     public void cancelParticipation(Long recruitmentId, Long memberId) {
         Recruitment recruitment = findRecruitmentByIdEntity(recruitmentId);
 
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new EntityNotFoundException("Member not found with id " + memberId));
+        Member member = findByIdEntity(memberRepository, memberId, "Member");
 
         MemberGathering memberGathering = memberGatheringRepository.findByGatheringAndGuestId(recruitment.getGathering(), member.getId())
                 .orElseThrow(() -> new EntityNotFoundException("You have not joined this recruitment."));
@@ -276,5 +221,26 @@ public class RecruitmentService {
     private Recruitment findRecruitmentByIdEntity(Long recruitmentId) {
         return recruitmentRepository.findByIdAndDeletedAtIsNull(recruitmentId)
                 .orElseThrow(() -> new EntityNotFoundException("Recruitment not found with id " + recruitmentId));
+    }
+
+    /**
+     * RecruitmentResponse 객체를 생성한다.
+     */
+    private RecruitmentResponse creativeRecruitmentResponse(Recruitment recruitment) {
+        return new RecruitmentResponse(
+                recruitment.getId(),
+                recruitment.getTitle(),
+                recruitment.getContent(),
+                recruitment.getAddress(),
+                recruitment.getMeetTime(),
+                recruitment.getMaxParticipants(),
+                recruitment.getTeam(),
+                recruitment.getBallpark()
+        );
+    }
+
+    private <T> T findByIdEntity(JpaRepository<T, Long> repository, Long id, String entityName) {
+        return repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(entityName + " not found with id " + id));
     }
 }
