@@ -76,17 +76,16 @@ class PostLikeControllerIntegrationTest {
         String loginId = "test";
         String password = "password";
 
-        //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
-        String token = authService.login(new LoginRequest(loginId, password));
+        authService.login(new LoginRequest(loginId, password));
 
         Post post = postService.create(request, member.getId(), Category.GENERAL.name());
+
+        //when
         postLikeService.likePost(post.getId(), member.getId());
 
         //then
-        mockMvc.perform(get("/likes/posts/" + post.getId())
-                        .header("Authorization", "Bearer " + token)
-                )
+        mockMvc.perform(get("/likes/posts/" + post.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.postId").value(post.getId()))
                 .andExpect(jsonPath("$.totalCount").value(1));

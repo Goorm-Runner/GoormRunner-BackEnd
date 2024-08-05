@@ -161,14 +161,12 @@ class PostControllerIntegrationTest {
 
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
-        String token = authService.login(new LoginRequest(loginId, password));
+        authService.login(new LoginRequest(loginId, password));
 
         Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
 
         //then
-        mockMvc.perform(get("/categories/general/posts/" + post.getId())
-                        .header("Authorization", "Bearer " + token)
-                )
+        mockMvc.perform(get("/categories/general/posts/" + post.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.categoryName").isNotEmpty())
                 .andExpect(jsonPath("$.postId").isNotEmpty())
@@ -193,14 +191,12 @@ class PostControllerIntegrationTest {
 
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
-        String token = authService.login(new LoginRequest(loginId, password));
+        authService.login(new LoginRequest(loginId, password));
 
         Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
 
         //then
-        mockMvc.perform(get("/categories/general/posts/" + post.getId() + 1)
-                        .header("Authorization", "Bearer " + token)
-                )
+        mockMvc.perform(get("/categories/general/posts/" + post.getId() + 1))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.title").value(POST_NOT_FOUND.name()))
                 .andExpect(jsonPath("$.message").value(POST_NOT_FOUND.getMessage()));
@@ -220,14 +216,12 @@ class PostControllerIntegrationTest {
 
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
-        String token = authService.login(new LoginRequest(loginId, password));
+        authService.login(new LoginRequest(loginId, password));
 
         postService.create(createRequest, member.getId(), categoryName.toUpperCase());
 
         //then
-        mockMvc.perform(get("/categories/general/posts?pageNumber=0&pageSize=10")
-                        .header("Authorization", "Bearer " + token)
-                )
+        mockMvc.perform(get("/categories/general/posts?pageNumber=0&pageSize=10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.overviews").isNotEmpty())
                 .andExpect(jsonPath("$.responseMetaData").isNotEmpty());
@@ -247,14 +241,12 @@ class PostControllerIntegrationTest {
 
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
-        String token = authService.login(new LoginRequest(loginId, password));
+        authService.login(new LoginRequest(loginId, password));
 
         postService.create(createRequest, member.getId(), categoryName.toUpperCase());
 
         //then
-        mockMvc.perform(get("/categories/generall/posts?pageNumber=0&pageSize=10") // wrong categoryName: generall
-                        .header("Authorization", "Bearer " + token)
-                )
+        mockMvc.perform(get("/categories/generall/posts?pageNumber=0&pageSize=10")) // wrong categoryName: generall
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.title").value(INVALID_CATEGORY.name()))
                 .andExpect(jsonPath("$.message").value(INVALID_CATEGORY.getMessage()));
