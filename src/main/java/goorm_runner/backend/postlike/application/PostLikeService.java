@@ -18,6 +18,10 @@ public class PostLikeService {
         postLikeRepository.save(postLike);
     }
 
+    public void deletePostLike(Long postId, Long memberId) {
+        postLikeRepository.deleteByPostIdAndMemberId(postId, memberId);
+    }
+
     public int countPostLikes(Long postId) {
         return postLikeRepository.countByPostId(postId);
     }

@@ -8,10 +8,7 @@ import goorm_runner.backend.postlike.dto.PostLikeResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,7 +18,7 @@ public class PostLikeController {
     private final PostLikeService postLikeService;
 
     @PostMapping("/likes/posts/{postId}")
-    public ResponseEntity<PostLikeResponse> postLike(@AuthenticationPrincipal SecurityMember securityMember, @PathVariable Long postId) {
+    public ResponseEntity<PostLikeResponse> createPostLike(@AuthenticationPrincipal SecurityMember securityMember, @PathVariable Long postId) {
 
         String username = securityMember.getUsername();
         Long memberId = memberService.findMemberIdByUsername(username);
@@ -33,11 +30,23 @@ public class PostLikeController {
     }
 
     @GetMapping("/likes/posts/{postId}")
-    public ResponseEntity<PostLikeCountResponse> postLikeCount(@PathVariable Long postId) {
+    public ResponseEntity<PostLikeCountResponse> getPostLikeCount(@PathVariable Long postId) {
 
         int likes = postLikeService.countPostLikes(postId);
 
         return ResponseEntity.ok(new PostLikeCountResponse(postId, likes));
+
+    }
+
+    @DeleteMapping("/likes/posts/{postId}")
+    public ResponseEntity<PostLikeResponse> deletePostLike(@AuthenticationPrincipal SecurityMember securityMember, @PathVariable Long postId) {
+
+        String username = securityMember.getUsername();
+        Long memberId = memberService.findMemberIdByUsername(username);
+
+        postLikeService.deletePostLike(postId, memberId);
+
+        return ResponseEntity.ok(PostLikeResponse.succeed());
 
     }
 }

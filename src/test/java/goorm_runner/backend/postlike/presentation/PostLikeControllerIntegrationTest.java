@@ -31,9 +31,6 @@ class PostLikeControllerIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
     private PostLikeService postLikeService;
 
     @Autowired
@@ -89,5 +86,57 @@ class PostLikeControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.postId").value(post.getId()))
                 .andExpect(jsonPath("$.totalCount").value(1));
+    }
+
+    @Test
+    void cancel_like_success() throws Exception {
+        //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest request = new PostCreateRequest(title, content);
+
+        String loginId = "test";
+        String password = "password";
+
+        Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        String token = authService.login(new LoginRequest(loginId, password));
+
+        Post post = postService.create(request, member.getId(), Category.GENERAL.name());
+
+        //when
+        postLikeService.likePost(post.getId(), member.getId());
+
+        //then
+        mockMvc.perform(post("/likes/posts/" + post.getId())
+                        .header("Authorization", "Bearer " + token)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
+    }
+
+    @Test
+    void delete_and_count() throws Exception {
+        //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest request = new PostCreateRequest(title, content);
+
+        String loginId = "test";
+        String password = "password";
+
+        Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        authService.login(new LoginRequest(loginId, password));
+
+        Post post = postService.create(request, member.getId(), Category.GENERAL.name());
+        postLikeService.likePost(post.getId(), member.getId());
+
+        //when
+        postLikeService.deletePostLike(post.getId(), member.getId());
+
+        //then
+        mockMvc.perform(get("/likes/posts/" + post.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.postId").value(post.getId()))
+                .andExpect(jsonPath("$.totalCount").value(0));
     }
 }
