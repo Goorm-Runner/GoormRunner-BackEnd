@@ -1,3 +1,5 @@
+truncate table authority;
+
 insert
 into
     authority
