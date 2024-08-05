@@ -6,6 +6,7 @@ import goorm_runner.backend.post.application.PostReadService;
 import goorm_runner.backend.post.application.PostService;
 import goorm_runner.backend.post.domain.Post;
 import goorm_runner.backend.post.dto.*;
+import goorm_runner.backend.postlike.application.PostLikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +25,7 @@ public class PostController {
     private final PostService postService;
     private final PostReadService postReadService;
     private final MemberService memberService;
+    private final PostLikeService postLikeService;
 
     @PostMapping("/categories/{categoryName}/posts")
     public ResponseEntity<PostCreateResponse> createPost(
@@ -47,7 +49,8 @@ public class PostController {
     public ResponseEntity<PostReadResponse> readPost(@PathVariable String categoryName, @PathVariable Long postId) {
 
         Post post = postReadService.readPost(postId);
-        PostReadResponse response = getReadResponse(categoryName.toUpperCase(), postId, post);
+        int likes = postLikeService.countPostLikes(postId);
+        PostReadResponse response = getReadResponse(categoryName.toUpperCase(), post, likes);
 
         return ResponseEntity.ok(response);
     }
@@ -93,13 +96,13 @@ public class PostController {
                 .build();
     }
 
-    private PostReadResponse getReadResponse(String categoryName, Long postId, Post post) {
+    private PostReadResponse getReadResponse(String categoryName, Post post, int likes) {
         return PostReadResponse.builder()
                 .categoryName(categoryName)
-                .postId(postId)
+                .postId(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
-                .likeCount(post.getLikeCount())
+                .likeCount(likes)
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .build();

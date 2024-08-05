@@ -83,7 +83,6 @@ public class PostService {
                 .authorId(authorId)
                 .title(request.title())
                 .content(request.content())
-                .likeCount((short) 0)
                 .category(category)
                 .build();
     }

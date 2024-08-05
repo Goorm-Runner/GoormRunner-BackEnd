@@ -31,20 +31,16 @@ public class Post extends BaseTimeEntity {
     private String content;
 
     @Column(nullable = false)
-    private Short likeCount;
-
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Category category;
 
     private LocalDateTime deletedAt;
 
     @Builder
-    public Post(Long authorId, String title, String content, Short likeCount, Category category) {
+    public Post(Long authorId, String title, String content, Category category) {
         this.authorId = authorId;
         this.title = title;
         this.content = content;
-        this.likeCount = likeCount;
         this.category = category;
     }
 
