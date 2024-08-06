@@ -1,14 +1,14 @@
-package goorm_runner.backend.post.application.exception;
+package goorm_runner.backend.postlike.application.exception;
 
 import goorm_runner.backend.global.ErrorCode;
 import lombok.Getter;
 
 @Getter
-public class PostException extends IllegalArgumentException {
+public class PostLikeException extends RuntimeException {
 
     private final ErrorCode errorCode;
 
-    public PostException(ErrorCode errorCode) {
+    public PostLikeException(ErrorCode errorCode) {
         this.errorCode = errorCode;
     }
 

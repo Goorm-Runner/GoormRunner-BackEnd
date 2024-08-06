@@ -13,10 +13,16 @@ public enum ErrorCode {
     EMPTY_TITLE(4005, HttpStatus.BAD_REQUEST, "제목을 입력해주세요."),
     EMPTY_CONTENT(4006, HttpStatus.BAD_REQUEST, "본문 내용을 입력해주세요."),
 
+    ALREADY_LIKED(4091, HttpStatus.CONFLICT, "이미 좋아요한 게시글입니다."),
+    NOT_ALREADY_LIKED(4092, HttpStatus.CONFLICT, "좋아요를 누른 상태여야 합니다."),
+
     REQUIRED_AUTHORITY_NOT_FOUND(5001, HttpStatus.INTERNAL_SERVER_ERROR, "데이터베이스 오류");
 
     private final int code;
+
+    @Getter
     private final HttpStatus httpStatus;
+
     @Getter
     private final String message;
 
