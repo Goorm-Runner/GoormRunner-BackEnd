@@ -61,7 +61,7 @@ public class PostController {
         Page<Post> posts = postReadService.readPage(categoryName.toUpperCase(), PageRequest.of(pageNumber, pageSize));
 
         List<PostOverview> overviews = posts.stream()
-                .map(post -> PostOverview.from(post, postService.getAuthorName(post.getId())))
+                .map(post -> PostOverview.from(post, postService.getAuthorName(post.getId()), postLikeService.countPostLikes(post.getId())))
                 .toList();
 
         ResponseMetaData responseMetaData = ResponseMetaData.of(posts);
