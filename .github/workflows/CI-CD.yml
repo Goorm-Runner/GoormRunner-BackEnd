@@ -43,12 +43,6 @@ jobs:
           SPRING_PROFILES_ACTIVE: test
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
-      - name: 테스트 결과를 PR에 코멘트로 등록 ✅
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always()
-        with:
-            files: '**/build/test-results/test/TEST-*.xml'
-
       - name: 테스트 실패한 곳 체크 🫠
         uses: mikepenz/action-junit-report@v3
         if: always()
