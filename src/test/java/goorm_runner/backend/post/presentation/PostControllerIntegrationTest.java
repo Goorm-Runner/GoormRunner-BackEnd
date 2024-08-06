@@ -186,6 +186,73 @@ class PostControllerIntegrationTest {
     }
 
     @Test
+    void read_after_like() throws Exception {
+        //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest createRequest = new PostCreateRequest(title, content);
+
+        String loginId = "test";
+        String password = "password";
+
+        String categoryName = Category.GENERAL.name();
+
+        //when
+        Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        authService.login(new LoginRequest(loginId, password));
+
+        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        postLikeService.likePost(post.getId(), member.getId());
+
+        //then
+        mockMvc.perform(get("/categories/general/posts/" + post.getId()))
+                .andExpect(status().isOk())
+                .andExpectAll(
+                        jsonPath("$.categoryName").value(Category.GENERAL.name()),
+                        jsonPath("$.postId").value(post.getId()),
+                        jsonPath("$.title").value(post.getTitle()),
+                        jsonPath("$.likeCount").value(1),
+                        jsonPath("$.content").value(post.getContent()),
+                        jsonPath("$.createdAt").value(post.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)),
+                        jsonPath("$.updatedAt").value(post.getUpdatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                );
+    }
+
+    @Test
+    void read_after_cancel_like() throws Exception {
+        //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest createRequest = new PostCreateRequest(title, content);
+
+        String loginId = "test";
+        String password = "password";
+
+        String categoryName = Category.GENERAL.name();
+
+        //when
+        Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        authService.login(new LoginRequest(loginId, password));
+
+        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        postLikeService.likePost(post.getId(), member.getId());
+        postLikeService.deletePostLike(post.getId(), member.getId());
+
+        //then
+        mockMvc.perform(get("/categories/general/posts/" + post.getId()))
+                .andExpect(status().isOk())
+                .andExpectAll(
+                        jsonPath("$.categoryName").value(Category.GENERAL.name()),
+                        jsonPath("$.postId").value(post.getId()),
+                        jsonPath("$.title").value(post.getTitle()),
+                        jsonPath("$.likeCount").value(0),
+                        jsonPath("$.content").value(post.getContent()),
+                        jsonPath("$.createdAt").value(post.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)),
+                        jsonPath("$.updatedAt").value(post.getUpdatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                );
+    }
+
+    @Test
     void read_failure() throws Exception {
         //given
         String title = "Example title";
