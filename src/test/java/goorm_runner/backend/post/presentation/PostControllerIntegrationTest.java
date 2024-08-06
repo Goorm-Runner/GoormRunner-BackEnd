@@ -20,6 +20,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.format.DateTimeFormatter;
+
 import static goorm_runner.backend.global.ErrorCode.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -172,13 +174,15 @@ class PostControllerIntegrationTest {
         //then
         mockMvc.perform(get("/categories/general/posts/" + post.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.categoryName").isNotEmpty())
-                .andExpect(jsonPath("$.postId").isNotEmpty())
-                .andExpect(jsonPath("$.title").isNotEmpty())
-                .andExpect(jsonPath("$.likeCount").isNotEmpty())
-                .andExpect(jsonPath("$.content").isNotEmpty())
-                .andExpect(jsonPath("$.createdAt").isNotEmpty())
-                .andExpect(jsonPath("$.updatedAt").isNotEmpty());
+                .andExpectAll(
+                        jsonPath("$.categoryName").value(Category.GENERAL.name()),
+                        jsonPath("$.postId").value(post.getId()),
+                        jsonPath("$.title").value(post.getTitle()),
+                        jsonPath("$.likeCount").value(0),
+                        jsonPath("$.content").value(post.getContent()),
+                        jsonPath("$.createdAt").value(post.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)),
+                        jsonPath("$.updatedAt").value(post.getUpdatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                );
     }
 
     @Test
@@ -232,8 +236,8 @@ class PostControllerIntegrationTest {
                         jsonPath("$.overviews[0].categoryName").value(categoryName),
                         jsonPath("$.overviews[0].postId").value(post.getId()),
                         jsonPath("$.overviews[0].title").value(post.getTitle()),
-                        jsonPath("$.overviews[0].createdAt").value(post.getCreatedAt().toString()),
-                        jsonPath("$.overviews[0].updatedAt").value(post.getUpdatedAt().toString()),
+                        jsonPath("$.overviews[0].createdAt").value(post.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)),
+                        jsonPath("$.overviews[0].updatedAt").value(post.getUpdatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)),
                         jsonPath("$.overviews[0].authorName").value(member.getNickname()),
                         jsonPath("$.overviews[0].likeCount").value(0)
                 )
@@ -274,8 +278,8 @@ class PostControllerIntegrationTest {
                         jsonPath("$.overviews[0].categoryName").value(categoryName),
                         jsonPath("$.overviews[0].postId").value(post.getId()),
                         jsonPath("$.overviews[0].title").value(post.getTitle()),
-                        jsonPath("$.overviews[0].createdAt").value(post.getCreatedAt().toString()),
-                        jsonPath("$.overviews[0].updatedAt").value(post.getUpdatedAt().toString()),
+                        jsonPath("$.overviews[0].createdAt").value(post.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)),
+                        jsonPath("$.overviews[0].updatedAt").value(post.getUpdatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)),
                         jsonPath("$.overviews[0].authorName").value(member.getNickname()),
                         jsonPath("$.overviews[0].likeCount").value(1)
                 )
@@ -317,8 +321,8 @@ class PostControllerIntegrationTest {
                         jsonPath("$.overviews[0].categoryName").value(categoryName),
                         jsonPath("$.overviews[0].postId").value(post.getId()),
                         jsonPath("$.overviews[0].title").value(post.getTitle()),
-                        jsonPath("$.overviews[0].createdAt").value(post.getCreatedAt().toString()),
-                        jsonPath("$.overviews[0].updatedAt").value(post.getUpdatedAt().toString()),
+                        jsonPath("$.overviews[0].createdAt").value(post.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)),
+                        jsonPath("$.overviews[0].updatedAt").value(post.getUpdatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)),
                         jsonPath("$.overviews[0].authorName").value(member.getNickname()),
                         jsonPath("$.overviews[0].likeCount").value(0)
                 )
@@ -603,9 +607,15 @@ class PostControllerIntegrationTest {
                         .header("Authorization", "Bearer " + token)
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.overviews").isNotEmpty())
-                .andExpect(jsonPath("$.responseMetaData").isNotEmpty())
                 .andExpect(jsonPath("$.overviews.size()").value(1))
-                .andExpect(jsonPath("$.overviews[0].title").value(title2));
+                .andExpect(jsonPath("$.overviews[0].title").value(title2))
+                .andExpectAll(
+                        jsonPath("$.responseMetaData.number").value(0),
+                        jsonPath("$.responseMetaData.size").value(10),
+                        jsonPath("$.responseMetaData.isFirst").value(true),
+                        jsonPath("$.responseMetaData.isLast").value(true),
+                        jsonPath("$.responseMetaData.hasNext").value(false),
+                        jsonPath("$.responseMetaData.hasPrevious").value(false)
+                );
     }
 }
