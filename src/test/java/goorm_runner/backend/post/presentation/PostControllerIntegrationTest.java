@@ -218,13 +218,28 @@ class PostControllerIntegrationTest {
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         authService.login(new LoginRequest(loginId, password));
 
-        postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
 
         //then
         mockMvc.perform(get("/categories/general/posts?pageNumber=0&pageSize=10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.overviews").isNotEmpty())
-                .andExpect(jsonPath("$.responseMetaData").isNotEmpty());
+                .andExpect(jsonPath("$.overviews.size()").value(1))
+                .andExpectAll(
+                        jsonPath("$.overviews[0].categoryName").value(categoryName),
+                        jsonPath("$.overviews[0].postId").value(post.getId()),
+                        jsonPath("$.overviews[0].title").value(post.getTitle()),
+                        jsonPath("$.overviews[0].createdAt").value(post.getCreatedAt().toString()),
+                        jsonPath("$.overviews[0].updatedAt").value(post.getUpdatedAt().toString()),
+                        jsonPath("$.overviews[0].authorName").value(member.getNickname())
+                )
+                .andExpectAll(
+                        jsonPath("$.responseMetaData.number").value(0),
+                        jsonPath("$.responseMetaData.size").value(10),
+                        jsonPath("$.responseMetaData.isFirst").value(true),
+                        jsonPath("$.responseMetaData.isLast").value(true),
+                        jsonPath("$.responseMetaData.hasNext").value(false),
+                        jsonPath("$.responseMetaData.hasPrevious").value(false)
+                );
     }
 
     @Test
