@@ -2,6 +2,8 @@ package goorm_runner.backend.member.security.config;
 
 import goorm_runner.backend.member.security.config.jwt.JwtAuthenticationFilter;
 import goorm_runner.backend.member.security.config.jwt.JwtTokenProvider;
+import goorm_runner.backend.member.security.config.oauth2.CustomOauth2UserService;
+import goorm_runner.backend.member.security.config.oauth2.OAuth2AuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,11 +31,28 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/members/signup").permitAll()
+                        .requestMatchers("/api/auth/login/google").permitAll()
+                        .requestMatchers("/api/auth/oauth2/redirect").permitAll()
                         .anyRequest().authenticated()
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService())
+                        )
+                        .successHandler(oAuth2AuthenticationSuccessHandler())
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+    @Bean
+    public CustomOauth2UserService customOAuth2UserService() {
+        return new CustomOauth2UserService();
+    }
+
+    @Bean
+    public OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
+        return new OAuth2AuthenticationSuccessHandler(jwtTokenProvider);
     }
 
     @Bean
