@@ -10,10 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,5 +33,17 @@ public class AuthController {
         String token = authService.login(request);
         return ResponseEntity.ok(new LoginResponse(token));
     }
+
+    @GetMapping("/login/google")
+    public ResponseEntity<?> googleLogin() {
+        return ResponseEntity.ok("Google 로그인 페이지로 리다이렉트됩니다.");
+    }
+
+    @GetMapping("/oauth2/redirect")
+    public ResponseEntity<?> oauth2Redirect(@RequestParam String token) {
+        return ResponseEntity.ok(Collections.singletonMap("token", token));
+    }
+
+
 
 }
