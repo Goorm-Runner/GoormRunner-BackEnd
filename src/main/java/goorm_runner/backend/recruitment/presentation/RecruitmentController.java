@@ -47,9 +47,17 @@ public class RecruitmentController {
     /**
      * 모든 모집 글을 조회한다.
      */
-    @GetMapping
+//    @GetMapping
     public ResponseEntity<List<RecruitmentResponse>> getAllRecruitments() {
         List<RecruitmentResponse> recruitments = recruitmentService.findAllRecruitments();
+        return ResponseEntity.ok(recruitments);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<RecruitmentResponse>> getRecruitments(
+            @RequestParam(required = false) Long teamId,
+            @RequestParam(required = false) Long ballparkId) {
+        List<RecruitmentResponse> recruitments = recruitmentService.findByTeamAndBallpark(teamId, ballparkId);
         return ResponseEntity.ok(recruitments);
     }
 
