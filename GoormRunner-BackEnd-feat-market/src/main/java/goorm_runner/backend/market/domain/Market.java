@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
 
 @Entity
 @Getter
@@ -43,7 +46,7 @@ public class Market extends BaseTimeEntity {
     @Column(length = 50, nullable = false)
     private Integer delivery;
 
-    @Column(name = "image_url")
+    @Column(length = 300, nullable = false)
     private String imageUrl;
 
 
@@ -60,10 +63,12 @@ public class Market extends BaseTimeEntity {
         this.imageUrl = imageUrl;
     }
 
-    public void update(String title, String content, Integer price, Integer delivery, String imageUrl) {
+    public void update(String title, String content, Integer price, MarketCategory category, MarketStatus status, Integer delivery, String imageUrl) {
         this.title = title;
         this.content = content;
         this.price = price;
+        this.category = category;
+        this.status = status;
         this.delivery = delivery;
         this.imageUrl = imageUrl;
     }

@@ -12,6 +12,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
 
 
 @Service
@@ -21,22 +26,34 @@ public class MarketService {
 
     private final MarketRepository marketRepository;
     private final MemberRepository memberRepository;
-    public Market create(MarketCreateRequest request, Long memberId,  String categoryName, String statustitle) {
-        validateOfRequests(request.title(), request.content(), request.price(), request.delivery(), request.imageUrl());
+
+    private static final String IMAGE_DIRECTORY = "uploaded-images/";
+
+    public Market create(MarketCreateRequest request, Long memberId,  String categoryName, String statustitle,MultipartFile image) throws IOException {
+        validateOfRequests(request.title(), request.content(), request.price(), request.delivery(), image.getOriginalFilename());
+
+        String imageUrl = saveImage(image);
 
         MarketCategory category = toMarketCategory(categoryName);
         MarketStatus status = toMarketStatus(statustitle);
-        Market market = getMarket(request, memberId, category, status);
+        Market market = getMarket(request, memberId, category, status, imageUrl);
+
+
         return marketRepository.save(market);
     }
 
-    public Market update(MarketUpdateRequest request, Long marketId) {
-        validateOfRequests(request.title(), request.content(), request.price(), request.delivery(), request.imageUrl());
+    public Market update(MarketUpdateRequest request, Long marketId, String categoryName, String statustitle, MultipartFile image)throws IOException {
+        validateOfRequests(request.title(), request.content(), request.price(), request.delivery(), image.getOriginalFilename());
 
         Market market = marketRepository.findById(marketId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 상품을 찾지 못했습니다."));
 
-        market.update(request.title(), request.content(), request.price(), request.delivery(), request.imageUrl());
+        MarketCategory category = toMarketCategory(categoryName);
+        MarketStatus status = toMarketStatus(statustitle);
+
+        String imageUrl = saveImage(image);
+
+        market.update(request.title(), request.content(), request.price(),category,status, request.delivery(), imageUrl);
         return market;
     }
 
@@ -44,7 +61,7 @@ public class MarketService {
         marketRepository.deleteById(marketId);
     }
 
-    private void validateOfRequests(String title, String content, Integer price,  Integer delivery, String imageUrl) {
+private void validateOfRequests(String title, String content, Integer price,  Integer delivery, String fileName) {
         if (!StringUtils.hasText(title)) {
             throw new IllegalArgumentException("제목을 입력해주세요.");
         }
@@ -61,9 +78,26 @@ public class MarketService {
             throw new IllegalArgumentException("배송비는 0 이상이어야 합니다.");
         }
 
-        if (!StringUtils.hasText(imageUrl)) {
-            throw new IllegalArgumentException("사진이 첨부되지 않았습니다.");
+        if (!StringUtils.hasText(fileName)) {
+            throw new IllegalArgumentException("이미지가 첨부되지 않았습니다.");
         }
+    }
+
+    private String saveImage(MultipartFile image) throws IOException {
+        // 디렉토리가 존재하지 않으면 생성
+        File directory = new File(IMAGE_DIRECTORY);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        // 파일 이름에 UUID 추가하여 중복 방지
+        String filename = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
+        File saveFile = new File(IMAGE_DIRECTORY + filename);
+
+        // 파일 저장
+        image.transferTo(saveFile);
+
+        return saveFile.getPath();
     }
 
     private MarketCategory toMarketCategory(String category) {
@@ -82,7 +116,7 @@ public class MarketService {
         }
     }
 
-    private Market getMarket(MarketCreateRequest request, Long memberId,  MarketCategory category, MarketStatus status) {
+    private Market getMarket(MarketCreateRequest request, Long memberId,  MarketCategory category, MarketStatus status, String imageUrl) {
         return Market.builder()
                 .memberId(memberId)
                 .title(request.title())
@@ -92,7 +126,7 @@ public class MarketService {
                 .category(category)
                 .status(status)
                 .delivery(request.delivery())
-                .imageUrl(request.imageUrl())
+                .imageUrl(imageUrl)
                 .build();
     }
 }

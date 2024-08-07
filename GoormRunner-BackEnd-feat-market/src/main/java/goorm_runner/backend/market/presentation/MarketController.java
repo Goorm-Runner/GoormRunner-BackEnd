@@ -13,8 +13,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -33,20 +35,24 @@ public class MarketController {
             @AuthenticationPrincipal SecurityMember securityMember,
             @PathVariable String categoryName,
             @RequestParam String statusTitle,
-            @RequestBody MarketCreateRequest request) {
+            @RequestBody MarketCreateRequest request,
+            @RequestParam("image") MultipartFile image) throws IOException {
 
 
-        String username = securityMember.getUsername();
-        Long memberId = memberService.getMemberIdByUsername(username);
+        try {
+            String username = securityMember.getUsername();
+            Long memberId = memberService.getMemberIdByUsername(username);
 
 
-        Market market = marketService.create(request, memberId, categoryName.toUpperCase(), statusTitle.toUpperCase());
-        MarketCreateResponse response = getCreateResponse(market);
+            Market market = marketService.create(request, memberId, categoryName.toUpperCase(), statusTitle.toUpperCase(), image);
+            MarketCreateResponse response = getCreateResponse(market);
 
 
-        URI location = newUri(response);
-
-        return ResponseEntity.created(location).body(response);
+            URI location = newUri(response);
+            return ResponseEntity.created(location).body(response);
+        } catch (IOException e) {
+        return ResponseEntity.status(500).body(null);
+    }
     }
 
 
@@ -81,11 +87,13 @@ public class MarketController {
     @PutMapping("/categories/{categoryName}/items/{marketId}")
     public ResponseEntity<MarketReadResponse> updateMarket(
             @PathVariable String categoryName,
+            @PathVariable String statusTitle,
             @PathVariable Long marketId,
-            @RequestBody MarketUpdateRequest request) {
+            @RequestBody MarketUpdateRequest request,
+            @RequestParam("image") MultipartFile image) throws IOException {
 
 
-        Market market = marketService.update(request, marketId);
+        Market market = marketService.update(request, marketId, categoryName, statusTitle, image);
         MarketReadResponse response = getReadResponse(categoryName.toUpperCase(), market);
 
         return ResponseEntity.ok(response);
