@@ -12,6 +12,7 @@ import goorm_runner.backend.team.domain.TeamRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,6 +63,14 @@ public class RecruitmentService {
         recruitmentRepository.save(recruitment);
 
         return creativeRecruitmentResponse(recruitment);
+    }
+
+    public List<RecruitmentResponse> findByTeamAndBallpark(Long teamId, Long ballparkId) {
+        Specification<Recruitment> spec = RecruitmentSpecifications.byTeamAndBallpark(teamId, ballparkId);
+
+        return recruitmentRepository.findAll(spec).stream()
+                .map(this::creativeRecruitmentResponse)
+                .collect(Collectors.toList());
     }
 
     /**
