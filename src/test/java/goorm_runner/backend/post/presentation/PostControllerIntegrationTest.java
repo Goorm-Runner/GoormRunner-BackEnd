@@ -8,10 +8,12 @@ import goorm_runner.backend.member.security.dto.MemberSignupRequest;
 import goorm_runner.backend.post.application.PostService;
 import goorm_runner.backend.post.domain.Category;
 import goorm_runner.backend.post.domain.Post;
+import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.dto.PostCreateRequest;
 import goorm_runner.backend.post.dto.PostUpdateRequest;
 import goorm_runner.backend.postlike.application.PostLikeService;
 import jakarta.persistence.EntityManager;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -49,6 +51,14 @@ class PostControllerIntegrationTest {
 
     @Autowired
     private EntityManager em;
+
+    @Autowired
+    private PostRepository postRepository;
+
+    @BeforeEach
+    void setUp() {
+        postRepository.deleteAll();
+    }
 
     @Test
     void create_success() throws Exception {

@@ -4,8 +4,10 @@ import goorm_runner.backend.global.ErrorCode;
 import goorm_runner.backend.post.application.exception.PostException;
 import goorm_runner.backend.post.domain.Category;
 import goorm_runner.backend.post.domain.Post;
+import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.dto.PostCreateRequest;
 import jakarta.persistence.EntityManager;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,6 +30,14 @@ public class PostServiceIntegrationTest {
 
     @Autowired
     private PostReadService postReadService;
+
+    @Autowired
+    private PostRepository postRepository;
+
+    @BeforeEach
+    void setUp() {
+        postRepository.deleteAll();
+    }
 
     @Test
     void delete_success() {
