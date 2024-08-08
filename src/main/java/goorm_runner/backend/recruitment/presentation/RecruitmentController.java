@@ -7,11 +7,10 @@ import goorm_runner.backend.recruitment.domain.MemberGathering;
 import goorm_runner.backend.recruitment.dto.ApproveRequest;
 import goorm_runner.backend.recruitment.dto.RecruitmentRequest;
 import goorm_runner.backend.recruitment.dto.RecruitmentResponse;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,16 +31,12 @@ public class RecruitmentController {
     public ResponseEntity<RecruitmentResponse> createRecruitment(
             @RequestBody RecruitmentRequest request,
             @AuthenticationPrincipal SecurityMember securityMember) {
-        if (securityMember == null) {
-            throw new AccessDeniedException("Authentication failed");
-        }
 
         String username = securityMember.getUsername();
         Long authorId = memberService.getMemberIdByUsername(username);
-        log.info("Create Member ID {}", authorId);
 
         RecruitmentResponse response = recruitmentService.createRecruitment(request, authorId);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     /**
@@ -82,7 +77,7 @@ public class RecruitmentController {
     /**
      * 특정 팀의 모집 글을 조회한다.
      */
-    @GetMapping("/team/{teamId}")
+//    @GetMapping("/team/{teamId}")
     public ResponseEntity<List<RecruitmentResponse>> getRecruitmentsByTeam(@PathVariable Long teamId) {
         List<RecruitmentResponse> recruitments = recruitmentService.findRecruitmentsByTeam(teamId);
         return ResponseEntity.ok(recruitments);
@@ -96,10 +91,6 @@ public class RecruitmentController {
             @PathVariable Long recruitmentId,
             @RequestBody RecruitmentRequest request,
             @AuthenticationPrincipal SecurityMember securityMember) {
-
-        if (securityMember == null) {
-            throw new AccessDeniedException("Authentication failed");
-        }
 
         String username = securityMember.getUsername();
         Long authorId = memberService.getMemberIdByUsername(username);
@@ -137,7 +128,7 @@ public class RecruitmentController {
         Long hostId = memberService.getMemberIdByUsername(username);
 
         recruitmentService.approveParticipation(recruitmentId, approveRequest.getMemberId(), hostId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     /**
@@ -152,7 +143,7 @@ public class RecruitmentController {
         Long memberId = memberService.getMemberIdByUsername(username);
 
         recruitmentService.cancelParticipation(recruitmentId, memberId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     /**
@@ -167,6 +158,6 @@ public class RecruitmentController {
         Long memberId = memberService.getMemberIdByUsername(username);
 
         recruitmentService.deleteRecruitment(recruitmentId, memberId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
