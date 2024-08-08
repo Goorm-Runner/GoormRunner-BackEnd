@@ -627,7 +627,6 @@ class PostControllerIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        Long authorId = 1L;
         PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         String loginId = "test";
@@ -637,6 +636,7 @@ class PostControllerIntegrationTest {
 
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        Long authorId = member.getId();
         String token = authService.login(new LoginRequest(loginId, password));
 
         Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
@@ -658,7 +658,6 @@ class PostControllerIntegrationTest {
         //given
         String title1 = "title1";
         String content1 = "content1";
-        Long authorId = 1L;
         PostCreateRequest createRequest1 = new PostCreateRequest(title1, content1);
 
         String title2 = "title1";
@@ -672,6 +671,7 @@ class PostControllerIntegrationTest {
 
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        Long authorId = member.getId();
         String token = authService.login(new LoginRequest(loginId, password));
 
         Post post1 = postService.create(createRequest1, member.getId(), categoryName.toUpperCase());
