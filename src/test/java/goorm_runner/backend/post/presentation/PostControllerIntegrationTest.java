@@ -627,6 +627,7 @@ class PostControllerIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
+        Long authorId = 1L;
         PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         String loginId = "test";
@@ -639,7 +640,7 @@ class PostControllerIntegrationTest {
         String token = authService.login(new LoginRequest(loginId, password));
 
         Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
-        postService.delete(post.getId());
+        postService.delete(post.getId(), authorId);
         em.flush();
         em.clear();
 
@@ -657,6 +658,7 @@ class PostControllerIntegrationTest {
         //given
         String title1 = "title1";
         String content1 = "content1";
+        Long authorId = 1L;
         PostCreateRequest createRequest1 = new PostCreateRequest(title1, content1);
 
         String title2 = "title1";
@@ -675,7 +677,7 @@ class PostControllerIntegrationTest {
         Post post1 = postService.create(createRequest1, member.getId(), categoryName.toUpperCase());
         postService.create(createRequest2, member.getId(), categoryName.toUpperCase());
 
-        postService.delete(post1.getId()); // post2만 남아있다.
+        postService.delete(post1.getId(), authorId); // post2만 남아있다.
         em.flush();
         em.clear();
 
