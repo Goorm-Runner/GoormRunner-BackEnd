@@ -37,7 +37,7 @@ public class RecruitmentController {
         }
 
         String username = securityMember.getUsername();
-        Long authorId = memberService.getMemberIdByUsername(username);
+        Long authorId = memberService.findMemberIdByUsername(username);
         log.info("Create Member ID {}", authorId);
 
         RecruitmentResponse response = recruitmentService.createRecruitment(request, authorId);
@@ -94,7 +94,7 @@ public class RecruitmentController {
         }
 
         String username = securityMember.getUsername();
-        Long authorId = memberService.getMemberIdByUsername(username);
+        Long authorId = memberService.findMemberIdByUsername(username);
 
         RecruitmentResponse response = recruitmentService.updateRecruitment(recruitmentId, request, authorId);
         return ResponseEntity.ok(response);
@@ -110,7 +110,7 @@ public class RecruitmentController {
             @AuthenticationPrincipal SecurityMember securityMember) {
 
         String username = securityMember.getUsername();
-        Long memberId = memberService.getMemberIdByUsername(username);
+        Long memberId = memberService.findMemberIdByUsername(username);
 
         MemberGathering memberGathering = recruitmentService.joinRecruitment(recruitmentId, memberId);
         return ResponseEntity.ok(memberGathering);
@@ -126,7 +126,7 @@ public class RecruitmentController {
             @AuthenticationPrincipal SecurityMember securityMember) {
 
         String username = securityMember.getUsername();
-        Long hostId = memberService.getMemberIdByUsername(username);
+        Long hostId = memberService.findMemberIdByUsername(username);
 
         recruitmentService.approveParticipation(recruitmentId, approveRequest.getMemberId(), hostId);
         return ResponseEntity.ok().build();
@@ -141,7 +141,7 @@ public class RecruitmentController {
             @AuthenticationPrincipal SecurityMember securityMember) {
 
         String username = securityMember.getUsername();
-        Long memberId = memberService.getMemberIdByUsername(username);
+        Long memberId = memberService.findMemberIdByUsername(username);
 
         recruitmentService.cancelParticipation(recruitmentId, memberId);
         return ResponseEntity.ok().build();
@@ -156,7 +156,7 @@ public class RecruitmentController {
             @AuthenticationPrincipal SecurityMember securityMember) {
 
         String username = securityMember.getUsername();
-        Long memberId = memberService.getMemberIdByUsername(username);
+        Long memberId = memberService.findMemberIdByUsername(username);
 
         recruitmentService.deleteRecruitment(recruitmentId, memberId);
         return ResponseEntity.ok().build();
