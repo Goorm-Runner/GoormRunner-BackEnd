@@ -37,7 +37,7 @@ jobs:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
       - name: 테스트 실행 🧪
-        run: ./gradlew test
+        run: ./gradlew test -Dspring.profiles.active=prod
         id: gradle_test
         env:
           DB_URL: ${{ secrets.DB_URL }}
