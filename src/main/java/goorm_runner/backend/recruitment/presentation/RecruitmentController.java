@@ -7,7 +7,6 @@ import goorm_runner.backend.recruitment.domain.MemberGathering;
 import goorm_runner.backend.recruitment.dto.ApproveRequest;
 import goorm_runner.backend.recruitment.dto.RecruitmentRequest;
 import goorm_runner.backend.recruitment.dto.RecruitmentResponse;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
