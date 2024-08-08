@@ -2,7 +2,7 @@ package goorm_runner.backend.market.application;
 
 import goorm_runner.backend.market.domain.Market;
 import goorm_runner.backend.market.domain.MarketCategory;
-import goorm_runner.backend.market.domain.MarketQueryRepository;
+import goorm_runner.backend.market.domain.MarketRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,16 +14,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 public class MarketReadService {
-    private final MarketQueryRepository marketQueryRepository;
+    private final MarketRepository marketRepository;
 
     public Market readMarket(Long marketId) {
-        return marketQueryRepository.findById(marketId)
+        return marketRepository.findById(marketId)
                 .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다."));
     }
 
     public Page<Market> readPage(String categoryName, Pageable pageable) {
         MarketCategory category = toCategory(categoryName);
-        return marketQueryRepository.findByCategory(category, pageable);
+        return marketRepository.findByCategory(category, pageable);
     }
 
     private MarketCategory toCategory(String category) {

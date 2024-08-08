@@ -6,8 +6,8 @@ import goorm_runner.backend.market.dto.MarketCreateRequest;
 import goorm_runner.backend.market.domain.Market;
 import goorm_runner.backend.market.dto.MarketUpdateRequest;
 import goorm_runner.backend.market.domain.MarketRepository;
+import goorm_runner.backend.market.exception.MarketNotFoundException;
 import goorm_runner.backend.member.application.MemberRepository;
-import goorm_runner.backend.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +46,7 @@ public class MarketService {
         validateOfRequests(request.title(), request.content(), request.price(), request.delivery(), image.getOriginalFilename());
 
         Market market = marketRepository.findById(marketId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 상품을 찾지 못했습니다."));
+                .orElseThrow(() -> new MarketNotFoundException("해당 상품을 찾지 못했습니다."));
 
         MarketCategory category = toMarketCategory(categoryName);
         MarketStatus status = toMarketStatus(statustitle);
@@ -61,13 +61,13 @@ public class MarketService {
         marketRepository.deleteById(marketId);
     }
 
-private void validateOfRequests(String title, String content, Integer price,  Integer delivery, String fileName) {
-        if (!StringUtils.hasText(title)) {
-            throw new IllegalArgumentException("제목을 입력해주세요.");
+    private void validateOfRequests(String title, String content, Integer price, Integer delivery, String fileName) {
+        if (!StringUtils.hasText(title) || title.length() > 100) {
+            throw new IllegalArgumentException("제목을 입력하거나 너무 길지 않게 하세요.");
         }
 
-        if (!StringUtils.hasText(content)) {
-            throw new IllegalArgumentException("본문 내용을 입력해주세요.");
+        if (!StringUtils.hasText(content) || content.length() > 1000) {
+            throw new IllegalArgumentException("본문 내용을 입력하거나 너무 길지 않게 하세요.");
         }
 
         if (price == null || price <= 0) {
@@ -78,8 +78,8 @@ private void validateOfRequests(String title, String content, Integer price,  In
             throw new IllegalArgumentException("배송비는 0 이상이어야 합니다.");
         }
 
-        if (!StringUtils.hasText(fileName)) {
-            throw new IllegalArgumentException("이미지가 첨부되지 않았습니다.");
+        if (!StringUtils.hasText(fileName) || !fileName.toLowerCase().endsWith(".jpg")) {
+            throw new IllegalArgumentException("지원하지 않는 이미지 파일 형식입니다.");
         }
     }
 
