@@ -1,7 +1,9 @@
 package goorm_runner.backend.member.security.application.exception;
 
 import goorm_runner.backend.global.ErrorCode;
+import lombok.Getter;
 
+@Getter
 public class AuthException extends IllegalArgumentException {
 
     private final ErrorCode errorCode;

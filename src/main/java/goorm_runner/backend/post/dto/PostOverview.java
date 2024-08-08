@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 
 @Builder
 public record PostOverview(String categoryName, Long postId, String title, LocalDateTime createdAt,
-                           LocalDateTime updatedAt, String authorName) {
-    public static PostOverview from(Post post, String authorName) {
+                           LocalDateTime updatedAt, String authorName, int likeCount) {
+    public static PostOverview from(Post post, String authorName, int likeCount) {
         return PostOverview.builder()
                 .categoryName(post.getCategory().name())
                 .postId(post.getId())
@@ -16,6 +16,7 @@ public record PostOverview(String categoryName, Long postId, String title, Local
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .authorName(authorName)
+                .likeCount(likeCount)
                 .build();
     }
 }

@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -43,6 +44,8 @@ public class Member {
 
     @OneToMany(mappedBy = "member")
     private Set<MemberAuthority> memberAuthorities = new HashSet<>();
+
+    private LocalDateTime deletedAt;
 
     @Builder
     public Member(String loginId, String nickname, String password, Role role, Sex sex, LocalDate birth, Long teamId, String profilePictureUrl, Set<MemberAuthority> memberAuthorities) {

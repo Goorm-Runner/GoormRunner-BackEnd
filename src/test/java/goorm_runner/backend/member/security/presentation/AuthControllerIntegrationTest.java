@@ -33,15 +33,15 @@ class AuthControllerIntegrationTest {
     @Test
     void signup_success() throws Exception {
         //given
-        String id = "id";
-        String username = "username";
+        String loginId = "loginId";
+        String nickname = "nickname";
         String password = "password";
         String role = "user";
         String sex = "male";
         String birth = "2024-07-30";
 
         //when
-        MemberSignupRequest request = new MemberSignupRequest(id, username, password, role, sex, birth);
+        MemberSignupRequest request = new MemberSignupRequest(loginId, nickname, password, role, sex, birth);
 
         //then
         mockMvc.perform(post("/api/auth/signup")
@@ -54,17 +54,17 @@ class AuthControllerIntegrationTest {
     @Test
     void login_success() throws Exception {
         //given
-        String id = "id";
-        String username = "username";
+        String loginId = "loginId";
+        String nickname = "nickname";
         String password = "password";
         String role = "user";
         String sex = "male";
         String birth = "2024-07-30";
 
-        authService.signup(new MemberSignupRequest(id, username, password, role, sex, birth));
+        authService.signup(new MemberSignupRequest(loginId, nickname, password, role, sex, birth));
 
         //when
-        LoginRequest loginRequest = new LoginRequest(id, password);
+        LoginRequest loginRequest = new LoginRequest(loginId, password);
 
         //then
         mockMvc.perform(post("/api/auth/login")
@@ -78,11 +78,11 @@ class AuthControllerIntegrationTest {
     @Test
     void login_without_signup_failure() throws Exception {
         //given
-        String id = "id";
+        String loginId = "loginId";
         String password = "password";
 
         //when
-        LoginRequest loginRequest = new LoginRequest(id, password);
+        LoginRequest loginRequest = new LoginRequest(loginId, password);
 
         //then
         mockMvc.perform(post("/api/auth/login")

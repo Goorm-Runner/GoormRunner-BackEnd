@@ -8,8 +8,12 @@ import goorm_runner.backend.member.security.dto.MemberSignupRequest;
 import goorm_runner.backend.post.application.PostService;
 import goorm_runner.backend.post.domain.Category;
 import goorm_runner.backend.post.domain.Post;
+import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.dto.PostCreateRequest;
 import goorm_runner.backend.post.dto.PostUpdateRequest;
+import goorm_runner.backend.postlike.application.PostLikeService;
+import jakarta.persistence.EntityManager;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,6 +21,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.format.DateTimeFormatter;
 
 import static goorm_runner.backend.global.ErrorCode.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -38,7 +44,21 @@ class PostControllerIntegrationTest {
     private PostService postService;
 
     @Autowired
+    private PostLikeService postLikeService;
+
+    @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private EntityManager em;
+
+    @Autowired
+    private PostRepository postRepository;
+
+    @BeforeEach
+    void setUp() {
+        postRepository.deleteAll();
+    }
 
     @Test
     void create_success() throws Exception {
@@ -157,22 +177,89 @@ class PostControllerIntegrationTest {
 
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
-        String token = authService.login(new LoginRequest(loginId, password));
+        authService.login(new LoginRequest(loginId, password));
 
         Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
 
         //then
-        mockMvc.perform(get("/categories/general/posts/" + post.getId())
-                        .header("Authorization", "Bearer " + token)
-                )
+        mockMvc.perform(get("/categories/general/posts/" + post.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.categoryName").isNotEmpty())
-                .andExpect(jsonPath("$.postId").isNotEmpty())
-                .andExpect(jsonPath("$.title").isNotEmpty())
-                .andExpect(jsonPath("$.likeCount").isNotEmpty())
-                .andExpect(jsonPath("$.content").isNotEmpty())
-                .andExpect(jsonPath("$.createdAt").isNotEmpty())
-                .andExpect(jsonPath("$.updatedAt").isNotEmpty());
+                .andExpectAll(
+                        jsonPath("$.categoryName").value(Category.GENERAL.name()),
+                        jsonPath("$.postId").value(post.getId()),
+                        jsonPath("$.title").value(post.getTitle()),
+                        jsonPath("$.likeCount").value(0),
+                        jsonPath("$.content").value(post.getContent()),
+                        jsonPath("$.createdAt").value(post.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)),
+                        jsonPath("$.updatedAt").value(post.getUpdatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                );
+    }
+
+    @Test
+    void read_after_like() throws Exception {
+        //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest createRequest = new PostCreateRequest(title, content);
+
+        String loginId = "test";
+        String password = "password";
+
+        String categoryName = Category.GENERAL.name();
+
+        //when
+        Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        authService.login(new LoginRequest(loginId, password));
+
+        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        postLikeService.likePost(post.getId(), member.getId());
+
+        //then
+        mockMvc.perform(get("/categories/general/posts/" + post.getId()))
+                .andExpect(status().isOk())
+                .andExpectAll(
+                        jsonPath("$.categoryName").value(Category.GENERAL.name()),
+                        jsonPath("$.postId").value(post.getId()),
+                        jsonPath("$.title").value(post.getTitle()),
+                        jsonPath("$.likeCount").value(1),
+                        jsonPath("$.content").value(post.getContent()),
+                        jsonPath("$.createdAt").value(post.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)),
+                        jsonPath("$.updatedAt").value(post.getUpdatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                );
+    }
+
+    @Test
+    void read_after_cancel_like() throws Exception {
+        //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest createRequest = new PostCreateRequest(title, content);
+
+        String loginId = "test";
+        String password = "password";
+
+        String categoryName = Category.GENERAL.name();
+
+        //when
+        Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        authService.login(new LoginRequest(loginId, password));
+
+        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        postLikeService.likePost(post.getId(), member.getId());
+        postLikeService.deletePostLike(post.getId(), member.getId());
+
+        //then
+        mockMvc.perform(get("/categories/general/posts/" + post.getId()))
+                .andExpect(status().isOk())
+                .andExpectAll(
+                        jsonPath("$.categoryName").value(Category.GENERAL.name()),
+                        jsonPath("$.postId").value(post.getId()),
+                        jsonPath("$.title").value(post.getTitle()),
+                        jsonPath("$.likeCount").value(0),
+                        jsonPath("$.content").value(post.getContent()),
+                        jsonPath("$.createdAt").value(post.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)),
+                        jsonPath("$.updatedAt").value(post.getUpdatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                );
     }
 
     @Test
@@ -189,14 +276,12 @@ class PostControllerIntegrationTest {
 
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
-        String token = authService.login(new LoginRequest(loginId, password));
+        authService.login(new LoginRequest(loginId, password));
 
         Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
 
         //then
-        mockMvc.perform(get("/categories/general/posts/" + post.getId() + 1)
-                        .header("Authorization", "Bearer " + token)
-                )
+        mockMvc.perform(get("/categories/general/posts/" + post.getId() + 1))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.title").value(POST_NOT_FOUND.name()))
                 .andExpect(jsonPath("$.message").value(POST_NOT_FOUND.getMessage()));
@@ -216,17 +301,116 @@ class PostControllerIntegrationTest {
 
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
-        String token = authService.login(new LoginRequest(loginId, password));
+        authService.login(new LoginRequest(loginId, password));
 
-        postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
 
         //then
-        mockMvc.perform(get("/categories/general/posts?pageNumber=0&pageSize=10")
-                        .header("Authorization", "Bearer " + token)
-                )
+        mockMvc.perform(get("/categories/general/posts?pageNumber=0&pageSize=10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.overviews").isNotEmpty())
-                .andExpect(jsonPath("$.responseMetaData").isNotEmpty());
+                .andExpect(jsonPath("$.overviews.size()").value(1))
+                .andExpectAll(
+                        jsonPath("$.overviews[0].categoryName").value(categoryName),
+                        jsonPath("$.overviews[0].postId").value(post.getId()),
+                        jsonPath("$.overviews[0].title").value(post.getTitle()),
+                        jsonPath("$.overviews[0].createdAt").value(post.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)),
+                        jsonPath("$.overviews[0].updatedAt").value(post.getUpdatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)),
+                        jsonPath("$.overviews[0].authorName").value(member.getNickname()),
+                        jsonPath("$.overviews[0].likeCount").value(0)
+                )
+                .andExpectAll(
+                        jsonPath("$.responseMetaData.number").value(0),
+                        jsonPath("$.responseMetaData.size").value(10),
+                        jsonPath("$.responseMetaData.isFirst").value(true),
+                        jsonPath("$.responseMetaData.isLast").value(true),
+                        jsonPath("$.responseMetaData.hasNext").value(false),
+                        jsonPath("$.responseMetaData.hasPrevious").value(false)
+                );
+    }
+
+    @Test
+    void readPage_likeCount() throws Exception {
+        //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest createRequest = new PostCreateRequest(title, content);
+
+        String loginId = "test";
+        String password = "password";
+
+        String categoryName = Category.GENERAL.name();
+
+        //when
+        Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        authService.login(new LoginRequest(loginId, password));
+
+        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        postLikeService.likePost(post.getId(), member.getId());
+
+        //then
+        mockMvc.perform(get("/categories/general/posts?pageNumber=0&pageSize=10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.overviews.size()").value(1))
+                .andExpectAll(
+                        jsonPath("$.overviews[0].categoryName").value(categoryName),
+                        jsonPath("$.overviews[0].postId").value(post.getId()),
+                        jsonPath("$.overviews[0].title").value(post.getTitle()),
+                        jsonPath("$.overviews[0].createdAt").value(post.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)),
+                        jsonPath("$.overviews[0].updatedAt").value(post.getUpdatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)),
+                        jsonPath("$.overviews[0].authorName").value(member.getNickname()),
+                        jsonPath("$.overviews[0].likeCount").value(1)
+                )
+                .andExpectAll(
+                        jsonPath("$.responseMetaData.number").value(0),
+                        jsonPath("$.responseMetaData.size").value(10),
+                        jsonPath("$.responseMetaData.isFirst").value(true),
+                        jsonPath("$.responseMetaData.isLast").value(true),
+                        jsonPath("$.responseMetaData.hasNext").value(false),
+                        jsonPath("$.responseMetaData.hasPrevious").value(false)
+                );
+    }
+
+    @Test
+    void readPage_after_cancel_like() throws Exception {
+        //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest createRequest = new PostCreateRequest(title, content);
+
+        String loginId = "test";
+        String password = "password";
+
+        String categoryName = Category.GENERAL.name();
+
+        //when
+        Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        authService.login(new LoginRequest(loginId, password));
+
+        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        postLikeService.likePost(post.getId(), member.getId());
+        postLikeService.deletePostLike(post.getId(), member.getId());
+
+        //then
+        mockMvc.perform(get("/categories/general/posts?pageNumber=0&pageSize=10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.overviews.size()").value(1))
+                .andExpectAll(
+                        jsonPath("$.overviews[0].categoryName").value(categoryName),
+                        jsonPath("$.overviews[0].postId").value(post.getId()),
+                        jsonPath("$.overviews[0].title").value(post.getTitle()),
+                        jsonPath("$.overviews[0].createdAt").value(post.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)),
+                        jsonPath("$.overviews[0].updatedAt").value(post.getUpdatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)),
+                        jsonPath("$.overviews[0].authorName").value(member.getNickname()),
+                        jsonPath("$.overviews[0].likeCount").value(0)
+                )
+                .andExpectAll(
+                        jsonPath("$.responseMetaData.number").value(0),
+                        jsonPath("$.responseMetaData.size").value(10),
+                        jsonPath("$.responseMetaData.isFirst").value(true),
+                        jsonPath("$.responseMetaData.isLast").value(true),
+                        jsonPath("$.responseMetaData.hasNext").value(false),
+                        jsonPath("$.responseMetaData.hasPrevious").value(false)
+                );
     }
 
     @Test
@@ -243,14 +427,12 @@ class PostControllerIntegrationTest {
 
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
-        String token = authService.login(new LoginRequest(loginId, password));
+        authService.login(new LoginRequest(loginId, password));
 
         postService.create(createRequest, member.getId(), categoryName.toUpperCase());
 
         //then
-        mockMvc.perform(get("/categories/generall/posts?pageNumber=0&pageSize=10") // wrong categoryName: generall
-                        .header("Authorization", "Bearer " + token)
-                )
+        mockMvc.perform(get("/categories/generall/posts?pageNumber=0&pageSize=10")) // wrong categoryName: generall
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.title").value(INVALID_CATEGORY.name()))
                 .andExpect(jsonPath("$.message").value(INVALID_CATEGORY.getMessage()));
@@ -389,7 +571,7 @@ class PostControllerIntegrationTest {
     }
 
     @Test
-    void deleteTest() throws Exception {
+    void delete_success() throws Exception {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
@@ -411,5 +593,106 @@ class PostControllerIntegrationTest {
                         .header("Authorization", "Bearer " + token)
                 )
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void delete_failure() throws Exception {
+        //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest createRequest = new PostCreateRequest(title, content);
+
+        String loginId = "test";
+        String password = "password";
+
+        String categoryName = "general";
+
+        //when
+        Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        String token = authService.login(new LoginRequest(loginId, password));
+
+        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+
+        //then
+        mockMvc.perform(delete("/categories/general/posts/" + post.getId() + 1)
+                        .header("Authorization", "Bearer " + token)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value(POST_NOT_FOUND.name()))
+                .andExpect(jsonPath("$.message").value(POST_NOT_FOUND.getMessage()));
+    }
+
+    @Test
+    void delete_then_read_failure() throws Exception {
+        //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest createRequest = new PostCreateRequest(title, content);
+
+        String loginId = "test";
+        String password = "password";
+
+        String categoryName = "general";
+
+        //when
+        Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        String token = authService.login(new LoginRequest(loginId, password));
+
+        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        postService.delete(post.getId());
+        em.flush();
+        em.clear();
+
+        //then
+        mockMvc.perform(get("/categories/general/posts/" + post.getId())
+                        .header("Authorization", "Bearer " + token)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value(POST_NOT_FOUND.name()))
+                .andExpect(jsonPath("$.message").value(POST_NOT_FOUND.getMessage()));
+    }
+
+    @Test
+    void delete_then_read_page() throws Exception {
+        //given
+        String title1 = "title1";
+        String content1 = "content1";
+        PostCreateRequest createRequest1 = new PostCreateRequest(title1, content1);
+
+        String title2 = "title1";
+        String content2 = "content1";
+        PostCreateRequest createRequest2 = new PostCreateRequest(title2, content2);
+
+        String loginId = "test";
+        String password = "password";
+
+        String categoryName = "general";
+
+        //when
+        Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        String token = authService.login(new LoginRequest(loginId, password));
+
+        Post post1 = postService.create(createRequest1, member.getId(), categoryName.toUpperCase());
+        postService.create(createRequest2, member.getId(), categoryName.toUpperCase());
+
+        postService.delete(post1.getId()); // post2만 남아있다.
+        em.flush();
+        em.clear();
+
+        //then
+        mockMvc.perform(get("/categories/general/posts?pageNumber=0&pageSize=10")
+                        .header("Authorization", "Bearer " + token)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.overviews.size()").value(1))
+                .andExpect(jsonPath("$.overviews[0].title").value(title2))
+                .andExpectAll(
+                        jsonPath("$.responseMetaData.number").value(0),
+                        jsonPath("$.responseMetaData.size").value(10),
+                        jsonPath("$.responseMetaData.isFirst").value(true),
+                        jsonPath("$.responseMetaData.isLast").value(true),
+                        jsonPath("$.responseMetaData.hasNext").value(false),
+                        jsonPath("$.responseMetaData.hasPrevious").value(false)
+                );
     }
 }
