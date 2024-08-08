@@ -1,6 +1,9 @@
 package goorm_runner.backend.member.security.application;
 
 import goorm_runner.backend.global.ErrorCode;
+import goorm_runner.backend.member.application.AuthorityRepository;
+import goorm_runner.backend.member.application.MemberAuthorityRepository;
+import goorm_runner.backend.member.application.MemberRepository;
 import goorm_runner.backend.member.domain.*;
 import goorm_runner.backend.member.security.application.exception.AuthException;
 import goorm_runner.backend.member.security.config.jwt.JwtTokenProvider;

@@ -2,7 +2,7 @@ package goorm_runner.backend.member.security.application;
 
 import goorm_runner.backend.global.ErrorCode;
 import goorm_runner.backend.member.application.exception.MemberException;
-import goorm_runner.backend.member.domain.MemberRepository;
+import goorm_runner.backend.member.application.MemberRepository;
 import goorm_runner.backend.member.security.SecurityMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
