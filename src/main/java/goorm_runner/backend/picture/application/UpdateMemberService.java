@@ -1,7 +1,7 @@
 package goorm_runner.backend.picture.application;
 
-import goorm_runner.backend.member.application.MemberRepository;
 import goorm_runner.backend.member.domain.Member;
+import goorm_runner.backend.member.domain.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
