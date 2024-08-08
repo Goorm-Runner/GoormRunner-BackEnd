@@ -59,6 +59,14 @@ public class Member {
         this.profilePictureUrl = profilePictureUrl;
     }
 
+    public void updateProfilePictureUrl(String profilePictureUrl) {
+        this.profilePictureUrl = profilePictureUrl;
+    }
+
+    public void removeProfilePictureUrl() {
+        this.profilePictureUrl = null;
+    }
+
     public void addMemberAuthority(MemberAuthority memberAuthority) {
         memberAuthorities.add(memberAuthority);
     }
