@@ -105,7 +105,7 @@ class PostReadServiceTest {
                 () -> assertThat(page.getNumber()).isEqualTo(0),
                 () -> assertThat(page.getTotalPages()).isEqualTo(1),
                 () -> assertThat(page.isFirst()).isTrue(),
-                () ->assertThat(page.hasNext()).isFalse()
+                () -> assertThat(page.hasNext()).isFalse()
         );
     }
 
