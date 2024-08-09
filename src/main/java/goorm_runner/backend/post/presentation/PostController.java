@@ -81,8 +81,13 @@ public class PostController {
     }
 
     @DeleteMapping("/categories/{ignoredCategoryName}/posts/{postId}")
-    public ResponseEntity<Void> deletePost(@PathVariable String ignoredCategoryName, @PathVariable Long postId) {
-        postService.delete(postId);
+    public ResponseEntity<Void> deletePost(@PathVariable String ignoredCategoryName,
+                                           @PathVariable Long postId,
+                                           @AuthenticationPrincipal SecurityMember securityMember) {
+        String username = securityMember.getUsername();
+        Long authorId = memberService.findMemberIdByUsername(username);
+
+        postService.delete(postId, authorId);
         return ResponseEntity.noContent().build();
     }
 

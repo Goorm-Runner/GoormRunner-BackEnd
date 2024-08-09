@@ -636,10 +636,11 @@ class PostControllerIntegrationTest {
 
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        Long authorId = member.getId();
         String token = authService.login(new LoginRequest(loginId, password));
 
         Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
-        postService.delete(post.getId());
+        postService.delete(post.getId(), authorId);
         em.flush();
         em.clear();
 
@@ -670,12 +671,13 @@ class PostControllerIntegrationTest {
 
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        Long authorId = member.getId();
         String token = authService.login(new LoginRequest(loginId, password));
 
         Post post1 = postService.create(createRequest1, member.getId(), categoryName.toUpperCase());
         postService.create(createRequest2, member.getId(), categoryName.toUpperCase());
 
-        postService.delete(post1.getId()); // post2만 남아있다.
+        postService.delete(post1.getId(), authorId); // post2만 남아있다.
         em.flush();
         em.clear();
 
