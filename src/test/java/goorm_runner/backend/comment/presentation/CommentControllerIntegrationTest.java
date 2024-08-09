@@ -184,7 +184,7 @@ class CommentControllerIntegrationTest {
     }
 
     @Test
-    void reading_non_existing_comment_failure() throws Exception {
+    void reading_non_existent_comment_failure() throws Exception {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
