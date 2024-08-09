@@ -1,6 +1,5 @@
-package goorm_runner.backend.member.application;
+package goorm_runner.backend.member.domain;
 
-import goorm_runner.backend.member.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

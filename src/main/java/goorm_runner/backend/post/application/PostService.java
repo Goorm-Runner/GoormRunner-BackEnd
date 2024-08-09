@@ -1,14 +1,15 @@
 package goorm_runner.backend.post.application;
 
-import goorm_runner.backend.member.application.MemberRepository;
 import goorm_runner.backend.member.application.exception.MemberException;
 import goorm_runner.backend.member.domain.Member;
+import goorm_runner.backend.member.domain.MemberRepository;
 import goorm_runner.backend.post.application.exception.PostException;
 import goorm_runner.backend.post.domain.Category;
 import goorm_runner.backend.post.domain.Post;
 import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.dto.PostCreateRequest;
 import goorm_runner.backend.post.dto.PostUpdateRequest;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,9 +44,17 @@ public class PostService {
         return post;
     }
 
-    public void delete(Long postId) {
+    public void delete(Long postId, Long authorId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(POST_NOT_FOUND));
+
+        Member author = memberRepository.findById(authorId)
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
+
+        if (!post.getAuthorId().equals(author.getId())) {
+            throw new PostException(NOT_POST_AUTHOR);
+        }
+
         post.delete();
     }
 
