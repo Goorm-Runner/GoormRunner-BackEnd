@@ -22,8 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import static goorm_runner.backend.global.ErrorCode.COMMENT_NOT_FOUND;
-import static goorm_runner.backend.global.ErrorCode.EMPTY_CONTENT;
+import static goorm_runner.backend.global.ErrorCode.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -209,6 +208,39 @@ class CommentControllerIntegrationTest {
                 status().isNotFound(),
                 jsonPath("$.title").value(COMMENT_NOT_FOUND.name()),
                 jsonPath("$.message").value(COMMENT_NOT_FOUND.getMessage())
+        );
+    }
+
+    @Test
+    void reading_comment_after_deleting_post_is_not_allowed() throws Exception {
+        //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest createRequest = new PostCreateRequest(title, content);
+
+        String loginId = "test";
+        String password = "password";
+
+        String categoryName = "general";
+
+        //when
+        Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        String token = authService.login(new LoginRequest(loginId, password));
+
+        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Comment comment = commentService.create(member.getId(), post.getId(), "comment");
+
+        postService.delete(post.getId());
+        em.flush();
+        em.clear();
+
+        //then
+        mockMvc.perform(get("/categories/general/posts/" + post.getId() + "/comments/" + comment.getId())
+                .header("Authorization", "Bearer " + token)
+        ).andExpectAll(
+                status().isNotFound(),
+                jsonPath("$.title").value(POST_NOT_FOUND.name()),
+                jsonPath("$.message").value(POST_NOT_FOUND.getMessage())
         );
     }
 }

@@ -49,7 +49,7 @@ public class CommentController {
             @PathVariable Long postId,
             @PathVariable Long commentId) {
 
-        Comment comment = commentReadService.read(commentId);
+        Comment comment = commentReadService.read(postId, commentId);
         CommentReadResponse response = CommentReadResponse.from(comment);
 
         return ResponseEntity.ok(response);
