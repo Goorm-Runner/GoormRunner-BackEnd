@@ -1,11 +1,14 @@
 package goorm_runner.backend.comment.domain;
 
+import goorm_runner.backend.comment.domain.exception.CommentException;
 import goorm_runner.backend.common.BaseTimeEntity;
+import goorm_runner.backend.global.ErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 
@@ -32,8 +35,15 @@ public class Comment extends BaseTimeEntity {
     private LocalDateTime deletedAt;
 
     public Comment(Long authorId, Long postId, String content) {
+        validateNotEmptyContent(content);
         this.authorId = authorId;
         this.postId = postId;
         this.content = content;
+    }
+
+    private void validateNotEmptyContent(String content) {
+        if (!StringUtils.hasText(content)) {
+            throw new CommentException(ErrorCode.EMPTY_CONTENT);
+        }
     }
 }

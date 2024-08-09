@@ -10,6 +10,7 @@ import goorm_runner.backend.post.application.PostService;
 import goorm_runner.backend.post.domain.Post;
 import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.dto.PostCreateRequest;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import static goorm_runner.backend.global.ErrorCode.POST_NOT_FOUND;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static goorm_runner.backend.global.ErrorCode.EMPTY_CONTENT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -45,6 +44,9 @@ class CommentControllerIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private EntityManager em;
 
     @BeforeEach
     void setUp() {
@@ -75,11 +77,73 @@ class CommentControllerIntegrationTest {
                         .header("Authorization", "Bearer " + token)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
+                ).andExpectAll(
+                        status().isCreated(),
+                        jsonPath("$.postId").value(post.getId()),
+                        jsonPath("$.commentId").isNotEmpty(),
+                        jsonPath("$.content").value(request.content()),
+                        jsonPath("$.createdAt").isNotEmpty()
+                );
+    }
+
+    @Test
+    void create_with_empty_content_failure() throws Exception {
+        //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest createRequest = new PostCreateRequest(title, content);
+
+        String loginId = "test";
+        String password = "password";
+
+        String categoryName = "general";
+        CommentCreateRequest request = new CommentCreateRequest("");
+
+        //when
+        Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        String token = authService.login(new LoginRequest(loginId, password));
+
+        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+
+        //then
+        mockMvc.perform(post("/categories/general/posts/" + post.getId() + "/comments")
+                        .header("Authorization", "Bearer " + token)
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON)
                 )
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.postId").value(post.getId()))
-                .andExpect(jsonPath("$.commentId").isNotEmpty())
-                .andExpect(jsonPath("$.content").value(request.content()))
-                .andExpect(jsonPath("$.createdAt").isNotEmpty());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value(EMPTY_CONTENT.name()))
+                .andExpect(jsonPath("$.message").value(EMPTY_CONTENT.getMessage()));
+    }
+
+    @Test
+    void comment_to_deleted_post_is_not_allowed() throws Exception {
+        //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest createRequest = new PostCreateRequest(title, content);
+
+        String loginId = "test";
+        String password = "password";
+
+        String categoryName = "general";
+        CommentCreateRequest request = new CommentCreateRequest("comment");
+
+        //when
+        Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        String token = authService.login(new LoginRequest(loginId, password));
+
+        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        postService.delete(post.getId());
+        em.flush();
+        em.clear();
+
+        //then
+        mockMvc.perform(post("/categories/general/posts/" + post.getId() + "/comments")
+                        .header("Authorization", "Bearer " + token)
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest());
     }
 }
