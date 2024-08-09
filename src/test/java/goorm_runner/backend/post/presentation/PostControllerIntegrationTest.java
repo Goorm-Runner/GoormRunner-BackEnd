@@ -282,7 +282,7 @@ class PostControllerIntegrationTest {
 
         //then
         mockMvc.perform(get("/categories/general/posts/" + post.getId() + 1))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.title").value(POST_NOT_FOUND.name()))
                 .andExpect(jsonPath("$.message").value(POST_NOT_FOUND.getMessage()));
     }
@@ -501,7 +501,7 @@ class PostControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                 )
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.title").value(POST_NOT_FOUND.name()))
                 .andExpect(jsonPath("$.message").value(POST_NOT_FOUND.getMessage()));
     }
@@ -617,7 +617,7 @@ class PostControllerIntegrationTest {
         mockMvc.perform(delete("/categories/general/posts/" + post.getId() + 1)
                         .header("Authorization", "Bearer " + token)
                 )
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.title").value(POST_NOT_FOUND.name()))
                 .andExpect(jsonPath("$.message").value(POST_NOT_FOUND.getMessage()));
     }
@@ -647,7 +647,7 @@ class PostControllerIntegrationTest {
         mockMvc.perform(get("/categories/general/posts/" + post.getId())
                         .header("Authorization", "Bearer " + token)
                 )
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.title").value(POST_NOT_FOUND.name()))
                 .andExpect(jsonPath("$.message").value(POST_NOT_FOUND.getMessage()));
     }

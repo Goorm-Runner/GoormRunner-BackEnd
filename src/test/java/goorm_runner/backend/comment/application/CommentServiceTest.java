@@ -64,4 +64,31 @@ class CommentServiceTest {
         assertThatThrownBy(() -> commentService.create(authorId, postId, content))
                 .isInstanceOf(RuntimeException.class);
     }
+
+    @Test
+    void read_success() {
+        //given
+        Long authorId = 1L;
+        Long postId = 1L;
+        String content = "lorem ipsum";
+
+        when(postRepository.findById(any()))
+                .thenReturn(Optional.of(new Post(1L, "title", "content", Category.GENERAL)));
+        
+        Comment comment = commentService.create(authorId, postId, content);
+
+        //when
+        Comment findComment = commentService.read(comment.getId());
+
+        //then
+        assertAll(
+                () -> assertThat(findComment.getId()).isEqualTo(comment.getId()),
+                () -> assertThat(findComment.getPostId()).isEqualTo(comment.getPostId()),
+                () -> assertThat(findComment.getAuthorId()).isEqualTo(comment.getAuthorId()),
+                () -> assertThat(findComment.getContent()).isEqualTo(comment.getContent()),
+                () -> assertThat(findComment.getCreatedAt()).isEqualTo(comment.getCreatedAt()),
+                () -> assertThat(findComment.getUpdatedAt()).isEqualTo(comment.getUpdatedAt()),
+                () -> assertThat(findComment.getDeletedAt()).isEqualTo(comment.getDeletedAt())
+        );
+    }
 }
