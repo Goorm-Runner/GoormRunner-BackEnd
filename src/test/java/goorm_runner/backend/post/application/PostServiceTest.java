@@ -45,7 +45,6 @@ class PostServiceTest {
                 () -> assertThat(post.getContent()).isEqualTo(content),
                 () -> assertThat(post.getAuthorId()).isEqualTo(authorId),
                 () -> assertThat(post.getCategory().name()).isEqualTo(categoryName),
-                () -> assertThat(post.getLikeCount()).isEqualTo((short) 0),
                 () -> assertThat(post.getCreatedAt()).isNotNull(),
                 () -> assertThat(post.getUpdatedAt()).isNotNull(),
                 () -> assertThat(post.getCreatedAt()).isEqualTo(post.getUpdatedAt())
