@@ -16,7 +16,10 @@ public enum ErrorCode {
     ALREADY_LIKED(4091, HttpStatus.CONFLICT, "이미 좋아요한 게시글입니다."),
     NOT_ALREADY_LIKED(4092, HttpStatus.CONFLICT, "좋아요를 누른 상태여야 합니다."),
 
-    REQUIRED_AUTHORITY_NOT_FOUND(5001, HttpStatus.INTERNAL_SERVER_ERROR, "데이터베이스 오류");
+    INVALID_EMAIL_ADDRESS(4015, HttpStatus.BAD_REQUEST, "유효하지 않은 이메일 주소입니다."),
+
+    REQUIRED_AUTHORITY_NOT_FOUND(5001, HttpStatus.INTERNAL_SERVER_ERROR, "데이터베이스 오류"),
+    EMAIL_SEND_FAILED(5006, HttpStatus.INTERNAL_SERVER_ERROR, "이메일 전송에 실패했습니다.");
 
     private final int code;
 
