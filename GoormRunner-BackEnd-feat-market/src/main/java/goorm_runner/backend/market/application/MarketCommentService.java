@@ -1,11 +1,11 @@
 package goorm_runner.backend.market.application;
 
-import goorm_runner.backend.market.domain.Comment;
-import goorm_runner.backend.market.domain.CommentRepository;
+import goorm_runner.backend.market.domain.MarketComment;
+import goorm_runner.backend.market.domain.MarketCommentRepository;
 import goorm_runner.backend.market.domain.Market;
 import goorm_runner.backend.market.domain.MarketRepository;
-import goorm_runner.backend.market.dto.CommentCreateRequest;
-import goorm_runner.backend.market.dto.CommentUpdateRequest;
+import goorm_runner.backend.market.dto.MarketCommentCreateRequest;
+import goorm_runner.backend.market.dto.MarketCommentUpdateRequest;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,16 +16,16 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class CommentService {
+public class MarketCommentService {
 
-    private final CommentRepository commentRepository;
+    private final MarketCommentRepository commentRepository;
     private final MarketRepository marketRepository;
 
-    public Comment createComment(CommentCreateRequest request, Long marketId, Long memberId) {
+    public MarketComment createComment(MarketCommentCreateRequest request, Long marketId, Long memberId) {
         Market market = marketRepository.findById(marketId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 상품을 찾을 수 없습니다."));
 
-        Comment comment = Comment.builder()
+        MarketComment comment = MarketComment.builder()
                 .market(market)
                 .memberId(memberId)
                 .content(request.getContent())
@@ -34,8 +34,8 @@ public class CommentService {
         return commentRepository.save(comment);
     }
 
-    public Comment updateComment(Long commentId, CommentUpdateRequest request) {
-        Comment comment = commentRepository.findById(commentId)
+    public MarketComment updateComment(Long commentId, MarketCommentUpdateRequest request) {
+        MarketComment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 댓글을 찾을 수 없습니다."));
 
         comment.updateContent(request.getContent());
@@ -46,7 +46,7 @@ public class CommentService {
         commentRepository.deleteById(commentId);
     }
 
-    public List<Comment> getCommentsByMarketId(Long marketId) {
+    public List<MarketComment> getCommentsByMarketId(Long marketId) {
         return commentRepository.findByMarketId(marketId);
     }
 }

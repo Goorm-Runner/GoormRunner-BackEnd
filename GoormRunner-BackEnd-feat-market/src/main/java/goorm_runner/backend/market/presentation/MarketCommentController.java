@@ -1,10 +1,10 @@
 package goorm_runner.backend.market.presentation;
 
-import goorm_runner.backend.market.application.CommentService;
-import goorm_runner.backend.market.domain.Comment;
-import goorm_runner.backend.market.dto.CommentCreateRequest;
-import goorm_runner.backend.market.dto.CommentUpdateRequest;
-import goorm_runner.backend.market.dto.CommentResponse;
+import goorm_runner.backend.market.application.MarketCommentService;
+import goorm_runner.backend.market.domain.MarketComment;
+import goorm_runner.backend.market.dto.MarketCommentCreateRequest;
+import goorm_runner.backend.market.dto.MarketCommentUpdateRequest;
+import goorm_runner.backend.market.dto.MarketCommentResponse;
 import goorm_runner.backend.member.application.MemberService;
 import goorm_runner.backend.member.security.SecurityMember;
 import lombok.RequiredArgsConstructor;
@@ -18,33 +18,33 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/market/{marketId}/comments")
 @RequiredArgsConstructor
-public class CommentController {
+public class MarketCommentController {
 
-    private final CommentService commentService;
+    private final MarketCommentService commentService;
     private final MemberService memberService;
 
     @PostMapping
-    public ResponseEntity<CommentResponse> createComment(
+    public ResponseEntity<MarketCommentResponse> createComment(
             @AuthenticationPrincipal SecurityMember securityMember,
             @PathVariable Long marketId,
-            @RequestBody CommentCreateRequest request) {
+            @RequestBody MarketCommentCreateRequest request) {
 
         String username = securityMember.getUsername();
         Long memberId = memberService.getMemberIdByUsername(username);
 
-        Comment comment = commentService.createComment(request, marketId, memberId);
-        CommentResponse response = toResponse(comment);
+        MarketComment comment = commentService.createComment(request, marketId, memberId);
+        MarketCommentResponse response = toResponse(comment);
 
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{commentId}")
-    public ResponseEntity<CommentResponse> updateComment(
+    public ResponseEntity<MarketCommentResponse> updateComment(
             @PathVariable Long commentId,
-            @RequestBody CommentUpdateRequest request) {
+            @RequestBody MarketCommentUpdateRequest request) {
 
-        Comment comment = commentService.updateComment(commentId, request);
-        CommentResponse response = toResponse(comment);
+        MarketComment comment = commentService.updateComment(commentId, request);
+        MarketCommentResponse response = toResponse(comment);
 
         return ResponseEntity.ok(response);
     }
@@ -56,17 +56,17 @@ public class CommentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CommentResponse>> getComments(@PathVariable Long marketId) {
-        List<Comment> comments = commentService.getCommentsByMarketId(marketId);
-        List<CommentResponse> response = comments.stream()
+    public ResponseEntity<List<MarketCommentResponse>> getComments(@PathVariable Long marketId) {
+        List<MarketComment> comments = commentService.getCommentsByMarketId(marketId);
+        List<MarketCommentResponse> response = comments.stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(response);
     }
 
-    private CommentResponse toResponse(Comment comment) {
-        return CommentResponse.builder()
+    private MarketCommentResponse toResponse(MarketComment comment) {
+        return MarketCommentResponse.builder()
                 .commentId(comment.getId())
                 .marketId(comment.getMarket().getId())
                 .memberId(comment.getMemberId())

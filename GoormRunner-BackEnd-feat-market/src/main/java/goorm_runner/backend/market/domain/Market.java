@@ -50,7 +50,7 @@ public class Market extends BaseTimeEntity {
     private String imageUrl;
 
     @OneToMany(mappedBy = "market", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments = new ArrayList<>();
+    private List<MarketComment> comments = new ArrayList<>();
 
     @Builder
     public Market(Long memberId, String title, String content, Integer price, Integer likeCount, MarketCategory category, MarketStatus status, Integer delivery, String imageUrl) {

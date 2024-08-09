@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @Table(name = "Comment")
-public class Comment extends BaseTimeEntity {
+public class MarketComment extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +28,7 @@ public class Comment extends BaseTimeEntity {
     private String content;
 
     @Builder
-    public Comment(Market market, Long memberId, String content) {
+    public MarketComment(Market market, Long memberId, String content) {
         this.market = market;
         this.memberId = memberId;
         this.content = content;

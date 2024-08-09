@@ -9,6 +9,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentCreateRequest {
+public class MarketCommentCreateRequest {
     private String content;
 }

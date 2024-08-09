@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class CommentResponse {
+public class MarketCommentResponse {
     private Long commentId;
     private Long marketId;
     private Long memberId;
