@@ -1,5 +1,6 @@
 package goorm_runner.backend.post.presentation;
 
+import goorm_runner.backend.global.PageMetaData;
 import goorm_runner.backend.member.application.MemberService;
 import goorm_runner.backend.member.security.SecurityMember;
 import goorm_runner.backend.post.application.PostReadService;
@@ -64,9 +65,9 @@ public class PostController {
                 .map(post -> PostOverview.from(post, postService.getAuthorName(post.getId()), postLikeService.countPostLikes(post.getId())))
                 .toList();
 
-        ResponseMetaData responseMetaData = ResponseMetaData.of(posts);
+        PageMetaData pageMetaData = PageMetaData.of(posts);
 
-        PostReadPageResponse response = new PostReadPageResponse(overviews, responseMetaData);
+        PostReadPageResponse response = new PostReadPageResponse(overviews, pageMetaData);
         return ResponseEntity.ok(response);
     }
 

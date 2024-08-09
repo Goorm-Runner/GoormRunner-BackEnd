@@ -319,12 +319,12 @@ class PostControllerIntegrationTest {
                         jsonPath("$.overviews[0].likeCount").value(0)
                 )
                 .andExpectAll(
-                        jsonPath("$.responseMetaData.number").value(0),
-                        jsonPath("$.responseMetaData.size").value(10),
-                        jsonPath("$.responseMetaData.isFirst").value(true),
-                        jsonPath("$.responseMetaData.isLast").value(true),
-                        jsonPath("$.responseMetaData.hasNext").value(false),
-                        jsonPath("$.responseMetaData.hasPrevious").value(false)
+                        jsonPath("$.pageMetaData.number").value(0),
+                        jsonPath("$.pageMetaData.size").value(10),
+                        jsonPath("$.pageMetaData.isFirst").value(true),
+                        jsonPath("$.pageMetaData.isLast").value(true),
+                        jsonPath("$.pageMetaData.hasNext").value(false),
+                        jsonPath("$.pageMetaData.hasPrevious").value(false)
                 );
     }
 
@@ -361,12 +361,12 @@ class PostControllerIntegrationTest {
                         jsonPath("$.overviews[0].likeCount").value(1)
                 )
                 .andExpectAll(
-                        jsonPath("$.responseMetaData.number").value(0),
-                        jsonPath("$.responseMetaData.size").value(10),
-                        jsonPath("$.responseMetaData.isFirst").value(true),
-                        jsonPath("$.responseMetaData.isLast").value(true),
-                        jsonPath("$.responseMetaData.hasNext").value(false),
-                        jsonPath("$.responseMetaData.hasPrevious").value(false)
+                        jsonPath("$.pageMetaData.number").value(0),
+                        jsonPath("$.pageMetaData.size").value(10),
+                        jsonPath("$.pageMetaData.isFirst").value(true),
+                        jsonPath("$.pageMetaData.isLast").value(true),
+                        jsonPath("$.pageMetaData.hasNext").value(false),
+                        jsonPath("$.pageMetaData.hasPrevious").value(false)
                 );
     }
 
@@ -404,12 +404,12 @@ class PostControllerIntegrationTest {
                         jsonPath("$.overviews[0].likeCount").value(0)
                 )
                 .andExpectAll(
-                        jsonPath("$.responseMetaData.number").value(0),
-                        jsonPath("$.responseMetaData.size").value(10),
-                        jsonPath("$.responseMetaData.isFirst").value(true),
-                        jsonPath("$.responseMetaData.isLast").value(true),
-                        jsonPath("$.responseMetaData.hasNext").value(false),
-                        jsonPath("$.responseMetaData.hasPrevious").value(false)
+                        jsonPath("$.pageMetaData.number").value(0),
+                        jsonPath("$.pageMetaData.size").value(10),
+                        jsonPath("$.pageMetaData.isFirst").value(true),
+                        jsonPath("$.pageMetaData.isLast").value(true),
+                        jsonPath("$.pageMetaData.hasNext").value(false),
+                        jsonPath("$.pageMetaData.hasPrevious").value(false)
                 );
     }
 
@@ -687,12 +687,12 @@ class PostControllerIntegrationTest {
                 .andExpect(jsonPath("$.overviews.size()").value(1))
                 .andExpect(jsonPath("$.overviews[0].title").value(title2))
                 .andExpectAll(
-                        jsonPath("$.responseMetaData.number").value(0),
-                        jsonPath("$.responseMetaData.size").value(10),
-                        jsonPath("$.responseMetaData.isFirst").value(true),
-                        jsonPath("$.responseMetaData.isLast").value(true),
-                        jsonPath("$.responseMetaData.hasNext").value(false),
-                        jsonPath("$.responseMetaData.hasPrevious").value(false)
+                        jsonPath("$.pageMetaData.number").value(0),
+                        jsonPath("$.pageMetaData.size").value(10),
+                        jsonPath("$.pageMetaData.isFirst").value(true),
+                        jsonPath("$.pageMetaData.isLast").value(true),
+                        jsonPath("$.pageMetaData.hasNext").value(false),
+                        jsonPath("$.pageMetaData.hasPrevious").value(false)
                 );
     }
 }

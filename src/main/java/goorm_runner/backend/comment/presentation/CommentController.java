@@ -3,18 +3,21 @@ package goorm_runner.backend.comment.presentation;
 import goorm_runner.backend.comment.application.CommentReadService;
 import goorm_runner.backend.comment.application.CommentService;
 import goorm_runner.backend.comment.domain.Comment;
-import goorm_runner.backend.comment.presentation.dto.CommentCreateRequest;
-import goorm_runner.backend.comment.presentation.dto.CommentCreateResponse;
-import goorm_runner.backend.comment.presentation.dto.CommentReadResponse;
+import goorm_runner.backend.comment.presentation.dto.*;
+import goorm_runner.backend.global.PageMetaData;
 import goorm_runner.backend.member.application.MemberService;
 import goorm_runner.backend.member.security.SecurityMember;
+import goorm_runner.backend.post.application.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,6 +26,7 @@ public class CommentController {
     private final MemberService memberService;
     private final CommentService commentService;
     private final CommentReadService commentReadService;
+    private final PostService postService;
 
     @PostMapping("/categories/{ignoredCategoryName}/posts/{postId}/comments")
     public ResponseEntity<CommentCreateResponse> postComment(
@@ -45,12 +49,27 @@ public class CommentController {
 
     @GetMapping("/categories/{ignoredCategoryName}/posts/{postId}/comments/{commentId}")
     public ResponseEntity<CommentReadResponse> getComment(
-            @PathVariable String ignoredCategoryName,
-            @PathVariable Long postId,
-            @PathVariable Long commentId) {
+            @PathVariable String ignoredCategoryName, @PathVariable Long postId, @PathVariable Long commentId) {
 
         Comment comment = commentReadService.read(postId, commentId);
         CommentReadResponse response = CommentReadResponse.from(comment);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/categories/{ignoredCategoryName}/posts/{postId}/comments")
+    public ResponseEntity<CommentPageResponse> getComments(
+            @PathVariable String ignoredCategoryName, @PathVariable Long postId, @RequestParam int pageNumber, @RequestParam int pageSize) {
+
+        Page<Comment> comments = commentReadService.readPage(postId, PageRequest.of(pageNumber, pageSize));
+
+        List<CommentOverview> commentOverviews = comments.stream()
+                .map(comment -> CommentOverview.of(postId, comment, postService.getAuthorName(postId)))
+                .toList();
+
+        PageMetaData pageMetaData = PageMetaData.of(comments);
+
+        CommentPageResponse response = new CommentPageResponse(commentOverviews, pageMetaData);
 
         return ResponseEntity.ok(response);
     }

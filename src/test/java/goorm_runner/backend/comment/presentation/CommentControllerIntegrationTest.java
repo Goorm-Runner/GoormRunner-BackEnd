@@ -22,6 +22,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.format.DateTimeFormatter;
+
 import static goorm_runner.backend.global.ErrorCode.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -242,5 +244,58 @@ class CommentControllerIntegrationTest {
                 jsonPath("$.title").value(POST_NOT_FOUND.name()),
                 jsonPath("$.message").value(POST_NOT_FOUND.getMessage())
         );
+    }
+
+    @Test
+    void readPage_success() throws Exception {
+        //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest createRequest = new PostCreateRequest(title, content);
+
+        String loginId = "test";
+        String password = "password";
+
+        String categoryName = "general";
+
+        //when
+        Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        String token = authService.login(new LoginRequest(loginId, password));
+
+        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Comment comment = commentService.create(member.getId(), post.getId(), "comment");
+
+        //then
+        mockMvc.perform(get("/categories/general/posts/" + post.getId() + "/comments?pageNumber=0&pageSize=10")
+                .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.overviews.size()").value(1))
+                .andExpectAll(
+                        jsonPath("$.overviews[0].postId").value(post.getId()),
+                        jsonPath("$.overviews[0].commentId").value(comment.getId()),
+                        jsonPath("$.overviews[0].content").value(comment.getContent()),
+                        jsonPath("$.overviews[0].createdAt").value(comment.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)),
+                        jsonPath("$.overviews[0].updatedAt").value(comment.getUpdatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)),
+                        jsonPath("$.overviews[0].authorName").value(member.getNickname())
+                )
+                .andExpectAll(
+                        jsonPath("$.pageMetaData.number").value(0),
+                        jsonPath("$.pageMetaData.size").value(10),
+                        jsonPath("$.pageMetaData.isFirst").value(true),
+                        jsonPath("$.pageMetaData.isLast").value(true),
+                        jsonPath("$.pageMetaData.hasNext").value(false),
+                        jsonPath("$.pageMetaData.hasPrevious").value(false)
+                );
+
+    }
+
+
+    @Test
+    void reading_page_after_deleting_post_is_not_allowed() {
+        //given
+
+        //when
+
+        //then
     }
 }
