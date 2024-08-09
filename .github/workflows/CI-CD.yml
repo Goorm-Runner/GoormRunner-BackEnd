@@ -35,6 +35,8 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_S3_BUCKET_NAME: ${{ secrets.AWS_S3_BUCKET_NAME }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          ADMIN_NAME: ${{ secrets.ADMIN_NAME }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
 
       - name: 테스트 실행 🧪
         run: ./gradlew test
@@ -48,6 +50,8 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_S3_BUCKET_NAME: ${{ secrets.AWS_S3_BUCKET_NAME }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          ADMIN_NAME: ${{ secrets.ADMIN_NAME }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
 
       - name: 테스트 실패한 곳 체크 🫠
         uses: mikepenz/action-junit-report@v3
