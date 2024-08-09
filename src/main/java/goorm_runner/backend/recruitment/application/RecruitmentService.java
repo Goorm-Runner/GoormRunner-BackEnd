@@ -2,8 +2,8 @@ package goorm_runner.backend.recruitment.application;
 
 import goorm_runner.backend.ballpark.domain.Ballpark;
 import goorm_runner.backend.ballpark.domain.BallparkRepository;
-import goorm_runner.backend.member.application.MemberRepository;
 import goorm_runner.backend.member.domain.Member;
+import goorm_runner.backend.member.domain.MemberRepository;
 import goorm_runner.backend.recruitment.domain.*;
 import goorm_runner.backend.recruitment.dto.RecruitmentRequest;
 import goorm_runner.backend.recruitment.dto.RecruitmentResponse;
