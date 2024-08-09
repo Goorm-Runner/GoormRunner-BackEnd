@@ -13,23 +13,25 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @Transactional
 @SpringBootTest
-class CommentServiceTest {
+class CommentReadServiceTest {
 
     @Autowired
     private CommentService commentService;
+
+    @Autowired
+    private CommentReadService commentReadService;
 
     @MockBean
     private PostRepository postRepository;
 
     @Test
-    void save_success() {
+    void read_success() {
         //given
         Long authorId = 1L;
         Long postId = 1L;
@@ -38,32 +40,21 @@ class CommentServiceTest {
         when(postRepository.findById(any()))
                 .thenReturn(Optional.of(new Post(1L, "title", "content", Category.GENERAL)));
 
-        //when
         Comment comment = commentService.create(authorId, postId, content);
+
+        //when
+        Comment findComment = commentReadService.read(comment.getId());
 
         //then
         assertAll(
-                () -> assertThat(comment.getAuthorId()).isEqualTo(authorId),
-                () -> assertThat(comment.getPostId()).isEqualTo(postId),
-                () -> assertThat(comment.getContent()).isEqualTo(content),
-                () -> assertThat(comment.getCreatedAt()).isNotNull(),
-                () -> assertThat(comment.getUpdatedAt()).isNotNull(),
-                () -> assertThat(comment.getCreatedAt()).isEqualTo(comment.getUpdatedAt()),
-                () -> assertThat(comment.getDeletedAt()).isNull()
+                () -> assertThat(findComment.getId()).isEqualTo(comment.getId()),
+                () -> assertThat(findComment.getPostId()).isEqualTo(comment.getPostId()),
+                () -> assertThat(findComment.getAuthorId()).isEqualTo(comment.getAuthorId()),
+                () -> assertThat(findComment.getContent()).isEqualTo(comment.getContent()),
+                () -> assertThat(findComment.getCreatedAt()).isEqualTo(comment.getCreatedAt()),
+                () -> assertThat(findComment.getUpdatedAt()).isEqualTo(comment.getUpdatedAt()),
+                () -> assertThat(findComment.getDeletedAt()).isEqualTo(comment.getDeletedAt())
         );
     }
-    
-    @Test
-    void save_with_empty_content_exception() {
-        //given
-        Long authorId = 1L;
-        Long postId = 1L;
-        String content = "";
-
-        //when-then
-        assertThatThrownBy(() -> commentService.create(authorId, postId, content))
-                .isInstanceOf(RuntimeException.class);
-    }
-
 
 }

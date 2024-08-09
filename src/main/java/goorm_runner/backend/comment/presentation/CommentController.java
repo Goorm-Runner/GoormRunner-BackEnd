@@ -1,5 +1,6 @@
 package goorm_runner.backend.comment.presentation;
 
+import goorm_runner.backend.comment.application.CommentReadService;
 import goorm_runner.backend.comment.application.CommentService;
 import goorm_runner.backend.comment.domain.Comment;
 import goorm_runner.backend.comment.presentation.dto.CommentCreateRequest;
@@ -21,6 +22,7 @@ public class CommentController {
 
     private final MemberService memberService;
     private final CommentService commentService;
+    private final CommentReadService commentReadService;
 
     @PostMapping("/categories/{ignoredCategoryName}/posts/{postId}/comments")
     public ResponseEntity<CommentCreateResponse> postComment(
@@ -47,7 +49,7 @@ public class CommentController {
             @PathVariable Long postId,
             @PathVariable Long commentId) {
 
-        Comment comment = commentService.read(commentId);
+        Comment comment = commentReadService.read(commentId);
         CommentReadResponse response = CommentReadResponse.from(comment);
 
         return ResponseEntity.ok(response);

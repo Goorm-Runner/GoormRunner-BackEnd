@@ -1,9 +1,7 @@
 package goorm_runner.backend.comment.application;
 
 import goorm_runner.backend.comment.domain.Comment;
-import goorm_runner.backend.comment.domain.CommentReadRepository;
 import goorm_runner.backend.comment.domain.CommentRepository;
-import goorm_runner.backend.comment.domain.exception.CommentException;
 import goorm_runner.backend.global.ErrorCode;
 import goorm_runner.backend.post.application.exception.PostException;
 import goorm_runner.backend.post.domain.PostRepository;
@@ -15,7 +13,6 @@ import org.springframework.stereotype.Service;
 public class CommentService {
 
     private final CommentRepository commentRepository;
-    private final CommentReadRepository commentReadRepository;
     private final PostRepository postRepository;
 
     public Comment create(Long authorId, Long postId, String content) {
@@ -26,8 +23,4 @@ public class CommentService {
         return commentRepository.save(comment);
     }
 
-    public Comment read(Long commentId) {
-        return commentReadRepository.findById(commentId)
-                .orElseThrow(() -> new CommentException(ErrorCode.COMMENT_NOT_FOUND));
-    }
 }
