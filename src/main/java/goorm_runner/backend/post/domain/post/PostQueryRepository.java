@@ -1,4 +1,4 @@
-package goorm_runner.backend.post.domain;
+package goorm_runner.backend.post.domain.post;
 
 
 import org.springframework.data.domain.Page;

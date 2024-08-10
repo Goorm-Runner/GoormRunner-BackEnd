@@ -1,4 +1,4 @@
-package goorm_runner.backend.comment.domain.exception;
+package goorm_runner.backend.post.domain.comment.exception;
 
 import goorm_runner.backend.global.ErrorCode;
 import lombok.Getter;

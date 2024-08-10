@@ -1,12 +1,12 @@
-package goorm_runner.backend.post.application;
+package goorm_runner.backend.post.application.post;
 
 import goorm_runner.backend.member.application.exception.MemberException;
 import goorm_runner.backend.member.domain.Member;
 import goorm_runner.backend.member.domain.MemberRepository;
-import goorm_runner.backend.post.application.exception.PostException;
-import goorm_runner.backend.post.domain.Category;
-import goorm_runner.backend.post.domain.Post;
-import goorm_runner.backend.post.domain.PostRepository;
+import goorm_runner.backend.post.application.post.exception.PostException;
+import goorm_runner.backend.post.domain.post.Category;
+import goorm_runner.backend.post.domain.post.Post;
+import goorm_runner.backend.post.domain.post.PostRepository;
 import goorm_runner.backend.post.dto.PostCreateRequest;
 import goorm_runner.backend.post.dto.PostUpdateRequest;
 import lombok.RequiredArgsConstructor;

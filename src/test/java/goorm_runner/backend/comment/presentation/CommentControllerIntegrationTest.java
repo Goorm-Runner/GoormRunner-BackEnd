@@ -1,17 +1,17 @@
 package goorm_runner.backend.comment.presentation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import goorm_runner.backend.comment.application.CommentService;
-import goorm_runner.backend.comment.domain.Comment;
-import goorm_runner.backend.comment.presentation.dto.CommentCreateRequest;
 import goorm_runner.backend.member.domain.Member;
 import goorm_runner.backend.member.security.application.AuthService;
 import goorm_runner.backend.member.security.dto.LoginRequest;
 import goorm_runner.backend.member.security.dto.MemberSignupRequest;
-import goorm_runner.backend.post.application.PostService;
-import goorm_runner.backend.post.domain.Post;
-import goorm_runner.backend.post.domain.PostRepository;
+import goorm_runner.backend.post.application.comment.CommentService;
+import goorm_runner.backend.post.application.post.PostService;
+import goorm_runner.backend.post.domain.comment.Comment;
+import goorm_runner.backend.post.domain.post.Post;
+import goorm_runner.backend.post.domain.post.PostRepository;
 import goorm_runner.backend.post.dto.PostCreateRequest;
+import goorm_runner.backend.post.presentation.comment.dto.CommentCreateRequest;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

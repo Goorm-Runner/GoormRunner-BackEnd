@@ -1,6 +1,6 @@
-package goorm_runner.backend.comment.presentation.dto;
+package goorm_runner.backend.post.presentation.comment.dto;
 
-import goorm_runner.backend.comment.domain.Comment;
+import goorm_runner.backend.post.domain.comment.Comment;
 
 public record CommentReadResponse(Long commentId, String content, String updatedAt) {
     public static CommentReadResponse from(Comment comment) {

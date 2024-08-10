@@ -1,10 +1,11 @@
 package goorm_runner.backend.comment.application;
 
-import goorm_runner.backend.comment.domain.Comment;
-import goorm_runner.backend.comment.domain.exception.CommentException;
-import goorm_runner.backend.post.domain.Category;
-import goorm_runner.backend.post.domain.Post;
-import goorm_runner.backend.post.domain.PostRepository;
+import goorm_runner.backend.post.application.comment.CommentService;
+import goorm_runner.backend.post.domain.comment.Comment;
+import goorm_runner.backend.post.domain.comment.exception.CommentException;
+import goorm_runner.backend.post.domain.post.Category;
+import goorm_runner.backend.post.domain.post.Post;
+import goorm_runner.backend.post.domain.post.PostRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

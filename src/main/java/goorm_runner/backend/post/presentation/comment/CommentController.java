@@ -1,13 +1,13 @@
-package goorm_runner.backend.comment.presentation;
+package goorm_runner.backend.post.presentation.comment;
 
-import goorm_runner.backend.comment.application.CommentReadService;
-import goorm_runner.backend.comment.application.CommentService;
-import goorm_runner.backend.comment.domain.Comment;
-import goorm_runner.backend.comment.presentation.dto.*;
 import goorm_runner.backend.global.PageMetaData;
 import goorm_runner.backend.member.application.MemberService;
 import goorm_runner.backend.member.security.SecurityMember;
-import goorm_runner.backend.post.application.PostService;
+import goorm_runner.backend.post.application.comment.CommentReadService;
+import goorm_runner.backend.post.application.comment.CommentService;
+import goorm_runner.backend.post.application.post.PostService;
+import goorm_runner.backend.post.domain.comment.Comment;
+import goorm_runner.backend.post.presentation.comment.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

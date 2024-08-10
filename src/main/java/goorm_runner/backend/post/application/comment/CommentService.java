@@ -1,11 +1,11 @@
-package goorm_runner.backend.comment.application;
+package goorm_runner.backend.post.application.comment;
 
-import goorm_runner.backend.comment.domain.Comment;
-import goorm_runner.backend.comment.domain.CommentRepository;
-import goorm_runner.backend.comment.domain.exception.CommentException;
 import goorm_runner.backend.global.ErrorCode;
-import goorm_runner.backend.post.application.exception.PostException;
-import goorm_runner.backend.post.domain.PostRepository;
+import goorm_runner.backend.post.application.post.exception.PostException;
+import goorm_runner.backend.post.domain.comment.Comment;
+import goorm_runner.backend.post.domain.comment.CommentRepository;
+import goorm_runner.backend.post.domain.comment.exception.CommentException;
+import goorm_runner.backend.post.domain.post.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

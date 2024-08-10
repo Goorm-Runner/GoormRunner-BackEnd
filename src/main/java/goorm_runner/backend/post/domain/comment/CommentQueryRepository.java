@@ -1,4 +1,4 @@
-package goorm_runner.backend.comment.domain;
+package goorm_runner.backend.post.domain.comment;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

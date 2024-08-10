@@ -1,12 +1,14 @@
-package goorm_runner.backend.post.domain;
+package goorm_runner.backend.post.domain.comment;
 
 import goorm_runner.backend.common.BaseTimeEntity;
+import goorm_runner.backend.global.ErrorCode;
+import goorm_runner.backend.post.domain.comment.exception.CommentException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 
@@ -14,38 +16,38 @@ import java.time.LocalDateTime;
 @Getter
 @SQLRestriction("deleted_at IS NULL")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Post extends BaseTimeEntity {
+public class Comment extends BaseTimeEntity {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "post_id", nullable = false)
+    @Column(name = "comment_id", nullable = false)
     private Long id;
 
     @Column(nullable = false)
     private Long authorId;
 
     @Column(nullable = false)
-    private String title;
+    private Long postId;
 
     @Column(nullable = false)
     private String content;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Category category;
-
     private LocalDateTime deletedAt;
 
-    @Builder
-    public Post(Long authorId, String title, String content, Category category) {
+    public Comment(Long authorId, Long postId, String content) {
+        validateNotEmptyContent(content);
         this.authorId = authorId;
-        this.title = title;
+        this.postId = postId;
         this.content = content;
-        this.category = category;
     }
 
-    public void update(String title, String content) {
-        this.title = title;
+    private void validateNotEmptyContent(String content) {
+        if (!StringUtils.hasText(content)) {
+            throw new CommentException(ErrorCode.EMPTY_CONTENT);
+        }
+    }
+
+    public void updateContent(String content) {
         this.content = content;
     }
 

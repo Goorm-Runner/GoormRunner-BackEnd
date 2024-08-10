@@ -1,4 +1,4 @@
-package goorm_runner.backend.post.application.exception;
+package goorm_runner.backend.post.application.post.exception;
 
 import goorm_runner.backend.global.ErrorCode;
 import lombok.Getter;
