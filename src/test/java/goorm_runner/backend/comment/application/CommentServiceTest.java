@@ -1,9 +1,11 @@
 package goorm_runner.backend.comment.application;
 
 import goorm_runner.backend.comment.domain.Comment;
+import goorm_runner.backend.comment.domain.exception.CommentException;
 import goorm_runner.backend.post.domain.Category;
 import goorm_runner.backend.post.domain.Post;
 import goorm_runner.backend.post.domain.PostRepository;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,6 +26,9 @@ class CommentServiceTest {
 
     @Autowired
     private CommentService commentService;
+
+    @Autowired
+    private EntityManager em;
 
     @MockBean
     private PostRepository postRepository;
@@ -60,10 +65,57 @@ class CommentServiceTest {
         Long postId = 1L;
         String content = "";
 
-        //when-then
+        //when
+        when(postRepository.findById(any()))
+                .thenReturn(Optional.of(new Post(1L, "title", "content", Category.GENERAL)));
+
+        //then
         assertThatThrownBy(() -> commentService.create(authorId, postId, content))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(CommentException.class);
     }
 
+    @Test
+    void update_success() {
+        //given
+        Long authorId = 1L;
+        Long postId = 1L;
+        String content = "lorem ipsum";
+
+        when(postRepository.findById(any()))
+                .thenReturn(Optional.of(new Post(1L, "title", "content", Category.GENERAL)));
+
+        Comment comment = commentService.create(authorId, postId, content);
+
+        //when
+        String updatedContent = "updated";
+        Comment updatedComment = commentService.update(comment.getId(), updatedContent);
+        em.flush();
+        em.clear();
+
+        //then
+        assertAll(
+                () -> assertThat(updatedComment.getContent()).isEqualTo(updatedContent),
+                () -> assertThat(updatedComment.getUpdatedAt()).isAfter(updatedComment.getCreatedAt())
+        );
+    }
+
+    @Test
+    void update_with_empty_content_exception() {
+        //given
+        Long authorId = 1L;
+        Long postId = 1L;
+        String content = "lorem ipsum";
+
+        when(postRepository.findById(any()))
+                .thenReturn(Optional.of(new Post(1L, "title", "content", Category.GENERAL)));
+
+        Comment comment = commentService.create(authorId, postId, content);
+
+        //when-then
+        String emptyContent = "";
+        assertThatThrownBy(() -> commentService.update(comment.getId(), emptyContent))
+                .isInstanceOf(CommentException.class);
+
+    }
 
 }

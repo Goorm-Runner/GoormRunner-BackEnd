@@ -23,12 +23,12 @@ public class CommentReadService {
                 .orElseThrow(() -> new CommentException(ErrorCode.COMMENT_NOT_FOUND));
     }
 
+    public Page<Comment> readPage(Long postId, Pageable pageable) {
+        return commentQueryRepository.findByPostId(postId, pageable);
+    }
+
     private void validatePostExisting(Long postId) {
         postRepository.findById(postId)
                 .orElseThrow(() -> new CommentException(ErrorCode.POST_NOT_FOUND));
-    }
-
-    public Page<Comment> readPage(Long postId, Pageable pageable) {
-        return commentQueryRepository.findByPostId(postId, pageable);
     }
 }

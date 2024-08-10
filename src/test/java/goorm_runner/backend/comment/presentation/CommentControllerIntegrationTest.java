@@ -286,16 +286,38 @@ class CommentControllerIntegrationTest {
                         jsonPath("$.pageMetaData.hasNext").value(false),
                         jsonPath("$.pageMetaData.hasPrevious").value(false)
                 );
-
     }
 
-
     @Test
-    void reading_page_after_deleting_post_is_not_allowed() {
+    void reading_page_after_deleting_post_is_not_allowed() throws Exception {
         //given
+        String title = "Example title";
+        String content = "<h1>Example</h1> Insert content here.";
+        PostCreateRequest createRequest = new PostCreateRequest(title, content);
+
+        String loginId = "test";
+        String password = "password";
+
+        String categoryName = "general";
 
         //when
+        Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
+        String token = authService.login(new LoginRequest(loginId, password));
+
+        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        commentService.create(member.getId(), post.getId(), "comment");
+
+        postService.delete(post.getId());
+        em.flush();
+        em.clear();
 
         //then
+        mockMvc.perform(get("/categories/general/posts/" + post.getId() + "/comments?pageNumber=0&pageSize=10")
+                        .header("Authorization", "Bearer " + token)
+                ).andExpectAll(
+                status().isNotFound(),
+                jsonPath("$.title").value(POST_NOT_FOUND.name()),
+                jsonPath("$.message").value(POST_NOT_FOUND.getMessage())
+        );
     }
 }
