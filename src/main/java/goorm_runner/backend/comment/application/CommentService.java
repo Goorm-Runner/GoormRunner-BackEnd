@@ -41,4 +41,11 @@ public class CommentService {
             throw new CommentException(ErrorCode.EMPTY_CONTENT);
         }
     }
+
+    public void delete(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentException(ErrorCode.COMMENT_NOT_FOUND));
+
+        comment.delete();
+    }
 }
