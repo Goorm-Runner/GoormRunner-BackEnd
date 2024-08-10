@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,12 +18,14 @@ public class CommentReadService {
     private final PostRepository postRepository;
     private final CommentQueryRepository commentQueryRepository;
 
+    @Transactional(readOnly = true)
     public Comment read(Long postId, Long commentId) {
         validatePostExisting(postId);
         return commentQueryRepository.findById(commentId)
                 .orElseThrow(() -> new CommentException(ErrorCode.COMMENT_NOT_FOUND));
     }
 
+    @Transactional(readOnly = true)
     public Page<Comment> readPage(Long postId, Pageable pageable) {
         return commentQueryRepository.findByPostId(postId, pageable);
     }
