@@ -59,7 +59,7 @@ class CommentReadServiceTest {
         when(postRepository.findById(any()))
                 .thenReturn(Optional.of(post));
 
-        Comment comment = commentService.create(authorId, postId, content);
+        Comment comment = commentService.create(authorId, post, content);
 
         //when
         Comment findComment = commentReadService.read(comment.getId());
@@ -88,7 +88,7 @@ class CommentReadServiceTest {
         when(postRepository.findById(any()))
                 .thenReturn(Optional.of(post));
 
-        commentService.create(authorId, postId, content);
+        commentService.create(authorId, post, content);
 
         //when
         PageRequest pageRequest = PageRequest.of(0, 10);

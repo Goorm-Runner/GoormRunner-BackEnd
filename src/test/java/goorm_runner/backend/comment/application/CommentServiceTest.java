@@ -53,7 +53,7 @@ class CommentServiceTest {
         when(postRepository.findById(any())).thenReturn(Optional.of(post));
 
         //when
-        Comment comment = commentService.create(authorId, postId, content);
+        Comment comment = commentService.create(authorId, post, content);
 
         //then
         assertAll(
@@ -74,12 +74,14 @@ class CommentServiceTest {
         Long postId = 1L;
         String content = "";
 
+        Post post = new Post(1L, "title", "content", Category.GENERAL);
+
         //when
         when(postRepository.findById(any()))
-                .thenReturn(Optional.of(new Post(1L, "title", "content", Category.GENERAL)));
+                .thenReturn(Optional.of(post));
 
         //then
-        assertThatThrownBy(() -> commentService.create(authorId, postId, content))
+        assertThatThrownBy(() -> commentService.create(authorId, post, content))
                 .isInstanceOf(CommentException.class);
     }
 
@@ -94,11 +96,11 @@ class CommentServiceTest {
         ReflectionTestUtils.setField(post, "id", postId);
         when(postRepository.findById(any())).thenReturn(Optional.of(post));
 
-        Comment comment = commentService.create(authorId, postId, content);
+        Comment comment = commentService.create(authorId, post, content);
 
         //when
         String updatedContent = "updated";
-        Comment updatedComment = commentService.update(postId, comment.getId(), updatedContent);
+        Comment updatedComment = commentService.update(post, comment.getId(), updatedContent);
         em.flush();
         em.clear();
 
@@ -120,11 +122,11 @@ class CommentServiceTest {
         ReflectionTestUtils.setField(post, "id", postId);
         when(postRepository.findById(any())).thenReturn(Optional.of(post));
 
-        Comment comment = commentService.create(authorId, postId, content);
+        Comment comment = commentService.create(authorId, post, content);
 
         //when-then
         String emptyContent = "";
-        assertThatThrownBy(() -> commentService.update(postId, comment.getId(), emptyContent))
+        assertThatThrownBy(() -> commentService.update(post, comment.getId(), emptyContent))
                 .isInstanceOf(CommentException.class);
 
     }

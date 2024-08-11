@@ -12,7 +12,6 @@ import goorm_runner.backend.post.domain.model.Category;
 import goorm_runner.backend.post.domain.model.Comment;
 import goorm_runner.backend.post.domain.model.Post;
 import goorm_runner.backend.post.presentation.comment.dto.CommentCreateRequest;
-import goorm_runner.backend.post.presentation.post.dto.PostCreateRequest;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -67,7 +66,6 @@ class CommentControllerIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         String loginId = "test";
         String password = "password";
@@ -99,7 +97,6 @@ class CommentControllerIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         String loginId = "test";
         String password = "password";
@@ -128,7 +125,6 @@ class CommentControllerIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         String loginId = "test";
         String password = "password";
@@ -158,7 +154,6 @@ class CommentControllerIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         String loginId = "test";
         String password = "password";
@@ -168,7 +163,7 @@ class CommentControllerIntegrationTest {
         String token = authService.login(new LoginRequest(loginId, password));
 
         Post post = postService.create(title, content, member.getId(), Category.GENERAL);
-        Comment comment = commentService.create(member.getId(), post.getId(), "comment");
+        Comment comment = commentService.create(member.getId(), post, "comment");
 
         //then
         mockMvc.perform(get("/categories/general/posts/" + post.getId() + "/comments/" + comment.getId())
@@ -186,7 +181,6 @@ class CommentControllerIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         String loginId = "test";
         String password = "password";
@@ -212,7 +206,6 @@ class CommentControllerIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         String loginId = "test";
         String password = "password";
@@ -222,7 +215,7 @@ class CommentControllerIntegrationTest {
         String token = authService.login(new LoginRequest(loginId, password));
 
         Post post = postService.create(title, content, member.getId(), Category.GENERAL);
-        Comment comment = commentService.create(member.getId(), post.getId(), "comment");
+        Comment comment = commentService.create(member.getId(), post, "comment");
 
         postService.delete(post.getId());
         em.flush();
@@ -243,7 +236,6 @@ class CommentControllerIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         String loginId = "test";
         String password = "password";
@@ -253,7 +245,7 @@ class CommentControllerIntegrationTest {
         String token = authService.login(new LoginRequest(loginId, password));
 
         Post post = postService.create(title, content, member.getId(), Category.GENERAL);
-        Comment comment = commentService.create(member.getId(), post.getId(), "comment");
+        Comment comment = commentService.create(member.getId(), post, "comment");
 
         //then
         mockMvc.perform(get("/categories/general/posts/" + post.getId() + "/comments?pageNumber=0&pageSize=10")
@@ -283,7 +275,6 @@ class CommentControllerIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         String loginId = "test";
         String password = "password";
@@ -293,7 +284,7 @@ class CommentControllerIntegrationTest {
         String token = authService.login(new LoginRequest(loginId, password));
 
         Post post = postService.create(title, content, member.getId(), Category.GENERAL);
-        commentService.create(member.getId(), post.getId(), "comment");
+        commentService.create(member.getId(), post, "comment");
 
         postService.delete(post.getId());
         em.flush();

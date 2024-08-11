@@ -49,10 +49,10 @@ public class CommentIntegrationTest {
         when(postRepository.findById(any()))
                 .thenReturn(Optional.of(post));
 
-        Comment comment = commentService.create(authorId, postId, content);
+        Comment comment = commentService.create(authorId, post, content);
 
         //when
-        commentService.delete(postId, comment.getId());
+        commentService.delete(post, comment.getId());
         em.flush();
         em.clear();
 

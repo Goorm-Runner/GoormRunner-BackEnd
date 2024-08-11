@@ -10,6 +10,7 @@ import goorm_runner.backend.post.application.post.PostReadService;
 import goorm_runner.backend.post.application.post.PostService;
 import goorm_runner.backend.post.domain.exception.CommentException;
 import goorm_runner.backend.post.domain.model.Comment;
+import goorm_runner.backend.post.domain.model.Post;
 import goorm_runner.backend.post.presentation.comment.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -42,7 +43,8 @@ public class CommentController {
         String username = securityMember.getUsername();
         Long authorId = memberService.findMemberIdByUsername(username);
 
-        Comment comment = commentService.create(authorId, postId, request.content());
+        Post post = postReadService.readPost(postId);
+        Comment comment = commentService.create(authorId, post, request.content());
         CommentCreateResponse response = CommentCreateResponse.from(comment);
 
         URI location = newUri(response);
@@ -93,7 +95,8 @@ public class CommentController {
         String username = securityMember.getUsername();
         Long authorId = memberService.findMemberIdByUsername(username);
 
-        Comment comment = commentService.update(postId, commentId, request.content());
+        Post post = postReadService.readPost(postId);
+        Comment comment = commentService.update(post, commentId, request.content());
         CommentUpdateResponse response = CommentUpdateResponse.from(comment);
 
         return ResponseEntity.ok()
@@ -110,7 +113,8 @@ public class CommentController {
         String username = securityMember.getUsername();
         Long authorId = memberService.findMemberIdByUsername(username);
 
-        commentService.delete(postId, commentId);
+        Post post = postReadService.readPost(postId);
+        commentService.delete(post, commentId);
 
         return ResponseEntity.noContent().build();
     }

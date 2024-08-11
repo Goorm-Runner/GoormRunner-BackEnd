@@ -37,13 +37,13 @@ public class Comment extends BaseTimeEntity {
 
     protected Comment(Post post, Long authorId, String content) {
         validateNotEmptyContent(content);
-
         this.post = post;
         this.authorId = authorId;
         this.content = content;
     }
 
     public void updateContent(String content) {
+        validateNotEmptyContent(content);
         this.content = content;
     }
 
