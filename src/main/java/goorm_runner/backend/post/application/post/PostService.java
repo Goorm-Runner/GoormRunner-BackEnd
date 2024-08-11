@@ -10,9 +10,9 @@ import goorm_runner.backend.post.domain.model.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
-import static goorm_runner.backend.global.ErrorCode.*;
+import static goorm_runner.backend.global.ErrorCode.MEMBER_NOT_FOUND;
+import static goorm_runner.backend.global.ErrorCode.POST_NOT_FOUND;
 
 @RequiredArgsConstructor
 @Service
@@ -23,16 +23,12 @@ public class PostService {
     private final MemberRepository memberRepository;
 
     public Post create(String title, String content, Long authorId, Category category) {
-        validateTitleAndContent(title, content);
-
         Post post = getPost(title, content, authorId, category);
 
         return postRepository.save(post);
     }
 
     public Post update(String title, String content, Long postId) {
-        validateTitleAndContent(title, content);
-
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(POST_NOT_FOUND));
 
@@ -55,16 +51,6 @@ public class PostService {
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
 
         return author.getNickname();
-    }
-
-    private void validateTitleAndContent(String title, String content) {
-        if (!StringUtils.hasText(title)) {
-            throw new PostException(EMPTY_TITLE);
-        }
-
-        if (!StringUtils.hasText(content)) {
-            throw new PostException(EMPTY_CONTENT);
-        }
     }
 
     private Post getPost(String title, String content, Long authorId, Category category) {

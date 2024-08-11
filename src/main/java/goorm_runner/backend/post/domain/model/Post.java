@@ -1,16 +1,21 @@
 package goorm_runner.backend.post.domain.model;
 
 import goorm_runner.backend.common.BaseTimeEntity;
+import goorm_runner.backend.post.application.post.exception.PostException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
+
+import static goorm_runner.backend.global.ErrorCode.EMPTY_CONTENT;
+import static goorm_runner.backend.global.ErrorCode.EMPTY_TITLE;
 
 @Entity
 @Getter
@@ -43,6 +48,7 @@ public class Post extends BaseTimeEntity {
 
     @Builder
     public Post(Long authorId, String title, String content, Category category) {
+        validateTitleAndContent(title, content);
         this.authorId = authorId;
         this.title = title;
         this.content = content;
@@ -50,6 +56,7 @@ public class Post extends BaseTimeEntity {
     }
 
     public void update(String title, String content) {
+        validateTitleAndContent(title, content);
         this.title = title;
         this.content = content;
     }
@@ -62,5 +69,15 @@ public class Post extends BaseTimeEntity {
         Comment comment = new Comment(this, authorId, content);
         comments.add(comment);
         return comment;
+    }
+
+    private void validateTitleAndContent(String title, String content) {
+        if (!StringUtils.hasText(title)) {
+            throw new PostException(EMPTY_TITLE);
+        }
+
+        if (!StringUtils.hasText(content)) {
+            throw new PostException(EMPTY_CONTENT);
+        }
     }
 }
