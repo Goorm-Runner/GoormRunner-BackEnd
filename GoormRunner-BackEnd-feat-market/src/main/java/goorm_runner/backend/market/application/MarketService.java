@@ -78,11 +78,16 @@ public class MarketService {
             throw new IllegalArgumentException("배송비는 0 이상이어야 합니다.");
         }
 
-        if (!StringUtils.hasText(fileName) || !fileName.toLowerCase().endsWith(".jpg")) {
+        if (!StringUtils.hasText(fileName) || !isValidImageExtension(fileName)) {
             throw new IllegalArgumentException("지원하지 않는 이미지 파일 형식입니다.");
         }
     }
 
+    private boolean isValidImageExtension(String fileName) {
+        String lowerCaseFileName = fileName.toLowerCase();
+        return lowerCaseFileName.endsWith(".jpg") || lowerCaseFileName.endsWith(".jpeg") ||
+                lowerCaseFileName.endsWith(".png") || lowerCaseFileName.endsWith(".gif");
+    }
     private MarketCategory toMarketCategory(String category) {
         try {
             return MarketCategory.valueOf(category);
