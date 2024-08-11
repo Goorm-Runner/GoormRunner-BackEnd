@@ -74,6 +74,39 @@ public class CommentController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/categories/{ignoredCategoryName}/posts/{postId}/comments/{commentId}")
+    public ResponseEntity<CommentUpdateResponse> editComment(
+            @AuthenticationPrincipal SecurityMember securityMember,
+            @PathVariable String ignoredCategoryName,
+            @PathVariable Long postId,
+            @PathVariable Long commentId,
+            @RequestBody CommentUpdateRequest request) {
+
+        String username = securityMember.getUsername();
+        Long authorId = memberService.findMemberIdByUsername(username);
+
+        Comment comment = commentService.update(postId, commentId, request.content());
+        CommentUpdateResponse response = CommentUpdateResponse.from(comment);
+
+        return ResponseEntity.ok()
+                .body(response);
+    }
+
+    @DeleteMapping("/categories/{ignoredCategoryName}/posts/{postId}/comments/{commentId}")
+    public ResponseEntity<Void> postComment(
+            @AuthenticationPrincipal SecurityMember securityMember,
+            @PathVariable String ignoredCategoryName,
+            @PathVariable Long postId,
+            @PathVariable Long commentId) {
+
+        String username = securityMember.getUsername();
+        Long authorId = memberService.findMemberIdByUsername(username);
+
+        commentService.delete(postId, commentId);
+
+        return ResponseEntity.noContent().build();
+    }
+
     private URI newUri(CommentCreateResponse response) {
         return ServletUriComponentsBuilder
                 .fromCurrentRequest()
