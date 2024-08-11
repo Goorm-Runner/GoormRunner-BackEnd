@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class Market extends BaseTimeEntity {
     @Column(nullable = false)
     private Long id;
 
-    @JoinColumn(name = "member_id", nullable = false)
+    @Column(name = "member_id", nullable = false)
     private Long memberId;
 
     @Column(nullable = false)
@@ -31,9 +32,6 @@ public class Market extends BaseTimeEntity {
 
     @Column(nullable = false)
     private Integer price;
-
-    @Column(nullable = false)
-    private Integer likeCount;
 
     @Column(length = 50, nullable = false)
     @Enumerated(EnumType.STRING)
@@ -46,22 +44,26 @@ public class Market extends BaseTimeEntity {
     @Column(length = 50, nullable = false)
     private Integer delivery;
 
+    private int likeCount;
+
     @Column(length = 300, nullable = false)
     private String imageUrl;
 
     @OneToMany(mappedBy = "market", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MarketComment> comments = new ArrayList<>();
 
+    private LocalDateTime deletedAt;
+
     @Builder
-    public Market(Long memberId, String title, String content, Integer price, Integer likeCount, MarketCategory category, MarketStatus status, Integer delivery, String imageUrl) {
+    public Market(Long memberId, String title, String content, Integer price,  MarketCategory category, MarketStatus status, Integer delivery, int likeCount, String imageUrl) {
         this.memberId = memberId;
         this.title = title;
         this.content = content;
         this.price = price;
-        this.likeCount = likeCount;
         this.category = category;
         this.status = status;
         this.delivery = delivery;
+        this.likeCount = likeCount;
         this.imageUrl = imageUrl;
     }
 
@@ -73,5 +75,13 @@ public class Market extends BaseTimeEntity {
         this.status = status;
         this.delivery = delivery;
         this.imageUrl = imageUrl;
+    }
+
+    public void setLikeCount(int likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    public void delete() {
+        deletedAt = LocalDateTime.now();
     }
 }
