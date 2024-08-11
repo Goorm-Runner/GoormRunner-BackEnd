@@ -1,4 +1,4 @@
-package goorm_runner.backend.post.dto;
+package goorm_runner.backend.post.presentation.post.dto;
 
 import goorm_runner.backend.global.PageMetaData;
 

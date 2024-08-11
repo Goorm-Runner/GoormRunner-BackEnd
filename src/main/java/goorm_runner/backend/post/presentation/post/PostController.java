@@ -8,7 +8,7 @@ import goorm_runner.backend.post.application.post.PostService;
 import goorm_runner.backend.post.application.post.exception.PostException;
 import goorm_runner.backend.post.domain.model.Category;
 import goorm_runner.backend.post.domain.model.Post;
-import goorm_runner.backend.post.dto.*;
+import goorm_runner.backend.post.presentation.post.dto.*;
 import goorm_runner.backend.postlike.application.PostLikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

@@ -8,7 +8,7 @@ import goorm_runner.backend.member.security.dto.MemberSignupRequest;
 import goorm_runner.backend.post.application.post.PostService;
 import goorm_runner.backend.post.domain.model.Category;
 import goorm_runner.backend.post.domain.model.Post;
-import goorm_runner.backend.post.dto.PostCreateRequest;
+import goorm_runner.backend.post.presentation.post.dto.PostCreateRequest;
 import goorm_runner.backend.postlike.application.PostLikeService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
