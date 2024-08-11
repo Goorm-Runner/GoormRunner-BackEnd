@@ -81,7 +81,7 @@ class PostControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.categoryName").value("GENERAL"))
+                .andExpect(jsonPath("$.categoryName").value(Category.GENERAL.name()))
                 .andExpect(jsonPath("$.postId").isNotEmpty())
                 .andExpect(jsonPath("$.title").value(title))
                 .andExpect(jsonPath("$.content").value(content))
@@ -173,13 +173,11 @@ class PostControllerIntegrationTest {
         String loginId = "test";
         String password = "password";
 
-        String categoryName = Category.GENERAL.name();
-
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
 
         //then
         mockMvc.perform(get("/categories/general/posts/" + post.getId()))
@@ -205,13 +203,11 @@ class PostControllerIntegrationTest {
         String loginId = "test";
         String password = "password";
 
-        String categoryName = Category.GENERAL.name();
-
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
         postLikeService.likePost(post.getId(), member.getId());
 
         //then
@@ -238,13 +234,11 @@ class PostControllerIntegrationTest {
         String loginId = "test";
         String password = "password";
 
-        String categoryName = Category.GENERAL.name();
-
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
         postLikeService.likePost(post.getId(), member.getId());
         postLikeService.deletePostLike(post.getId(), member.getId());
 
@@ -272,13 +266,11 @@ class PostControllerIntegrationTest {
         String loginId = "test";
         String password = "password";
 
-        String categoryName = Category.GENERAL.name();
-
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
 
         //then
         mockMvc.perform(get("/categories/general/posts/" + post.getId() + 1))
@@ -297,20 +289,18 @@ class PostControllerIntegrationTest {
         String loginId = "test";
         String password = "password";
 
-        String categoryName = Category.GENERAL.name();
-
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
 
         //then
         mockMvc.perform(get("/categories/general/posts?pageNumber=0&pageSize=10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.overviews.size()").value(1))
                 .andExpectAll(
-                        jsonPath("$.overviews[0].categoryName").value(categoryName),
+                        jsonPath("$.overviews[0].categoryName").value(Category.GENERAL.name()),
                         jsonPath("$.overviews[0].postId").value(post.getId()),
                         jsonPath("$.overviews[0].title").value(post.getTitle()),
                         jsonPath("$.overviews[0].createdAt").value(post.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)),
@@ -338,13 +328,11 @@ class PostControllerIntegrationTest {
         String loginId = "test";
         String password = "password";
 
-        String categoryName = Category.GENERAL.name();
-
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
         postLikeService.likePost(post.getId(), member.getId());
 
         //then
@@ -352,7 +340,7 @@ class PostControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.overviews.size()").value(1))
                 .andExpectAll(
-                        jsonPath("$.overviews[0].categoryName").value(categoryName),
+                        jsonPath("$.overviews[0].categoryName").value(Category.GENERAL.name()),
                         jsonPath("$.overviews[0].postId").value(post.getId()),
                         jsonPath("$.overviews[0].title").value(post.getTitle()),
                         jsonPath("$.overviews[0].createdAt").value(post.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)),
@@ -380,13 +368,11 @@ class PostControllerIntegrationTest {
         String loginId = "test";
         String password = "password";
 
-        String categoryName = Category.GENERAL.name();
-
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
         postLikeService.likePost(post.getId(), member.getId());
         postLikeService.deletePostLike(post.getId(), member.getId());
 
@@ -395,7 +381,7 @@ class PostControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.overviews.size()").value(1))
                 .andExpectAll(
-                        jsonPath("$.overviews[0].categoryName").value(categoryName),
+                        jsonPath("$.overviews[0].categoryName").value(Category.GENERAL.name()),
                         jsonPath("$.overviews[0].postId").value(post.getId()),
                         jsonPath("$.overviews[0].title").value(post.getTitle()),
                         jsonPath("$.overviews[0].createdAt").value(post.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)),
@@ -423,13 +409,11 @@ class PostControllerIntegrationTest {
         String loginId = "test";
         String password = "password";
 
-        String categoryName = Category.GENERAL.name();
-
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         authService.login(new LoginRequest(loginId, password));
 
-        postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        postService.create(createRequest, member.getId(), Category.GENERAL);
 
         //then
         mockMvc.perform(get("/categories/generall/posts?pageNumber=0&pageSize=10")) // wrong categoryName: generall
@@ -447,12 +431,11 @@ class PostControllerIntegrationTest {
 
         String loginId = "test";
         String password = "password";
-        String categoryName = Category.GENERAL.name();
 
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
 
         //when
         String updatedTitle = "Updated title";
@@ -483,12 +466,11 @@ class PostControllerIntegrationTest {
 
         String loginId = "test";
         String password = "password";
-        String categoryName = Category.GENERAL.name();
 
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
 
         //when
         String updatedTitle = "Updated title";
@@ -515,12 +497,11 @@ class PostControllerIntegrationTest {
 
         String loginId = "test";
         String password = "password";
-        String categoryName = Category.GENERAL.name();
 
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
 
         //when
         String emptyTitle = "";
@@ -547,12 +528,11 @@ class PostControllerIntegrationTest {
 
         String loginId = "test";
         String password = "password";
-        String categoryName = Category.GENERAL.name();
 
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
 
         //when
         String updatedTitle = "Updated title";
@@ -580,13 +560,11 @@ class PostControllerIntegrationTest {
         String loginId = "test";
         String password = "password";
 
-        String categoryName = "general";
-
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
 
         //then
         mockMvc.perform(delete("/categories/general/posts/" + post.getId())
@@ -605,13 +583,11 @@ class PostControllerIntegrationTest {
         String loginId = "test";
         String password = "password";
 
-        String categoryName = "general";
-
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
 
         //then
         mockMvc.perform(delete("/categories/general/posts/" + post.getId() + 1)
@@ -632,13 +608,11 @@ class PostControllerIntegrationTest {
         String loginId = "test";
         String password = "password";
 
-        String categoryName = "general";
-
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
         postService.delete(post.getId());
         em.flush();
         em.clear();
@@ -666,14 +640,12 @@ class PostControllerIntegrationTest {
         String loginId = "test";
         String password = "password";
 
-        String categoryName = "general";
-
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post1 = postService.create(createRequest1, member.getId(), categoryName.toUpperCase());
-        postService.create(createRequest2, member.getId(), categoryName.toUpperCase());
+        Post post1 = postService.create(createRequest1, member.getId(), Category.GENERAL);
+        postService.create(createRequest2, member.getId(), Category.GENERAL);
 
         postService.delete(post1.getId()); // post2만 남아있다.
         em.flush();

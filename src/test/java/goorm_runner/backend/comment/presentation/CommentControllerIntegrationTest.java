@@ -8,6 +8,7 @@ import goorm_runner.backend.member.security.dto.MemberSignupRequest;
 import goorm_runner.backend.post.application.comment.CommentService;
 import goorm_runner.backend.post.application.post.PostService;
 import goorm_runner.backend.post.domain.PostRepository;
+import goorm_runner.backend.post.domain.model.Category;
 import goorm_runner.backend.post.domain.model.Comment;
 import goorm_runner.backend.post.domain.model.Post;
 import goorm_runner.backend.post.dto.PostCreateRequest;
@@ -71,14 +72,13 @@ class CommentControllerIntegrationTest {
         String loginId = "test";
         String password = "password";
 
-        String categoryName = "general";
         CommentCreateRequest request = new CommentCreateRequest("comment");
 
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
 
         //then
         mockMvc.perform(post("/categories/general/posts/" + post.getId() + "/comments")
@@ -104,14 +104,13 @@ class CommentControllerIntegrationTest {
         String loginId = "test";
         String password = "password";
 
-        String categoryName = "general";
         CommentCreateRequest request = new CommentCreateRequest("");
 
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
 
         //then
         mockMvc.perform(post("/categories/general/posts/" + post.getId() + "/comments")
@@ -134,14 +133,13 @@ class CommentControllerIntegrationTest {
         String loginId = "test";
         String password = "password";
 
-        String categoryName = "general";
         CommentCreateRequest request = new CommentCreateRequest("comment");
 
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
         postService.delete(post.getId());
         em.flush();
         em.clear();
@@ -165,13 +163,11 @@ class CommentControllerIntegrationTest {
         String loginId = "test";
         String password = "password";
 
-        String categoryName = "general";
-
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
         Comment comment = commentService.create(member.getId(), post.getId(), "comment");
 
         //then
@@ -195,13 +191,11 @@ class CommentControllerIntegrationTest {
         String loginId = "test";
         String password = "password";
 
-        String categoryName = "general";
-
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
 
         //then
         mockMvc.perform(get("/categories/general/posts/" + post.getId() + "/comments/" + -1L)
@@ -223,13 +217,11 @@ class CommentControllerIntegrationTest {
         String loginId = "test";
         String password = "password";
 
-        String categoryName = "general";
-
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
         Comment comment = commentService.create(member.getId(), post.getId(), "comment");
 
         postService.delete(post.getId());
@@ -256,13 +248,11 @@ class CommentControllerIntegrationTest {
         String loginId = "test";
         String password = "password";
 
-        String categoryName = "general";
-
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
         Comment comment = commentService.create(member.getId(), post.getId(), "comment");
 
         //then
@@ -298,13 +288,11 @@ class CommentControllerIntegrationTest {
         String loginId = "test";
         String password = "password";
 
-        String categoryName = "general";
-
         //when
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), categoryName.toUpperCase());
+        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
         commentService.create(member.getId(), post.getId(), "comment");
 
         postService.delete(post.getId());

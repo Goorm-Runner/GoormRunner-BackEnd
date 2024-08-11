@@ -50,9 +50,7 @@ public class PostServiceIntegrationTest {
 
         Long authorId = 1L;
 
-        String categoryName = Category.GENERAL.name();
-
-        Post post = postService.create(createRequest, authorId, categoryName);
+        Post post = postService.create(createRequest, authorId, Category.GENERAL);
         Long postId = post.getId();
 
         //when
@@ -71,9 +69,7 @@ public class PostServiceIntegrationTest {
 
         Long authorId = 1L;
 
-        String categoryName = Category.GENERAL.name();
-
-        Post post = postService.create(createRequest, authorId, categoryName);
+        Post post = postService.create(createRequest, authorId, Category.GENERAL);
         Long postId = post.getId();
 
         //then
@@ -91,9 +87,7 @@ public class PostServiceIntegrationTest {
 
         Long authorId = 1L;
 
-        String categoryName = Category.GENERAL.name();
-
-        Post post = postService.create(createRequest, authorId, categoryName);
+        Post post = postService.create(createRequest, authorId, Category.GENERAL);
         Long postId = post.getId();
 
         //when
@@ -118,15 +112,13 @@ public class PostServiceIntegrationTest {
 
         Long authorId = 1L;
 
-        String categoryName = Category.GENERAL.name();
-
-        Post post1 = postService.create(createRequest1, authorId, categoryName);
-        postService.create(createRequest2, authorId, categoryName);
+        Post post1 = postService.create(createRequest1, authorId, Category.GENERAL);
+        postService.create(createRequest2, authorId, Category.GENERAL);
 
         //when
         postService.delete(post1.getId());
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<Post> posts = postReadService.readPage(categoryName, pageRequest);
+        Page<Post> posts = postReadService.readPage(Category.GENERAL.name(), pageRequest);
 
         //then
         assertThat(posts.getTotalElements()).isEqualTo(1);

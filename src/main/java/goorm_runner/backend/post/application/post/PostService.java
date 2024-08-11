@@ -24,10 +24,9 @@ public class PostService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
 
-    public Post create(PostCreateRequest request, Long authorId, String categoryName) {
+    public Post create(PostCreateRequest request, Long authorId, Category category) {
         validateTitleAndContent(request.title(), request.content());
 
-        Category category = toCategory(categoryName);
         Post post = getPost(request, authorId, category);
 
         return postRepository.save(post);
@@ -67,14 +66,6 @@ public class PostService {
 
         if (!StringUtils.hasText(content)) {
             throw new PostException(EMPTY_CONTENT);
-        }
-    }
-
-    private Category toCategory(String category) {
-        try {
-            return Category.valueOf(category);
-        } catch (IllegalArgumentException e) {
-            throw new PostException(INVALID_CATEGORY);
         }
     }
 

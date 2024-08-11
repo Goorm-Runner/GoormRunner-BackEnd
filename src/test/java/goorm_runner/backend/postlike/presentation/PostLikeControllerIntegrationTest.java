@@ -52,7 +52,7 @@ class PostLikeControllerIntegrationTest {
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(request, member.getId(), Category.GENERAL.name());
+        Post post = postService.create(request, member.getId(), Category.GENERAL);
 
         //then
         mockMvc.perform(post("/likes/posts/" + post.getId())
@@ -76,7 +76,7 @@ class PostLikeControllerIntegrationTest {
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(request, member.getId(), Category.GENERAL.name());
+        Post post = postService.create(request, member.getId(), Category.GENERAL);
 
         postLikeService.likePost(post.getId(), member.getId());
 
@@ -102,7 +102,7 @@ class PostLikeControllerIntegrationTest {
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(request, member.getId(), Category.GENERAL.name());
+        Post post = postService.create(request, member.getId(), Category.GENERAL);
 
         //when
         postLikeService.likePost(post.getId(), member.getId());
@@ -127,7 +127,7 @@ class PostLikeControllerIntegrationTest {
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(request, member.getId(), Category.GENERAL.name());
+        Post post = postService.create(request, member.getId(), Category.GENERAL);
 
         //when
         postLikeService.likePost(post.getId(), member.getId());
@@ -153,7 +153,7 @@ class PostLikeControllerIntegrationTest {
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(request, member.getId(), Category.GENERAL.name());
+        Post post = postService.create(request, member.getId(), Category.GENERAL);
         postLikeService.likePost(post.getId(), member.getId());
 
         //when
@@ -179,7 +179,7 @@ class PostLikeControllerIntegrationTest {
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(request, member.getId(), Category.GENERAL.name());
+        Post post = postService.create(request, member.getId(), Category.GENERAL);
 
         //when
 

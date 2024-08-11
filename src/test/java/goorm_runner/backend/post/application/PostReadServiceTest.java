@@ -50,9 +50,7 @@ class PostReadServiceTest {
 
         Long authorId = 1L;
 
-        String categoryName = Category.GENERAL.name();
-
-        Post post = postService.create(createRequest, authorId, categoryName);
+        Post post = postService.create(createRequest, authorId, Category.GENERAL);
 
         //when
         Post findPost = postReadService.readPost(post.getId());
@@ -69,9 +67,7 @@ class PostReadServiceTest {
 
         Long authorId = 1L;
 
-        String categoryName = Category.GENERAL.name();
-
-        Post post = postService.create(createRequest, authorId, categoryName);
+        Post post = postService.create(createRequest, authorId, Category.GENERAL);
 
         //when
         Long wrongId = post.getId() + 1;
@@ -91,13 +87,11 @@ class PostReadServiceTest {
 
         Long authorId = 1L;
 
-        String categoryName = Category.GENERAL.name();
-
-        postService.create(createRequest, authorId, categoryName);
+        postService.create(createRequest, authorId, Category.GENERAL);
 
         //when
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<Post> page = postReadService.readPage(categoryName, pageRequest);
+        Page<Post> page = postReadService.readPage(Category.GENERAL.name(), pageRequest);
 
         //then
         List<Post> contents = page.getContent();
@@ -120,9 +114,7 @@ class PostReadServiceTest {
 
         Long authorId = 1L;
 
-        String categoryName = Category.GENERAL.name();
-
-        postService.create(createRequest, authorId, categoryName);
+        postService.create(createRequest, authorId, Category.GENERAL);
 
         //when
         PageRequest pageRequest = PageRequest.of(0, 10);

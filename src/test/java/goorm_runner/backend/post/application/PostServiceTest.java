@@ -3,6 +3,7 @@ package goorm_runner.backend.post.application;
 import goorm_runner.backend.post.application.post.PostService;
 import goorm_runner.backend.post.application.post.exception.PostException;
 import goorm_runner.backend.post.domain.PostRepository;
+import goorm_runner.backend.post.domain.model.Category;
 import goorm_runner.backend.post.domain.model.Post;
 import goorm_runner.backend.post.dto.PostCreateRequest;
 import goorm_runner.backend.post.dto.PostUpdateRequest;
@@ -35,17 +36,15 @@ class PostServiceTest {
 
         Long authorId = 1L;
 
-        String categoryName = "GENERAL";
-
         //when
-        Post post = postService.create(request, authorId, categoryName);
+        Post post = postService.create(request, authorId, Category.GENERAL);
 
         //then
         assertAll(
                 () -> assertThat(post.getTitle()).isEqualTo(title),
                 () -> assertThat(post.getContent()).isEqualTo(content),
                 () -> assertThat(post.getAuthorId()).isEqualTo(authorId),
-                () -> assertThat(post.getCategory().name()).isEqualTo(categoryName),
+                () -> assertThat(post.getCategory().name()).isEqualTo(Category.GENERAL.name()),
                 () -> assertThat(post.getCreatedAt()).isNotNull(),
                 () -> assertThat(post.getUpdatedAt()).isNotNull(),
                 () -> assertThat(post.getCreatedAt()).isEqualTo(post.getUpdatedAt())
@@ -61,10 +60,8 @@ class PostServiceTest {
 
         Long authorId = 1L;
 
-        String categoryName = "GENERAL";
-
         //when-then
-        assertThatThrownBy(() -> postService.create(request, authorId, categoryName))
+        assertThatThrownBy(() -> postService.create(request, authorId, Category.GENERAL))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(EMPTY_TITLE.getMessage());
     }
@@ -78,29 +75,10 @@ class PostServiceTest {
 
         Long authorId = 1L;
 
-        String categoryName = "GENERAL";
-
         //when-then
-        assertThatThrownBy(() -> postService.create(request, authorId, categoryName))
+        assertThatThrownBy(() -> postService.create(request, authorId, Category.GENERAL))
                 .isInstanceOf(PostException.class)
                 .hasMessage(EMPTY_CONTENT.getMessage());
-    }
-
-    @Test
-    void save_invalid_category() {
-        //given
-        String title = "Example title";
-        String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest request = new PostCreateRequest(title, content);
-
-        Long authorId = 1L;
-
-        String categoryName = "INVALID";
-
-        //when-then
-        assertThatThrownBy(() -> postService.create(request, authorId, categoryName))
-                .isInstanceOf(PostException.class)
-                .hasMessage(INVALID_CATEGORY.getMessage());
     }
 
     @Test
@@ -112,9 +90,7 @@ class PostServiceTest {
 
         Long authorId = 1L;
 
-        String categoryName = "GENERAL";
-
-        Post post = postService.create(createRequest, authorId, categoryName);
+        Post post = postService.create(createRequest, authorId, Category.GENERAL);
 
         //when
         String updatedTitle = "UpdatedTitle";
@@ -141,9 +117,7 @@ class PostServiceTest {
 
         Long authorId = 1L;
 
-        String categoryName = "GENERAL";
-
-        Post post = postService.create(createRequest, authorId, categoryName);
+        Post post = postService.create(createRequest, authorId, Category.GENERAL);
 
         //when
         String updatedTitle = "UpdatedTitle";
@@ -165,9 +139,7 @@ class PostServiceTest {
 
         Long authorId = 1L;
 
-        String categoryName = "GENERAL";
-
-        Post post = postService.create(createRequest, authorId, categoryName);
+        Post post = postService.create(createRequest, authorId, Category.GENERAL);
 
         //when
         String emptyTitle = "";
@@ -189,9 +161,7 @@ class PostServiceTest {
 
         Long authorId = 1L;
 
-        String categoryName = "GENERAL";
-
-        Post post = postService.create(createRequest, authorId, categoryName);
+        Post post = postService.create(createRequest, authorId, Category.GENERAL);
 
         //when
         String emptyTitle = "UpdatedTitle";

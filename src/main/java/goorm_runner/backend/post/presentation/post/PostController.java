@@ -5,6 +5,8 @@ import goorm_runner.backend.member.application.MemberService;
 import goorm_runner.backend.member.security.SecurityMember;
 import goorm_runner.backend.post.application.post.PostReadService;
 import goorm_runner.backend.post.application.post.PostService;
+import goorm_runner.backend.post.application.post.exception.PostException;
+import goorm_runner.backend.post.domain.model.Category;
 import goorm_runner.backend.post.domain.model.Post;
 import goorm_runner.backend.post.dto.*;
 import goorm_runner.backend.postlike.application.PostLikeService;
@@ -18,6 +20,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+
+import static goorm_runner.backend.global.ErrorCode.INVALID_CATEGORY;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,7 +41,8 @@ public class PostController {
         String username = securityMember.getUsername();
         Long authorId = memberService.findMemberIdByUsername(username);
 
-        Post post = postService.create(request, authorId, categoryName.toUpperCase());
+        Category category = toCategory(categoryName.toUpperCase());
+        Post post = postService.create(request, authorId, category);
         PostCreateResponse response = getCreateResponse(post);
 
         URI location = newUri(response);
@@ -85,6 +90,14 @@ public class PostController {
     public ResponseEntity<Void> deletePost(@PathVariable String ignoredCategoryName, @PathVariable Long postId) {
         postService.delete(postId);
         return ResponseEntity.noContent().build();
+    }
+
+    private Category toCategory(String category) {
+        try {
+            return Category.valueOf(category);
+        } catch (IllegalArgumentException e) {
+            throw new PostException(INVALID_CATEGORY);
+        }
     }
 
     private PostCreateResponse getCreateResponse(Post post) {
