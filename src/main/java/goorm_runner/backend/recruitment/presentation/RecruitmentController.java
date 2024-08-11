@@ -118,7 +118,7 @@ public class RecruitmentController {
     /**
      * 글 작성자가 참여 요청을 승인한다.
      */
-    @PostMapping("/{recruitmentId}/approve")
+//    @PostMapping("/{recruitmentId}/approve")
     public ResponseEntity<Void> approveParticipation(
             @PathVariable Long recruitmentId,
             @RequestBody ApproveRequest approveRequest,
@@ -134,7 +134,7 @@ public class RecruitmentController {
     /**
      * 회원이 참여를 취소한다.
      */
-    @DeleteMapping("/{recruitmentId}/cancel")
+//    @DeleteMapping("/{recruitmentId}/cancel")
     public ResponseEntity<Void> cancelParticipation(
             @PathVariable Long recruitmentId,
             @AuthenticationPrincipal SecurityMember securityMember) {
