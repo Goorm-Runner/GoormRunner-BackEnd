@@ -1,6 +1,8 @@
-package goorm_runner.backend.post.domain.post;
+package goorm_runner.backend.post.domain;
 
 
+import goorm_runner.backend.post.domain.model.Category;
+import goorm_runner.backend.post.domain.model.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

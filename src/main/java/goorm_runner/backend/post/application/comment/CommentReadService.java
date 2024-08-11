@@ -1,10 +1,10 @@
 package goorm_runner.backend.post.application.comment;
 
 import goorm_runner.backend.global.ErrorCode;
-import goorm_runner.backend.post.domain.comment.Comment;
-import goorm_runner.backend.post.domain.comment.CommentQueryRepository;
-import goorm_runner.backend.post.domain.comment.exception.CommentException;
-import goorm_runner.backend.post.domain.post.PostRepository;
+import goorm_runner.backend.post.domain.CommentQueryRepository;
+import goorm_runner.backend.post.domain.PostRepository;
+import goorm_runner.backend.post.domain.exception.CommentException;
+import goorm_runner.backend.post.domain.model.Comment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

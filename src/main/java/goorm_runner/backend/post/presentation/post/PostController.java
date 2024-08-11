@@ -5,7 +5,7 @@ import goorm_runner.backend.member.application.MemberService;
 import goorm_runner.backend.member.security.SecurityMember;
 import goorm_runner.backend.post.application.post.PostReadService;
 import goorm_runner.backend.post.application.post.PostService;
-import goorm_runner.backend.post.domain.post.Post;
+import goorm_runner.backend.post.domain.model.Post;
 import goorm_runner.backend.post.dto.*;
 import goorm_runner.backend.postlike.application.PostLikeService;
 import lombok.RequiredArgsConstructor;

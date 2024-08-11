@@ -2,16 +2,17 @@ package goorm_runner.backend.comment.application;
 
 import goorm_runner.backend.post.application.comment.CommentReadService;
 import goorm_runner.backend.post.application.comment.CommentService;
-import goorm_runner.backend.post.domain.comment.Comment;
-import goorm_runner.backend.post.domain.comment.exception.CommentException;
-import goorm_runner.backend.post.domain.post.Category;
-import goorm_runner.backend.post.domain.post.Post;
-import goorm_runner.backend.post.domain.post.PostRepository;
+import goorm_runner.backend.post.domain.PostRepository;
+import goorm_runner.backend.post.domain.exception.CommentException;
+import goorm_runner.backend.post.domain.model.Category;
+import goorm_runner.backend.post.domain.model.Comment;
+import goorm_runner.backend.post.domain.model.Post;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -43,13 +44,15 @@ public class CommentIntegrationTest {
         Long postId = 1L;
         String content = "lorem ipsum";
 
+        Post post = new Post(1L, "title", "content", Category.GENERAL);
+        ReflectionTestUtils.setField(post, "id", 1L);
         when(postRepository.findById(any()))
-                .thenReturn(Optional.of(new Post(1L, "title", "content", Category.GENERAL)));
+                .thenReturn(Optional.of(post));
 
         Comment comment = commentService.create(authorId, postId, content);
 
         //when
-        commentService.delete(comment.getId());
+        commentService.delete(postId, comment.getId());
         em.flush();
         em.clear();
 

@@ -2,9 +2,9 @@ package goorm_runner.backend.post.application.post;
 
 import goorm_runner.backend.global.ErrorCode;
 import goorm_runner.backend.post.application.post.exception.PostException;
-import goorm_runner.backend.post.domain.post.Category;
-import goorm_runner.backend.post.domain.post.Post;
-import goorm_runner.backend.post.domain.post.PostQueryRepository;
+import goorm_runner.backend.post.domain.PostQueryRepository;
+import goorm_runner.backend.post.domain.model.Category;
+import goorm_runner.backend.post.domain.model.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

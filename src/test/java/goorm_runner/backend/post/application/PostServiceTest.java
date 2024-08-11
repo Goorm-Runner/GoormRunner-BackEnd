@@ -2,8 +2,8 @@ package goorm_runner.backend.post.application;
 
 import goorm_runner.backend.post.application.post.PostService;
 import goorm_runner.backend.post.application.post.exception.PostException;
-import goorm_runner.backend.post.domain.post.Post;
-import goorm_runner.backend.post.domain.post.PostRepository;
+import goorm_runner.backend.post.domain.PostRepository;
+import goorm_runner.backend.post.domain.model.Post;
 import goorm_runner.backend.post.dto.PostCreateRequest;
 import goorm_runner.backend.post.dto.PostUpdateRequest;
 import org.junit.jupiter.api.Test;

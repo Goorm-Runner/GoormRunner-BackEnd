@@ -3,7 +3,7 @@ package goorm_runner.backend.post.presentation.comment;
 import goorm_runner.backend.global.ErrorCode;
 import goorm_runner.backend.global.ErrorResult;
 import goorm_runner.backend.post.application.post.exception.PostException;
-import goorm_runner.backend.post.domain.comment.exception.CommentException;
+import goorm_runner.backend.post.domain.exception.CommentException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

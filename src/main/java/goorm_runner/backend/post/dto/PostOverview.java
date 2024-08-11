@@ -1,6 +1,6 @@
 package goorm_runner.backend.post.dto;
 
-import goorm_runner.backend.post.domain.post.Post;
+import goorm_runner.backend.post.domain.model.Post;
 import lombok.Builder;
 
 import java.time.LocalDateTime;

@@ -1,4 +1,4 @@
-package goorm_runner.backend.post.domain.post;
+package goorm_runner.backend.post.domain.model;
 
 public enum Category {
     GENERAL("자유게시판"),

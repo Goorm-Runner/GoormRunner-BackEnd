@@ -6,7 +6,7 @@ import goorm_runner.backend.member.security.SecurityMember;
 import goorm_runner.backend.post.application.comment.CommentReadService;
 import goorm_runner.backend.post.application.comment.CommentService;
 import goorm_runner.backend.post.application.post.PostService;
-import goorm_runner.backend.post.domain.comment.Comment;
+import goorm_runner.backend.post.domain.model.Comment;
 import goorm_runner.backend.post.presentation.comment.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
