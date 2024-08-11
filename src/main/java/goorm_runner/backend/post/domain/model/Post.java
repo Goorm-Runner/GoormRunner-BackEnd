@@ -1,15 +1,12 @@
 package goorm_runner.backend.post.domain.model;
 
 import goorm_runner.backend.common.BaseTimeEntity;
-import goorm_runner.backend.global.ErrorCode;
-import goorm_runner.backend.post.domain.exception.CommentException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.LinkedList;
@@ -62,17 +59,8 @@ public class Post extends BaseTimeEntity {
     }
 
     public Comment addComment(Long authorId, String content) {
-        validateNotEmptyContent(content);
-
         Comment comment = new Comment(this, authorId, content);
         comments.add(comment);
-
         return comment;
-    }
-
-    private void validateNotEmptyContent(String content) {
-        if (!StringUtils.hasText(content)) {
-            throw new CommentException(ErrorCode.EMPTY_CONTENT);
-        }
     }
 }
