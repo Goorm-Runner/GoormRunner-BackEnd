@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Builder
 public record MarketReadResponse(String categoryName, Long marketId, String title, String content,
-                                 Integer price, Integer likeCount, MarketStatus status,
+                                 Integer price, int likeCount, MarketStatus status,
                                  LocalDateTime createdAt, LocalDateTime updatedAt) {
 
 }

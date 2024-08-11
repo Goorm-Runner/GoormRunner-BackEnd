@@ -124,7 +124,7 @@ public class MarketController {
                 market.getTitle(),
                 market.getContent(),
                 market.getPrice(),
-                market.getLikeCount().intValue(),
+                market.getLikeCount(),
                 market.getStatus(),
                 market.getCreatedAt(),
                 market.getUpdatedAt()

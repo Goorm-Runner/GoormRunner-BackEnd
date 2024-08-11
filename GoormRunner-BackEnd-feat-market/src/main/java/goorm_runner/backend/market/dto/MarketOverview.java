@@ -12,7 +12,7 @@ public class MarketOverview {
     private String title;
     private String categoryName;
     private Integer price;
-    private Integer likeCount;
+    private int likeCount;
     private MarketStatus status;
     public static MarketOverview from(Market market) {
         return MarketOverview.builder()

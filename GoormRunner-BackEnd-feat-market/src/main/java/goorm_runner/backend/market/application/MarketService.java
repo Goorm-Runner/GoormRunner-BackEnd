@@ -13,9 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
 
 
 @Service
@@ -29,20 +27,21 @@ public class MarketService {
     private static final String IMAGE_DIRECTORY = "uploaded-images/";
 
     public Market create(MarketCreateRequest request, Long memberId,  String categoryName, String statustitle,MultipartFile image) throws IOException {
-        validateOfRequests(request.title(), request.content(), request.price(), request.delivery(), image.getOriginalFilename());
+        validateRequests(request.title(), request.content(), request.price(), request.delivery(), image.getOriginalFilename());
 
-        String imageUrl = imageStorageService.saveImage(image);;
+        String imageUrl = imageStorageService.saveImage(image);
 
         MarketCategory category = toMarketCategory(categoryName);
-        MarketStatus status = toMarketStatus(statustitle);
-        Market market = getMarket(request, memberId, category, status, imageUrl);
+        MarketStatus status = toMarketStatus(statustitle);int initialLikeCount = 0; // 기본 likeCount 값을 설정
+        Market market = getMarket(request, memberId, category, status, initialLikeCount, imageUrl);
+
 
 
         return marketRepository.save(market);
     }
 
     public Market update(MarketUpdateRequest request, Long marketId, String categoryName, String statustitle, MultipartFile image)throws IOException {
-        validateOfRequests(request.title(), request.content(), request.price(), request.delivery(), image.getOriginalFilename());
+        validateRequests(request.title(), request.content(), request.price(), request.delivery(), image.getOriginalFilename());
 
         Market market = marketRepository.findById(marketId)
                 .orElseThrow(() -> new MarketNotFoundException("해당 상품을 찾지 못했습니다."));
@@ -57,10 +56,12 @@ public class MarketService {
     }
 
     public void delete(Long marketId) {
-        marketRepository.deleteById(marketId);
+        Market market = marketRepository.findById(marketId)
+                .orElseThrow(() -> new MarketNotFoundException("해당 상품을 찾지 못했습니다."));
+        marketRepository.delete(market);
     }
 
-    private void validateOfRequests(String title, String content, Integer price, Integer delivery, String fileName) {
+    private void validateRequests(String title, String content, Integer price, Integer delivery, String fileName) {
         if (!StringUtils.hasText(title) || title.length() > 100) {
             throw new IllegalArgumentException("제목을 입력하거나 너무 길지 않게 하세요.");
         }
@@ -98,16 +99,16 @@ public class MarketService {
         }
     }
 
-    private Market getMarket(MarketCreateRequest request, Long memberId,  MarketCategory category, MarketStatus status, String imageUrl) {
+    private Market getMarket(MarketCreateRequest request, Long memberId,  MarketCategory category, MarketStatus status, int likeCount, String imageUrl) {
         return Market.builder()
                 .memberId(memberId)
                 .title(request.title())
                 .content(request.content())
                 .price(request.price())
-                .likeCount((Integer) 0)
                 .category(category)
                 .status(status)
                 .delivery(request.delivery())
+                .likeCount(likeCount)
                 .imageUrl(imageUrl)
                 .build();
     }
