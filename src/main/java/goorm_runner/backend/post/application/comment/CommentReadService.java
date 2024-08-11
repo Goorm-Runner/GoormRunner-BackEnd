@@ -19,8 +19,7 @@ public class CommentReadService {
     private final CommentQueryRepository commentQueryRepository;
 
     @Transactional(readOnly = true)
-    public Comment read(Long postId, Long commentId) {
-        validatePostExisting(postId);
+    public Comment read(Long commentId) {
         return commentQueryRepository.findById(commentId)
                 .orElseThrow(() -> new CommentException(ErrorCode.COMMENT_NOT_FOUND));
     }
@@ -28,10 +27,5 @@ public class CommentReadService {
     @Transactional(readOnly = true)
     public Page<Comment> readPage(Long postId, Pageable pageable) {
         return commentQueryRepository.findByPostId(postId, pageable);
-    }
-
-    private void validatePostExisting(Long postId) {
-        postRepository.findById(postId)
-                .orElseThrow(() -> new CommentException(ErrorCode.POST_NOT_FOUND));
     }
 }

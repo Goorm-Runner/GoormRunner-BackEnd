@@ -62,7 +62,7 @@ class CommentReadServiceTest {
         Comment comment = commentService.create(authorId, postId, content);
 
         //when
-        Comment findComment = commentReadService.read(postId, comment.getId());
+        Comment findComment = commentReadService.read(comment.getId());
 
         //then
         assertAll(

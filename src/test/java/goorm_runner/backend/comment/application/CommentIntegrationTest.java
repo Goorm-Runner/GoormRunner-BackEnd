@@ -57,7 +57,7 @@ public class CommentIntegrationTest {
         em.clear();
 
         //then
-        assertThatThrownBy(() -> commentReadService.read(postId, comment.getId()))
+        assertThatThrownBy(() -> commentReadService.read(comment.getId()))
                 .isInstanceOf(CommentException.class);
     }
 }

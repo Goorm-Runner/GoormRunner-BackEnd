@@ -26,4 +26,8 @@ public class PostReadService {
     public Page<Post> readPage(Category category, Pageable pageable) {
         return postQueryRepository.findByCategory(category, pageable);
     }
+
+    public boolean existsPost(Long postId) {
+        return postQueryRepository.existsById(postId);
+    }
 }

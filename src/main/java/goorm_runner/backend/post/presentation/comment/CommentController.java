@@ -1,11 +1,14 @@
 package goorm_runner.backend.post.presentation.comment;
 
+import goorm_runner.backend.global.ErrorCode;
 import goorm_runner.backend.global.PageMetaData;
 import goorm_runner.backend.member.application.MemberService;
 import goorm_runner.backend.member.security.SecurityMember;
 import goorm_runner.backend.post.application.comment.CommentReadService;
 import goorm_runner.backend.post.application.comment.CommentService;
+import goorm_runner.backend.post.application.post.PostReadService;
 import goorm_runner.backend.post.application.post.PostService;
+import goorm_runner.backend.post.domain.exception.CommentException;
 import goorm_runner.backend.post.domain.model.Comment;
 import goorm_runner.backend.post.presentation.comment.dto.*;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,7 @@ public class CommentController {
     private final CommentService commentService;
     private final CommentReadService commentReadService;
     private final PostService postService;
+    private final PostReadService postReadService;
 
     @PostMapping("/categories/{ignoredCategoryName}/posts/{postId}/comments")
     public ResponseEntity<CommentCreateResponse> postComment(
@@ -51,7 +55,9 @@ public class CommentController {
     public ResponseEntity<CommentReadResponse> getComment(
             @PathVariable String ignoredCategoryName, @PathVariable Long postId, @PathVariable Long commentId) {
 
-        Comment comment = commentReadService.read(postId, commentId);
+        validatePostExisting(postId);
+
+        Comment comment = commentReadService.read(commentId);
         CommentReadResponse response = CommentReadResponse.from(comment);
 
         return ResponseEntity.ok(response);
@@ -60,6 +66,8 @@ public class CommentController {
     @GetMapping("/categories/{ignoredCategoryName}/posts/{postId}/comments")
     public ResponseEntity<CommentPageResponse> getComments(
             @PathVariable String ignoredCategoryName, @PathVariable Long postId, @RequestParam int pageNumber, @RequestParam int pageSize) {
+
+        validatePostExisting(postId);
 
         Page<Comment> comments = commentReadService.readPage(postId, PageRequest.of(pageNumber, pageSize));
 
@@ -113,5 +121,11 @@ public class CommentController {
                 .path("/{id}")
                 .buildAndExpand(response.postId())
                 .toUri();
+    }
+
+    private void validatePostExisting(Long postId) {
+        if (!postReadService.existsPost(postId)) {
+            throw new CommentException(ErrorCode.POST_NOT_FOUND);
+        }
     }
 }
