@@ -168,7 +168,6 @@ class PostControllerIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         String loginId = "test";
         String password = "password";
@@ -177,7 +176,7 @@ class PostControllerIntegrationTest {
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
+        Post post = postService.create(title, content, member.getId(), Category.GENERAL);
 
         //then
         mockMvc.perform(get("/categories/general/posts/" + post.getId()))
@@ -198,7 +197,6 @@ class PostControllerIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         String loginId = "test";
         String password = "password";
@@ -207,7 +205,7 @@ class PostControllerIntegrationTest {
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
+        Post post = postService.create(title, content, member.getId(), Category.GENERAL);
         postLikeService.likePost(post.getId(), member.getId());
 
         //then
@@ -229,7 +227,6 @@ class PostControllerIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         String loginId = "test";
         String password = "password";
@@ -238,7 +235,7 @@ class PostControllerIntegrationTest {
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
+        Post post = postService.create(title, content, member.getId(), Category.GENERAL);
         postLikeService.likePost(post.getId(), member.getId());
         postLikeService.deletePostLike(post.getId(), member.getId());
 
@@ -261,7 +258,6 @@ class PostControllerIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         String loginId = "test";
         String password = "password";
@@ -270,7 +266,7 @@ class PostControllerIntegrationTest {
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
+        Post post = postService.create(title, content, member.getId(), Category.GENERAL);
 
         //then
         mockMvc.perform(get("/categories/general/posts/" + post.getId() + 1))
@@ -284,7 +280,6 @@ class PostControllerIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         String loginId = "test";
         String password = "password";
@@ -293,7 +288,7 @@ class PostControllerIntegrationTest {
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
+        Post post = postService.create(title, content, member.getId(), Category.GENERAL);
 
         //then
         mockMvc.perform(get("/categories/general/posts?pageNumber=0&pageSize=10"))
@@ -323,7 +318,6 @@ class PostControllerIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         String loginId = "test";
         String password = "password";
@@ -332,7 +326,7 @@ class PostControllerIntegrationTest {
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
+        Post post = postService.create(title, content, member.getId(), Category.GENERAL);
         postLikeService.likePost(post.getId(), member.getId());
 
         //then
@@ -363,7 +357,6 @@ class PostControllerIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         String loginId = "test";
         String password = "password";
@@ -372,7 +365,7 @@ class PostControllerIntegrationTest {
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
+        Post post = postService.create(title, content, member.getId(), Category.GENERAL);
         postLikeService.likePost(post.getId(), member.getId());
         postLikeService.deletePostLike(post.getId(), member.getId());
 
@@ -404,7 +397,6 @@ class PostControllerIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         String loginId = "test";
         String password = "password";
@@ -413,7 +405,7 @@ class PostControllerIntegrationTest {
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         authService.login(new LoginRequest(loginId, password));
 
-        postService.create(createRequest, member.getId(), Category.GENERAL);
+        postService.create(title, content, member.getId(), Category.GENERAL);
 
         //then
         mockMvc.perform(get("/categories/generall/posts?pageNumber=0&pageSize=10")) // wrong categoryName: generall
@@ -427,7 +419,6 @@ class PostControllerIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         String loginId = "test";
         String password = "password";
@@ -435,7 +426,7 @@ class PostControllerIntegrationTest {
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
+        Post post = postService.create(title, content, member.getId(), Category.GENERAL);
 
         //when
         String updatedTitle = "Updated title";
@@ -462,7 +453,6 @@ class PostControllerIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         String loginId = "test";
         String password = "password";
@@ -470,7 +460,7 @@ class PostControllerIntegrationTest {
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
+        Post post = postService.create(title, content, member.getId(), Category.GENERAL);
 
         //when
         String updatedTitle = "Updated title";
@@ -493,7 +483,6 @@ class PostControllerIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         String loginId = "test";
         String password = "password";
@@ -501,7 +490,7 @@ class PostControllerIntegrationTest {
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
+        Post post = postService.create(title, content, member.getId(), Category.GENERAL);
 
         //when
         String emptyTitle = "";
@@ -524,7 +513,6 @@ class PostControllerIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         String loginId = "test";
         String password = "password";
@@ -532,7 +520,7 @@ class PostControllerIntegrationTest {
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
+        Post post = postService.create(title, content, member.getId(), Category.GENERAL);
 
         //when
         String updatedTitle = "Updated title";
@@ -555,7 +543,6 @@ class PostControllerIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         String loginId = "test";
         String password = "password";
@@ -564,7 +551,7 @@ class PostControllerIntegrationTest {
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
+        Post post = postService.create(title, content, member.getId(), Category.GENERAL);
 
         //then
         mockMvc.perform(delete("/categories/general/posts/" + post.getId())
@@ -578,7 +565,6 @@ class PostControllerIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         String loginId = "test";
         String password = "password";
@@ -587,7 +573,7 @@ class PostControllerIntegrationTest {
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
+        Post post = postService.create(title, content, member.getId(), Category.GENERAL);
 
         //then
         mockMvc.perform(delete("/categories/general/posts/" + post.getId() + 1)
@@ -603,7 +589,6 @@ class PostControllerIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         String loginId = "test";
         String password = "password";
@@ -612,7 +597,7 @@ class PostControllerIntegrationTest {
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post = postService.create(createRequest, member.getId(), Category.GENERAL);
+        Post post = postService.create(title, content, member.getId(), Category.GENERAL);
         postService.delete(post.getId());
         em.flush();
         em.clear();
@@ -631,11 +616,9 @@ class PostControllerIntegrationTest {
         //given
         String title1 = "title1";
         String content1 = "content1";
-        PostCreateRequest createRequest1 = new PostCreateRequest(title1, content1);
 
         String title2 = "title1";
         String content2 = "content1";
-        PostCreateRequest createRequest2 = new PostCreateRequest(title2, content2);
 
         String loginId = "test";
         String password = "password";
@@ -644,8 +627,8 @@ class PostControllerIntegrationTest {
         Member member = authService.signup(new MemberSignupRequest(loginId, "test", password, "user", "male", "2000-01-01"));
         String token = authService.login(new LoginRequest(loginId, password));
 
-        Post post1 = postService.create(createRequest1, member.getId(), Category.GENERAL);
-        postService.create(createRequest2, member.getId(), Category.GENERAL);
+        Post post1 = postService.create(title1, content1, member.getId(), Category.GENERAL);
+        postService.create(title2, content2, member.getId(), Category.GENERAL);
 
         postService.delete(post1.getId()); // post2만 남아있다.
         em.flush();

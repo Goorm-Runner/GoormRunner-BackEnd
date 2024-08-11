@@ -7,8 +7,6 @@ import goorm_runner.backend.post.application.post.exception.PostException;
 import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.domain.model.Category;
 import goorm_runner.backend.post.domain.model.Post;
-import goorm_runner.backend.post.dto.PostCreateRequest;
-import goorm_runner.backend.post.dto.PostUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,21 +22,21 @@ public class PostService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
 
-    public Post create(PostCreateRequest request, Long authorId, Category category) {
-        validateTitleAndContent(request.title(), request.content());
+    public Post create(String title, String content, Long authorId, Category category) {
+        validateTitleAndContent(title, content);
 
-        Post post = getPost(request, authorId, category);
+        Post post = getPost(title, content, authorId, category);
 
         return postRepository.save(post);
     }
 
-    public Post update(PostUpdateRequest request, Long postId) {
-        validateTitleAndContent(request.title(), request.content());
+    public Post update(String title, String content, Long postId) {
+        validateTitleAndContent(title, content);
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(POST_NOT_FOUND));
 
-        post.update(request.title(), request.content());
+        post.update(title, content);
         return post;
     }
 
@@ -69,11 +67,11 @@ public class PostService {
         }
     }
 
-    private Post getPost(PostCreateRequest request, Long authorId, Category category) {
+    private Post getPost(String title, String content, Long authorId, Category category) {
         return Post.builder()
                 .authorId(authorId)
-                .title(request.title())
-                .content(request.content())
+                .title(title)
+                .content(content)
                 .category(category)
                 .build();
     }

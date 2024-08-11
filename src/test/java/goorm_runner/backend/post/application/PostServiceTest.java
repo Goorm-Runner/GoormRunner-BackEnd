@@ -37,7 +37,7 @@ class PostServiceTest {
         Long authorId = 1L;
 
         //when
-        Post post = postService.create(request, authorId, Category.GENERAL);
+        Post post = postService.create(title, content, authorId, Category.GENERAL);
 
         //then
         assertAll(
@@ -61,7 +61,7 @@ class PostServiceTest {
         Long authorId = 1L;
 
         //when-then
-        assertThatThrownBy(() -> postService.create(request, authorId, Category.GENERAL))
+        assertThatThrownBy(() -> postService.create(title, content, authorId, Category.GENERAL))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(EMPTY_TITLE.getMessage());
     }
@@ -76,7 +76,7 @@ class PostServiceTest {
         Long authorId = 1L;
 
         //when-then
-        assertThatThrownBy(() -> postService.create(request, authorId, Category.GENERAL))
+        assertThatThrownBy(() -> postService.create(title, content, authorId, Category.GENERAL))
                 .isInstanceOf(PostException.class)
                 .hasMessage(EMPTY_CONTENT.getMessage());
     }
@@ -90,14 +90,13 @@ class PostServiceTest {
 
         Long authorId = 1L;
 
-        Post post = postService.create(createRequest, authorId, Category.GENERAL);
+        Post post = postService.create(title, content, authorId, Category.GENERAL);
 
         //when
         String updatedTitle = "UpdatedTitle";
         String updatedContent = "UpdatedContent";
-        PostUpdateRequest updateRequest = new PostUpdateRequest(updatedTitle, updatedContent);
 
-        Post updated = postService.update(updateRequest, post.getId());
+        Post updated = postService.update(updatedTitle, updatedContent, post.getId());
         postRepository.flush();
 
         //then
@@ -117,7 +116,7 @@ class PostServiceTest {
 
         Long authorId = 1L;
 
-        Post post = postService.create(createRequest, authorId, Category.GENERAL);
+        Post post = postService.create(title, content, authorId, Category.GENERAL);
 
         //when
         String updatedTitle = "UpdatedTitle";
@@ -125,7 +124,7 @@ class PostServiceTest {
         PostUpdateRequest updateRequest = new PostUpdateRequest(updatedTitle, updatedContent);
 
         //then
-        assertThatThrownBy(() -> postService.update(updateRequest, post.getId() + 1))
+        assertThatThrownBy(() -> postService.update(title, content, post.getId() + 1))
                 .isInstanceOf(PostException.class)
                 .hasMessage(POST_NOT_FOUND.getMessage());
     }
@@ -135,19 +134,17 @@ class PostServiceTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         Long authorId = 1L;
 
-        Post post = postService.create(createRequest, authorId, Category.GENERAL);
+        Post post = postService.create(title, content, authorId, Category.GENERAL);
 
         //when
         String emptyTitle = "";
         String updatedContent = "UpdatedContent";
-        PostUpdateRequest updateRequest = new PostUpdateRequest(emptyTitle, updatedContent);
 
         //then
-        assertThatThrownBy(() -> postService.update(updateRequest, post.getId()))
+        assertThatThrownBy(() -> postService.update(emptyTitle, updatedContent, post.getId()))
                 .isInstanceOf(PostException.class)
                 .hasMessage(EMPTY_TITLE.getMessage());
     }
@@ -157,19 +154,17 @@ class PostServiceTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         Long authorId = 1L;
 
-        Post post = postService.create(createRequest, authorId, Category.GENERAL);
+        Post post = postService.create(title, content, authorId, Category.GENERAL);
 
         //when
         String emptyTitle = "UpdatedTitle";
         String updatedContent = "";
-        PostUpdateRequest updateRequest = new PostUpdateRequest(emptyTitle, updatedContent);
 
         //then
-        assertThatThrownBy(() -> postService.update(updateRequest, post.getId()))
+        assertThatThrownBy(() -> postService.update(emptyTitle, updatedContent, post.getId()))
                 .isInstanceOf(PostException.class)
                 .hasMessage(EMPTY_CONTENT.getMessage());
     }

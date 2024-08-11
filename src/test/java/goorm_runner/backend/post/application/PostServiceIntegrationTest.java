@@ -46,11 +46,10 @@ public class PostServiceIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         Long authorId = 1L;
 
-        Post post = postService.create(createRequest, authorId, Category.GENERAL);
+        Post post = postService.create(title, content, authorId, Category.GENERAL);
         Long postId = post.getId();
 
         //when
@@ -65,11 +64,10 @@ public class PostServiceIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         Long authorId = 1L;
 
-        Post post = postService.create(createRequest, authorId, Category.GENERAL);
+        Post post = postService.create(title, content, authorId, Category.GENERAL);
         Long postId = post.getId();
 
         //then
@@ -87,7 +85,7 @@ public class PostServiceIntegrationTest {
 
         Long authorId = 1L;
 
-        Post post = postService.create(createRequest, authorId, Category.GENERAL);
+        Post post = postService.create(title, content, authorId, Category.GENERAL);
         Long postId = post.getId();
 
         //when
@@ -107,13 +105,11 @@ public class PostServiceIntegrationTest {
         String title1 = "Example title";
         String title2 = "Example title2";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest1 = new PostCreateRequest(title1, content);
-        PostCreateRequest createRequest2 = new PostCreateRequest(title2, content);
 
         Long authorId = 1L;
 
-        Post post1 = postService.create(createRequest1, authorId, Category.GENERAL);
-        postService.create(createRequest2, authorId, Category.GENERAL);
+        Post post1 = postService.create(title1, content, authorId, Category.GENERAL);
+        postService.create(title2, content, authorId, Category.GENERAL);
 
         //when
         postService.delete(post1.getId());

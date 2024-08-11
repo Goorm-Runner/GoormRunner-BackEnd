@@ -42,7 +42,7 @@ public class PostController {
         Long authorId = memberService.findMemberIdByUsername(username);
 
         Category category = toCategory(categoryName.toUpperCase());
-        Post post = postService.create(request, authorId, category);
+        Post post = postService.create(request.title(), request.content(), authorId, category);
         PostCreateResponse response = getCreateResponse(post);
 
         URI location = newUri(response);
@@ -82,7 +82,7 @@ public class PostController {
     public ResponseEntity<PostUpdateResponse> updatePost(
             @PathVariable String categoryName, @PathVariable Long postId, @RequestBody PostUpdateRequest request) {
 
-        Post post = postService.update(request, postId);
+        Post post = postService.update(request.title(), request.content(), postId);
         PostUpdateResponse response = getUpdateResponse(categoryName.toUpperCase(), postId, post);
 
         return ResponseEntity.ok(response);

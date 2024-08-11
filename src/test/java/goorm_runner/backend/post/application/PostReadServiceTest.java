@@ -6,7 +6,6 @@ import goorm_runner.backend.post.application.post.exception.PostException;
 import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.domain.model.Category;
 import goorm_runner.backend.post.domain.model.Post;
-import goorm_runner.backend.post.dto.PostCreateRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,11 +44,10 @@ class PostReadServiceTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         Long authorId = 1L;
 
-        Post post = postService.create(createRequest, authorId, Category.GENERAL);
+        Post post = postService.create(title, content, authorId, Category.GENERAL);
 
         //when
         Post findPost = postReadService.readPost(post.getId());
@@ -62,11 +60,10 @@ class PostReadServiceTest {
     void read_failure() {
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         Long authorId = 1L;
 
-        Post post = postService.create(createRequest, authorId, Category.GENERAL);
+        Post post = postService.create(title, content, authorId, Category.GENERAL);
 
         //when
         Long wrongId = post.getId() + 1;
@@ -82,11 +79,10 @@ class PostReadServiceTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         Long authorId = 1L;
 
-        postService.create(createRequest, authorId, Category.GENERAL);
+        postService.create(title, content, authorId, Category.GENERAL);
 
         //when
         PageRequest pageRequest = PageRequest.of(0, 10);
