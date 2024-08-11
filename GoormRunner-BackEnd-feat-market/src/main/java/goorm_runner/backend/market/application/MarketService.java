@@ -7,7 +7,6 @@ import goorm_runner.backend.market.domain.Market;
 import goorm_runner.backend.market.dto.MarketUpdateRequest;
 import goorm_runner.backend.market.domain.MarketRepository;
 import goorm_runner.backend.market.exception.MarketNotFoundException;
-import goorm_runner.backend.member.application.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,14 +24,14 @@ import java.util.UUID;
 public class MarketService {
 
     private final MarketRepository marketRepository;
-    private final MemberRepository memberRepository;
+    private final MarketImageStorageService imageStorageService;
 
     private static final String IMAGE_DIRECTORY = "uploaded-images/";
 
     public Market create(MarketCreateRequest request, Long memberId,  String categoryName, String statustitle,MultipartFile image) throws IOException {
         validateOfRequests(request.title(), request.content(), request.price(), request.delivery(), image.getOriginalFilename());
 
-        String imageUrl = saveImage(image);
+        String imageUrl = imageStorageService.saveImage(image);;
 
         MarketCategory category = toMarketCategory(categoryName);
         MarketStatus status = toMarketStatus(statustitle);
@@ -51,7 +50,7 @@ public class MarketService {
         MarketCategory category = toMarketCategory(categoryName);
         MarketStatus status = toMarketStatus(statustitle);
 
-        String imageUrl = saveImage(image);
+        String imageUrl = imageStorageService.saveImage(image);
 
         market.update(request.title(), request.content(), request.price(),category,status, request.delivery(), imageUrl);
         return market;
@@ -81,23 +80,6 @@ public class MarketService {
         if (!StringUtils.hasText(fileName) || !fileName.toLowerCase().endsWith(".jpg")) {
             throw new IllegalArgumentException("지원하지 않는 이미지 파일 형식입니다.");
         }
-    }
-
-    private String saveImage(MultipartFile image) throws IOException {
-        // 디렉토리가 존재하지 않으면 생성
-        File directory = new File(IMAGE_DIRECTORY);
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
-
-        // 파일 이름에 UUID 추가하여 중복 방지
-        String filename = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
-        File saveFile = new File(IMAGE_DIRECTORY + filename);
-
-        // 파일 저장
-        image.transferTo(saveFile);
-
-        return saveFile.getPath();
     }
 
     private MarketCategory toMarketCategory(String category) {
