@@ -8,6 +8,7 @@ import goorm_runner.backend.post.application.comment.CommentReadService;
 import goorm_runner.backend.post.application.comment.CommentService;
 import goorm_runner.backend.post.application.post.PostReadService;
 import goorm_runner.backend.post.application.post.PostService;
+import goorm_runner.backend.post.application.post.exception.PostException;
 import goorm_runner.backend.post.domain.exception.CommentException;
 import goorm_runner.backend.post.domain.model.Comment;
 import goorm_runner.backend.post.domain.model.Post;
@@ -22,6 +23,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -55,7 +57,11 @@ public class CommentController {
 
     @GetMapping("/categories/{ignoredCategoryName}/posts/{postId}/comments/{commentId}")
     public ResponseEntity<CommentReadResponse> getComment(
-            @PathVariable String ignoredCategoryName, @PathVariable Long postId, @PathVariable Long commentId) {
+            @AuthenticationPrincipal SecurityMember securityMember, @PathVariable String ignoredCategoryName,
+            @PathVariable Long postId, @PathVariable Long commentId) {
+
+        String username = securityMember.getUsername();
+        Long authorId = memberService.findMemberIdByUsername(username);
 
         validatePostExisting(postId);
 
@@ -86,16 +92,16 @@ public class CommentController {
 
     @PutMapping("/categories/{ignoredCategoryName}/posts/{postId}/comments/{commentId}")
     public ResponseEntity<CommentUpdateResponse> editComment(
-            @AuthenticationPrincipal SecurityMember securityMember,
-            @PathVariable String ignoredCategoryName,
-            @PathVariable Long postId,
-            @PathVariable Long commentId,
-            @RequestBody CommentUpdateRequest request) {
+            @AuthenticationPrincipal SecurityMember securityMember, @PathVariable String ignoredCategoryName,
+            @PathVariable Long postId, @PathVariable Long commentId, @RequestBody CommentUpdateRequest request) {
 
         String username = securityMember.getUsername();
         Long authorId = memberService.findMemberIdByUsername(username);
 
         Post post = postReadService.readPost(postId);
+
+        checkAuthor(post, authorId);
+
         Comment comment = commentService.update(post, commentId, request.content());
         CommentUpdateResponse response = CommentUpdateResponse.from(comment);
 
@@ -105,17 +111,17 @@ public class CommentController {
 
     @DeleteMapping("/categories/{ignoredCategoryName}/posts/{postId}/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(
-            @AuthenticationPrincipal SecurityMember securityMember,
-            @PathVariable String ignoredCategoryName,
-            @PathVariable Long postId,
-            @PathVariable Long commentId) {
+            @AuthenticationPrincipal SecurityMember securityMember, @PathVariable String ignoredCategoryName,
+            @PathVariable Long postId, @PathVariable Long commentId) {
 
         String username = securityMember.getUsername();
         Long authorId = memberService.findMemberIdByUsername(username);
 
         Post post = postReadService.readPost(postId);
-        commentService.delete(post, commentId);
 
+        checkAuthor(post, authorId);
+
+        commentService.delete(post, commentId);
         return ResponseEntity.noContent().build();
     }
 
@@ -130,6 +136,12 @@ public class CommentController {
     private void validatePostExisting(Long postId) {
         if (!postReadService.existsPost(postId)) {
             throw new CommentException(ErrorCode.POST_NOT_FOUND);
+        }
+    }
+
+    private void checkAuthor(Post post, Long authorId) {
+        if (!Objects.equals(post.getAuthorId(), authorId)) {
+            throw new PostException(ErrorCode.ACCESS_DENIED);
         }
     }
 }
