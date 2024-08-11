@@ -101,7 +101,7 @@ public class CommentController {
     }
 
     @DeleteMapping("/categories/{ignoredCategoryName}/posts/{postId}/comments/{commentId}")
-    public ResponseEntity<Void> postComment(
+    public ResponseEntity<Void> deleteComment(
             @AuthenticationPrincipal SecurityMember securityMember,
             @PathVariable String ignoredCategoryName,
             @PathVariable Long postId,
