@@ -65,6 +65,12 @@ public class RecruitmentService {
 
         recruitmentRepository.save(recruitment);
 
+        MemberGathering memberGathering = MemberGathering.builder()
+                .gathering(gathering)
+                .guest(host)
+                .build();
+        memberGatheringRepository.save(memberGathering);
+
         return creativeRecruitmentResponse(recruitment);
     }
 
@@ -180,7 +186,7 @@ public class RecruitmentService {
         MemberGathering memberGathering = memberGatheringRepository.findByGatheringAndGuestId(recruitment.getGathering(), memberId)
                 .orElseThrow(() -> new RecruitmentException(ErrorCode.PARTICIPATION_REQUEST_NOT_FOUND));
 
-        memberGathering.approve();
+//        memberGathering.approve();
         memberGatheringRepository.save(memberGathering);
     }
 
