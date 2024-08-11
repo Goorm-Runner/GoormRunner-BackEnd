@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @Table(name = "Market")
+@Where(clause = "deleted_at IS NULL")
 public class Market extends BaseTimeEntity {
 
     @Id
@@ -83,5 +85,9 @@ public class Market extends BaseTimeEntity {
 
     public void delete() {
         deletedAt = LocalDateTime.now();
+    }
+
+    public boolean isDeleted() {
+        return this.deletedAt != null;
     }
 }

@@ -9,13 +9,14 @@ public enum MarketCategory {
     ETC("기타 굿즈");
 
 
-    private final String category;
+    private final String displayName;
 
-    MarketCategory(String category) {
-        this.category = category;
+    MarketCategory(String displayName) {
+        this.displayName = displayName;
     }
 
-    public String getCategory() {
-        return category;
+    @Override
+    public String toString() {
+        return displayName;
     }
 }

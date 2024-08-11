@@ -14,6 +14,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 
 @Service
@@ -24,7 +25,6 @@ public class MarketService {
     private final MarketRepository marketRepository;
     private final MarketImageStorageService imageStorageService;
 
-    private static final String IMAGE_DIRECTORY = "uploaded-images/";
 
     public Market create(MarketCreateRequest request, Long memberId,  String categoryName, String statustitle,MultipartFile image) throws IOException {
         validateRequests(request.title(), request.content(), request.price(), request.delivery(), image.getOriginalFilename());
@@ -58,7 +58,8 @@ public class MarketService {
     public void delete(Long marketId) {
         Market market = marketRepository.findById(marketId)
                 .orElseThrow(() -> new MarketNotFoundException("해당 상품을 찾지 못했습니다."));
-        marketRepository.delete(market);
+        market.delete();
+        marketRepository.save(market);
     }
 
     private void validateRequests(String title, String content, Integer price, Integer delivery, String fileName) {
@@ -104,6 +105,9 @@ public class MarketService {
         }
     }
 
+    public List<Market> getAllMarkets() {
+        return marketRepository.findAll(); // 논리적으로 삭제된 항목은 자동으로 제외됨
+    }
     private Market getMarket(MarketCreateRequest request, Long memberId,  MarketCategory category, MarketStatus status, int likeCount, String imageUrl) {
         return Market.builder()
                 .memberId(memberId)

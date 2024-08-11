@@ -7,13 +7,14 @@ public enum MarketStatus {
     USED_FAIR("중고 상품 - 중");
 
 
-    private final String status;
+    private final String displayName;
 
-    MarketStatus(String status) {
-        this.status = status;
+    MarketStatus(String displayName) {
+        this.displayName = displayName;
     }
 
-    public String getStatus() {
-        return status;
+    @Override
+    public String toString() {
+        return displayName;
     }
 }
