@@ -71,14 +71,12 @@ class CommentServiceTest {
     void save_with_empty_content_exception() {
         //given
         Long authorId = 1L;
-        Long postId = 1L;
         String content = "";
 
         Post post = new Post(1L, "title", "content", Category.GENERAL);
 
         //when
-        when(postRepository.findById(any()))
-                .thenReturn(Optional.of(post));
+        when(postRepository.findById(any())).thenReturn(Optional.of(post));
 
         //then
         assertThatThrownBy(() -> commentService.create(authorId, post, content))

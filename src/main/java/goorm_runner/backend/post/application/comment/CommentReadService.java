@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CommentReadService {
 
-    private final PostRepository postRepository;
     private final CommentQueryRepository commentQueryRepository;
 
     @Transactional(readOnly = true)

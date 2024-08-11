@@ -57,11 +57,7 @@ public class CommentController {
 
     @GetMapping("/categories/{ignoredCategoryName}/posts/{postId}/comments/{commentId}")
     public ResponseEntity<CommentReadResponse> getComment(
-            @AuthenticationPrincipal SecurityMember securityMember, @PathVariable String ignoredCategoryName,
-            @PathVariable Long postId, @PathVariable Long commentId) {
-
-        String username = securityMember.getUsername();
-        Long authorId = memberService.findMemberIdByUsername(username);
+            @PathVariable String ignoredCategoryName, @PathVariable Long postId, @PathVariable Long commentId) {
 
         validatePostExisting(postId);
 

@@ -55,7 +55,7 @@ class CommentReadServiceTest {
         String content = "lorem ipsum";
 
         Post post = new Post(1L, "title", "content", Category.GENERAL);
-        ReflectionTestUtils.setField(post, "id", 1L);
+        ReflectionTestUtils.setField(post, "id", postId);
         when(postRepository.findById(any()))
                 .thenReturn(Optional.of(post));
 
