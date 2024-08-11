@@ -23,16 +23,7 @@ public class PostReadService {
                 .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
     }
 
-    public Page<Post> readPage(String categoryName, Pageable pageable) {
-        Category category = toCategory(categoryName);
+    public Page<Post> readPage(Category category, Pageable pageable) {
         return postQueryRepository.findByCategory(category, pageable);
-    }
-
-    private Category toCategory(String category) {
-        try {
-            return Category.valueOf(category);
-        } catch (IllegalArgumentException e) {
-            throw new PostException(ErrorCode.INVALID_CATEGORY);
-        }
     }
 }

@@ -118,7 +118,7 @@ public class PostServiceIntegrationTest {
         //when
         postService.delete(post1.getId());
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<Post> posts = postReadService.readPage(Category.GENERAL.name(), pageRequest);
+        Page<Post> posts = postReadService.readPage(Category.GENERAL, pageRequest);
 
         //then
         assertThat(posts.getTotalElements()).isEqualTo(1);

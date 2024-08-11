@@ -64,7 +64,9 @@ public class PostController {
     @GetMapping("/categories/{categoryName}/posts")
     public ResponseEntity<PostReadPageResponse> readPage(@PathVariable String categoryName, @RequestParam int pageNumber, @RequestParam int pageSize) {
 
-        Page<Post> posts = postReadService.readPage(categoryName.toUpperCase(), PageRequest.of(pageNumber, pageSize));
+        Category category = toCategory(categoryName.toUpperCase());
+
+        Page<Post> posts = postReadService.readPage(category, PageRequest.of(pageNumber, pageSize));
 
         List<PostOverview> overviews = posts.stream()
                 .map(post -> PostOverview.from(post, postService.getAuthorName(post.getId()), postLikeService.countPostLikes(post.getId())))

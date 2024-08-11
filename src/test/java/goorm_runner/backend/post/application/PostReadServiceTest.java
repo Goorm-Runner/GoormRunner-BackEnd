@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static goorm_runner.backend.global.ErrorCode.INVALID_CATEGORY;
 import static goorm_runner.backend.global.ErrorCode.POST_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -91,7 +90,7 @@ class PostReadServiceTest {
 
         //when
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<Post> page = postReadService.readPage(Category.GENERAL.name(), pageRequest);
+        Page<Post> page = postReadService.readPage(Category.GENERAL, pageRequest);
 
         //then
         List<Post> contents = page.getContent();
@@ -103,26 +102,5 @@ class PostReadServiceTest {
                 () -> assertThat(page.isFirst()).isTrue(),
                 () -> assertThat(page.hasNext()).isFalse()
         );
-    }
-
-    @Test
-    void read_page_with_wrong_categoryName_failure() {
-        //given
-        String title = "Example title";
-        String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
-
-        Long authorId = 1L;
-
-        postService.create(createRequest, authorId, Category.GENERAL);
-
-        //when
-        PageRequest pageRequest = PageRequest.of(0, 10);
-        String wrongCategoryName = "GENERALL";
-
-        //then
-        assertThatThrownBy(() -> postReadService.readPage(wrongCategoryName, pageRequest))
-                .isInstanceOf(PostException.class)
-                .hasMessage(INVALID_CATEGORY.getMessage());
     }
 }
