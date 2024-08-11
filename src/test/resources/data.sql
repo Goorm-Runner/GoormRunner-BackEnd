@@ -1,3 +1,5 @@
+delete from authority where type = 'ROLE_USER';
+
 insert
 into
     authority
