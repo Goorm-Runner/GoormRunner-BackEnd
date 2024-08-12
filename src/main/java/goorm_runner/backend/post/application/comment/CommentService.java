@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -30,24 +32,34 @@ public class CommentService {
         return new CommentCreateResult(post.getId(), comment.getId(), comment.getContent(), comment.getCreatedAt().toString());
     }
 
-    public CommentUpdateResult update(Post post, Long commentId, String content) {
+    public CommentUpdateResult update(Post post, Long commentId, String content, Long loginId) {
         Comment findComment = post.getComments()
                 .stream()
                 .filter(comment -> comment.getId().equals(commentId))
                 .findFirst()
                 .orElseThrow(() -> new CommentException(ErrorCode.COMMENT_NOT_FOUND));
+
+        checkAuthor(findComment, loginId);
 
         findComment.updateContent(content);
         return CommentUpdateResult.from(findComment);
     }
 
-    public void delete(Post post, Long commentId) {
+    public void delete(Post post, Long commentId, Long loginId) {
         Comment findComment = post.getComments()
                 .stream()
                 .filter(comment -> comment.getId().equals(commentId))
                 .findFirst()
                 .orElseThrow(() -> new CommentException(ErrorCode.COMMENT_NOT_FOUND));
 
+        checkAuthor(findComment, loginId);
+
         findComment.delete();
+    }
+
+    private void checkAuthor(Comment comment, Long loginId) {
+        if (!Objects.equals(comment.getAuthorId(), loginId)) {
+            throw new PostException(ErrorCode.ACCESS_DENIED);
+        }
     }
 }

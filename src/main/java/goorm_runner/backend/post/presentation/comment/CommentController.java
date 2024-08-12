@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -83,14 +82,12 @@ public class CommentController {
             @PathVariable Long postId, @PathVariable Long commentId, @RequestBody CommentUpdateRequest request) {
 
         String username = securityMember.getUsername();
-        Long authorId = memberService.findMemberIdByUsername(username);
+        Long loginId = memberService.findMemberIdByUsername(username);
 
         Post post = postQueryRepository.findById(postId)
                 .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
 
-        checkAuthor(post, authorId);
-
-        CommentUpdateResult result = commentService.update(post, commentId, request.content());
+        CommentUpdateResult result = commentService.update(post, commentId, request.content(), loginId);
         CommentUpdateResponse response = CommentUpdateResponse.from(result);
 
         return ResponseEntity.ok()
@@ -103,14 +100,12 @@ public class CommentController {
             @PathVariable Long postId, @PathVariable Long commentId) {
 
         String username = securityMember.getUsername();
-        Long authorId = memberService.findMemberIdByUsername(username);
+        Long loginId = memberService.findMemberIdByUsername(username);
 
         Post post = postQueryRepository.findById(postId)
                 .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
 
-        checkAuthor(post, authorId);
-
-        commentService.delete(post, commentId);
+        commentService.delete(post, commentId, loginId);
         return ResponseEntity.noContent().build();
     }
 
@@ -125,12 +120,6 @@ public class CommentController {
     private void validatePostExisting(Long postId) {
         if (!postQueryRepository.existsById(postId)) {
             throw new CommentException(ErrorCode.POST_NOT_FOUND);
-        }
-    }
-
-    private void checkAuthor(Post post, Long authorId) {
-        if (!Objects.equals(post.getAuthorId(), authorId)) {
-            throw new PostException(ErrorCode.ACCESS_DENIED);
         }
     }
 }
