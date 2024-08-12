@@ -22,7 +22,7 @@ public class MarketLikeController {
             @PathVariable Long marketId) {
 
         String username = securityMember.getUsername();
-        Long memberId = memberService.getMemberIdByUsername(username);
+        Long memberId = memberService.findMemberIdByUsername(username);
 
         marketlikeService.toggleLike(marketId, memberId);
 

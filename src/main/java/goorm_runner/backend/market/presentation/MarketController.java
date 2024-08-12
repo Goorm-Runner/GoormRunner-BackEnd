@@ -41,7 +41,7 @@ public class MarketController {
 
         try {
             String username = securityMember.getUsername();
-            Long memberId = memberService.getMemberIdByUsername(username);
+            Long memberId = memberService.findMemberIdByUsername(username);
 
 
             Market market = marketService.create(request, memberId, categoryName.toUpperCase(), statusTitle.toUpperCase(), image);
