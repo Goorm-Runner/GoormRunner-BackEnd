@@ -1,14 +1,10 @@
-package goorm_runner.backend.comment.application;
+package goorm_runner.backend.post.application.comment;
 
-import goorm_runner.backend.post.application.comment.CommentReadService;
-import goorm_runner.backend.post.application.comment.CommentService;
 import goorm_runner.backend.post.application.comment.dto.CommentCreateResult;
-import goorm_runner.backend.post.domain.CommentRepository;
 import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.domain.model.Category;
 import goorm_runner.backend.post.domain.model.Comment;
 import goorm_runner.backend.post.domain.model.Post;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

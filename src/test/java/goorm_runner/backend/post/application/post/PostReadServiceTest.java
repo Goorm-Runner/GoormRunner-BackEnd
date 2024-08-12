@@ -1,7 +1,5 @@
-package goorm_runner.backend.post.application;
+package goorm_runner.backend.post.application.post;
 
-import goorm_runner.backend.post.application.post.PostReadService;
-import goorm_runner.backend.post.application.post.PostService;
 import goorm_runner.backend.post.application.post.exception.PostException;
 import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.domain.model.Category;

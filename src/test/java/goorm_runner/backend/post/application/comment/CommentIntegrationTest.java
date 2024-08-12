@@ -1,7 +1,5 @@
-package goorm_runner.backend.comment.application;
+package goorm_runner.backend.post.application.comment;
 
-import goorm_runner.backend.post.application.comment.CommentReadService;
-import goorm_runner.backend.post.application.comment.CommentService;
 import goorm_runner.backend.post.application.comment.dto.CommentCreateResult;
 import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.domain.exception.CommentException;
