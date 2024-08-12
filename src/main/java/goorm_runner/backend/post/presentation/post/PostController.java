@@ -1,17 +1,18 @@
 package goorm_runner.backend.post.presentation.post;
 
-import goorm_runner.backend.global.PageMetaData;
+import goorm_runner.backend.global.ErrorCode;
 import goorm_runner.backend.member.application.MemberService;
 import goorm_runner.backend.member.security.SecurityMember;
 import goorm_runner.backend.post.application.post.PostReadService;
 import goorm_runner.backend.post.application.post.PostService;
+import goorm_runner.backend.post.application.post.dto.PostReadPageResult;
 import goorm_runner.backend.post.application.post.exception.PostException;
+import goorm_runner.backend.post.domain.PostQueryRepository;
 import goorm_runner.backend.post.domain.model.Category;
 import goorm_runner.backend.post.domain.model.Post;
 import goorm_runner.backend.post.presentation.post.dto.*;
 import goorm_runner.backend.postlike.application.PostLikeService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 import static goorm_runner.backend.global.ErrorCode.INVALID_CATEGORY;
 
@@ -31,6 +31,7 @@ public class PostController {
     private final PostReadService postReadService;
     private final MemberService memberService;
     private final PostLikeService postLikeService;
+    private final PostQueryRepository postQueryRepository;
 
     @PostMapping("/categories/{categoryName}/posts")
     public ResponseEntity<PostCreateResponse> createPost(
@@ -54,7 +55,9 @@ public class PostController {
     @GetMapping("/categories/{categoryName}/posts/{postId}")
     public ResponseEntity<PostReadResponse> readPost(@PathVariable String categoryName, @PathVariable Long postId) {
 
-        Post post = postReadService.readPost(postId);
+        Post post = postQueryRepository.findById(postId)
+                .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
+
         int likes = postLikeService.countPostLikes(postId);
         PostReadResponse response = getReadResponse(categoryName.toUpperCase(), post, likes);
 
@@ -66,15 +69,9 @@ public class PostController {
 
         Category category = toCategory(categoryName.toUpperCase());
 
-        Page<Post> posts = postReadService.readPage(category, PageRequest.of(pageNumber, pageSize));
+        PostReadPageResult result = postReadService.readPage(category, PageRequest.of(pageNumber, pageSize));
 
-        List<PostOverview> overviews = posts.stream()
-                .map(post -> PostOverview.from(post, postService.getAuthorName(post.getId()), postLikeService.countPostLikes(post.getId())))
-                .toList();
-
-        PageMetaData pageMetaData = PageMetaData.from(posts);
-
-        PostReadPageResponse response = new PostReadPageResponse(overviews, pageMetaData);
+        PostReadPageResponse response = PostReadPageResponse.from(result);
         return ResponseEntity.ok(response);
     }
 

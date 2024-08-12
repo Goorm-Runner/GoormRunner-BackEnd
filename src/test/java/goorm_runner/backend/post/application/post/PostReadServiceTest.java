@@ -1,22 +1,21 @@
 package goorm_runner.backend.post.application.post;
 
-import goorm_runner.backend.post.application.post.exception.PostException;
-import goorm_runner.backend.post.domain.PostRepository;
+import goorm_runner.backend.global.PageMetaData;
+import goorm_runner.backend.member.domain.Member;
+import goorm_runner.backend.member.domain.MemberRepository;
+import goorm_runner.backend.member.domain.Role;
+import goorm_runner.backend.member.domain.Sex;
+import goorm_runner.backend.post.application.post.dto.PostReadPageResult;
 import goorm_runner.backend.post.domain.model.Category;
-import goorm_runner.backend.post.domain.model.Post;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.time.LocalDate;
 
-import static goorm_runner.backend.global.ErrorCode.POST_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest
@@ -30,71 +29,46 @@ class PostReadServiceTest {
     private PostService postService;
 
     @Autowired
-    private PostRepository postRepository;
+    private MemberRepository memberRepository;
 
-    @BeforeEach
-    void setUp() {
-        postRepository.deleteAll();
-    }
-
-    @Test
-    void read_success() {
-        //given
-        String title = "Example title";
-        String content = "<h1>Example</h1> Insert content here.";
-
-        Long authorId = 1L;
-
-        Post post = postService.create(title, content, authorId, Category.GENERAL);
-
-        //when
-        Post findPost = postReadService.readPost(post.getId());
-
-        //then
-        assertThat(post == findPost).isTrue();
-    }
-
-    @Test
-    void read_failure() {
-        String title = "Example title";
-        String content = "<h1>Example</h1> Insert content here.";
-
-        Long authorId = 1L;
-
-        Post post = postService.create(title, content, authorId, Category.GENERAL);
-
-        //when
-        Long wrongId = post.getId() + 1;
-
-        //then
-        assertThatThrownBy(() -> postReadService.readPost(wrongId))
-                .isInstanceOf(PostException.class)
-                .hasMessage(POST_NOT_FOUND.getMessage());
-    }
 
     @Test
     void read_page_success() {
         //given
+        String loginId = "loginId";
+        String nickname = "username";
+        String password = "password";
+
+        Member member = memberRepository.save(
+                Member.builder()
+                        .loginId(loginId)
+                        .nickname(nickname)
+                        .password(password)
+                        .role(Role.USER)
+                        .sex(Sex.MALE)
+                        .birth(LocalDate.now())
+                        .build()
+        );
+
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
 
-        Long authorId = 1L;
-
-        postService.create(title, content, authorId, Category.GENERAL);
+        postService.create(title, content, member.getId(), Category.GENERAL);
 
         //when
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<Post> page = postReadService.readPage(Category.GENERAL, pageRequest);
+        PostReadPageResult result = postReadService.readPage(Category.GENERAL, pageRequest);
+        PageMetaData pageMetaData = result.pageMetaData();
 
         //then
-        List<Post> contents = page.getContent();
         assertAll(
-                () -> assertThat(contents.size()).isEqualTo(1),
-                () -> assertThat(page.getTotalPages()).isEqualTo(1),
-                () -> assertThat(page.getNumber()).isEqualTo(0),
-                () -> assertThat(page.getTotalPages()).isEqualTo(1),
-                () -> assertThat(page.isFirst()).isTrue(),
-                () -> assertThat(page.hasNext()).isFalse()
+                () -> assertThat(result.overviews().size()).isEqualTo(1),
+                () -> assertThat(pageMetaData.number()).isEqualTo(0),
+                () -> assertThat(pageMetaData.size()).isEqualTo(10),
+                () -> assertThat(pageMetaData.isFirst()).isTrue(),
+                () -> assertThat(pageMetaData.isLast()).isTrue(),
+                () -> assertThat(pageMetaData.hasPrevious()).isFalse(),
+                () -> assertThat(pageMetaData.hasNext()).isFalse()
         );
     }
 }

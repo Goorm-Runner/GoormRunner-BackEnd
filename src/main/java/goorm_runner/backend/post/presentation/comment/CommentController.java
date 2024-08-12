@@ -9,8 +9,8 @@ import goorm_runner.backend.post.application.comment.dto.CommentCreateResult;
 import goorm_runner.backend.post.application.comment.dto.CommentPageResult;
 import goorm_runner.backend.post.application.comment.dto.CommentReadResult;
 import goorm_runner.backend.post.application.comment.dto.CommentUpdateResult;
-import goorm_runner.backend.post.application.post.PostReadService;
 import goorm_runner.backend.post.application.post.exception.PostException;
+import goorm_runner.backend.post.domain.PostQueryRepository;
 import goorm_runner.backend.post.domain.exception.CommentException;
 import goorm_runner.backend.post.domain.model.Post;
 import goorm_runner.backend.post.presentation.comment.dto.*;
@@ -31,7 +31,7 @@ public class CommentController {
     private final MemberService memberService;
     private final CommentService commentService;
     private final CommentReadService commentReadService;
-    private final PostReadService postReadService;
+    private final PostQueryRepository postQueryRepository;
 
     @PostMapping("/categories/{ignoredCategoryName}/posts/{postId}/comments")
     public ResponseEntity<CommentCreateResponse> postComment(
@@ -85,7 +85,8 @@ public class CommentController {
         String username = securityMember.getUsername();
         Long authorId = memberService.findMemberIdByUsername(username);
 
-        Post post = postReadService.readPost(postId);
+        Post post = postQueryRepository.findById(postId)
+                .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
 
         checkAuthor(post, authorId);
 
@@ -104,7 +105,8 @@ public class CommentController {
         String username = securityMember.getUsername();
         Long authorId = memberService.findMemberIdByUsername(username);
 
-        Post post = postReadService.readPost(postId);
+        Post post = postQueryRepository.findById(postId)
+                .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
 
         checkAuthor(post, authorId);
 
@@ -121,7 +123,7 @@ public class CommentController {
     }
 
     private void validatePostExisting(Long postId) {
-        if (!postReadService.existsPost(postId)) {
+        if (!postQueryRepository.existsById(postId)) {
             throw new CommentException(ErrorCode.POST_NOT_FOUND);
         }
     }

@@ -49,17 +49,6 @@ public class PostService {
         post.delete();
     }
 
-    public String getAuthorName(Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostException(POST_NOT_FOUND));
-
-        Long authorId = post.getAuthorId();
-        Member author = memberRepository.findById(authorId)
-                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
-
-        return author.getNickname();
-    }
-
     private Post getPost(String title, String content, Long authorId, Category category) {
         return Post.builder()
                 .authorId(authorId)

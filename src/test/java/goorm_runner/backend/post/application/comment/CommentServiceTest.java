@@ -5,7 +5,6 @@ import goorm_runner.backend.post.application.comment.dto.CommentUpdateResult;
 import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.domain.exception.CommentException;
 import goorm_runner.backend.post.domain.model.Category;
-import goorm_runner.backend.post.domain.model.Comment;
 import goorm_runner.backend.post.domain.model.Post;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;

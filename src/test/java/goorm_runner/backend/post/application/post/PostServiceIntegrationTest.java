@@ -3,6 +3,7 @@ package goorm_runner.backend.post.application.post;
 import goorm_runner.backend.global.ErrorCode;
 import goorm_runner.backend.member.domain.Member;
 import goorm_runner.backend.member.domain.MemberRepository;
+import goorm_runner.backend.post.application.post.dto.PostReadPageResult;
 import goorm_runner.backend.post.application.post.exception.PostException;
 import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.domain.model.Category;
@@ -13,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -91,34 +91,6 @@ public class PostServiceIntegrationTest {
     }
 
     @Test
-    void delete_then_cannot_read() {
-        //given
-        String title = "Example title";
-        String content = "<h1>Example</h1> Insert content here.";
-
-        Long authorId = 1L;
-
-        Member mockMember = mock(Member.class);
-        when(mockMember.getId()).thenReturn(authorId);
-
-        when(memberRepository.findById(any()))
-                .thenReturn(Optional.of(mockMember));
-
-        Post post = postService.create(title, content, authorId, Category.GENERAL);
-        Long postId = post.getId();
-
-        //when
-        postService.delete(postId, authorId);
-        entityManager.flush();
-        entityManager.clear();
-
-        //then
-        assertThatThrownBy(() -> postReadService.readPost(postId))
-                .isInstanceOf(PostException.class)
-                .hasMessage(ErrorCode.POST_NOT_FOUND.getMessage());
-    }
-
-    @Test
     void delete_then_cannot_read_page() {
         //given
         String title1 = "Example title";
@@ -139,10 +111,10 @@ public class PostServiceIntegrationTest {
         //when
         postService.delete(post1.getId(), authorId);
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<Post> posts = postReadService.readPage(Category.GENERAL, pageRequest);
+        PostReadPageResult result = postReadService.readPage(Category.GENERAL, pageRequest);
 
         //then
-        assertThat(posts.getTotalElements()).isEqualTo(1);
-        assertThat(posts.getContent().get(0).getTitle()).isEqualTo(title2);
+        assertThat(result.overviews().size()).isEqualTo(1);
+        assertThat(result.overviews().get(0).title()).isEqualTo(title2);
     }
 }

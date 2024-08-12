@@ -11,12 +11,10 @@ import goorm_runner.backend.post.application.comment.dto.CommentReadResult;
 import goorm_runner.backend.post.application.comment.dto.CommentResultOverview;
 import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.domain.model.Category;
-import goorm_runner.backend.post.domain.model.Comment;
 import goorm_runner.backend.post.domain.model.Post;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
