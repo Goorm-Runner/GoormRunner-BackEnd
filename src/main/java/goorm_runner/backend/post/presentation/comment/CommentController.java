@@ -8,11 +8,10 @@ import goorm_runner.backend.post.application.comment.CommentService;
 import goorm_runner.backend.post.application.comment.dto.CommentCreateResult;
 import goorm_runner.backend.post.application.comment.dto.CommentPageResult;
 import goorm_runner.backend.post.application.comment.dto.CommentReadResult;
+import goorm_runner.backend.post.application.comment.dto.CommentUpdateResult;
 import goorm_runner.backend.post.application.post.PostReadService;
-import goorm_runner.backend.post.application.post.PostService;
 import goorm_runner.backend.post.application.post.exception.PostException;
 import goorm_runner.backend.post.domain.exception.CommentException;
-import goorm_runner.backend.post.domain.model.Comment;
 import goorm_runner.backend.post.domain.model.Post;
 import goorm_runner.backend.post.presentation.comment.dto.*;
 import lombok.RequiredArgsConstructor;
@@ -90,8 +89,8 @@ public class CommentController {
 
         checkAuthor(post, authorId);
 
-        Comment comment = commentService.update(post, commentId, request.content());
-        CommentUpdateResponse response = CommentUpdateResponse.from(comment);
+        CommentUpdateResult result = commentService.update(post, commentId, request.content());
+        CommentUpdateResponse response = CommentUpdateResponse.from(result);
 
         return ResponseEntity.ok()
                 .body(response);

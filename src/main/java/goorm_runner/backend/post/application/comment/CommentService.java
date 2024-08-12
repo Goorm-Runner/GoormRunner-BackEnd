@@ -2,6 +2,7 @@ package goorm_runner.backend.post.application.comment;
 
 import goorm_runner.backend.global.ErrorCode;
 import goorm_runner.backend.post.application.comment.dto.CommentCreateResult;
+import goorm_runner.backend.post.application.comment.dto.CommentUpdateResult;
 import goorm_runner.backend.post.application.post.exception.PostException;
 import goorm_runner.backend.post.domain.CommentRepository;
 import goorm_runner.backend.post.domain.PostRepository;
@@ -29,7 +30,7 @@ public class CommentService {
         return new CommentCreateResult(post.getId(), comment.getId(), comment.getContent(), comment.getCreatedAt().toString());
     }
 
-    public Comment update(Post post, Long commentId, String content) {
+    public CommentUpdateResult update(Post post, Long commentId, String content) {
         Comment findComment = post.getComments()
                 .stream()
                 .filter(comment -> comment.getId().equals(commentId))
@@ -37,7 +38,7 @@ public class CommentService {
                 .orElseThrow(() -> new CommentException(ErrorCode.COMMENT_NOT_FOUND));
 
         findComment.updateContent(content);
-        return findComment;
+        return CommentUpdateResult.from(findComment);
     }
 
     public void delete(Post post, Long commentId) {

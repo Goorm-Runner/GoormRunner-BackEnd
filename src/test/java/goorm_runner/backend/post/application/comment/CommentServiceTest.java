@@ -1,6 +1,7 @@
 package goorm_runner.backend.post.application.comment;
 
 import goorm_runner.backend.post.application.comment.dto.CommentCreateResult;
+import goorm_runner.backend.post.application.comment.dto.CommentUpdateResult;
 import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.domain.exception.CommentException;
 import goorm_runner.backend.post.domain.model.Category;
@@ -83,15 +84,12 @@ class CommentServiceTest {
 
         //when
         String updatedContent = "updated";
-        Comment updatedComment = commentService.update(post, result.commentId(), updatedContent);
+        CommentUpdateResult updateResult = commentService.update(post, result.commentId(), updatedContent);
         em.flush();
         em.clear();
 
         //then
-        assertAll(
-                () -> assertThat(updatedComment.getContent()).isEqualTo(updatedContent),
-                () -> assertThat(updatedComment.getUpdatedAt()).isAfter(updatedComment.getCreatedAt())
-        );
+        assertThat(updateResult.content()).isEqualTo(updatedContent);
     }
 
     @Test
