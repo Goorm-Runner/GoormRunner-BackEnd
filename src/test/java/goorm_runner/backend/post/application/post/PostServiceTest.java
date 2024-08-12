@@ -4,8 +4,6 @@ import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.domain.exception.PostException;
 import goorm_runner.backend.post.domain.model.Category;
 import goorm_runner.backend.post.domain.model.Post;
-import goorm_runner.backend.post.presentation.post.dto.PostCreateRequest;
-import goorm_runner.backend.post.presentation.post.dto.PostUpdateRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,7 +29,6 @@ class PostServiceTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest request = new PostCreateRequest(title, content);
 
         Long authorId = 1L;
 
@@ -55,7 +52,6 @@ class PostServiceTest {
         //given
         String title = "";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest request = new PostCreateRequest(title, content);
 
         Long authorId = 1L;
 
@@ -70,7 +66,6 @@ class PostServiceTest {
         //given
         String title = "Example title";
         String content = "";
-        PostCreateRequest request = new PostCreateRequest(title, content);
 
         Long authorId = 1L;
 
@@ -85,7 +80,6 @@ class PostServiceTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         Long authorId = 1L;
 
@@ -111,7 +105,6 @@ class PostServiceTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         Long authorId = 1L;
 
@@ -120,10 +113,9 @@ class PostServiceTest {
         //when
         String updatedTitle = "UpdatedTitle";
         String updatedContent = "UpdatedContent";
-        PostUpdateRequest updateRequest = new PostUpdateRequest(updatedTitle, updatedContent);
 
         //then
-        assertThatThrownBy(() -> postService.update(title, content, post.getId() + 1))
+        assertThatThrownBy(() -> postService.update(updatedTitle, updatedContent, post.getId() + 1))
                 .isInstanceOf(PostException.class)
                 .hasMessage(POST_NOT_FOUND.getMessage());
     }

@@ -8,7 +8,6 @@ import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.domain.exception.PostException;
 import goorm_runner.backend.post.domain.model.Category;
 import goorm_runner.backend.post.domain.model.Post;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +27,6 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @Transactional
 public class PostServiceIntegrationTest {
-
-    @Autowired
-    private EntityManager entityManager;
 
     @Autowired
     private PostService postService;
