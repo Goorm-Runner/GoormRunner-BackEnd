@@ -50,11 +50,6 @@ public class PostLikeService {
     }
 
     private void validatePostNotDeleted(Long postId){
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostLikeException(ErrorCode.POST_NOT_FOUND));
-
-        if (post.getDeletedAt() != null){
-            throw new RuntimeException("Post already deleted");
-        }
+        postRepository.findById(postId).orElseThrow(() -> new PostLikeException(ErrorCode.POST_NOT_FOUND));
     }
 }
