@@ -32,16 +32,7 @@ class CommentReadServiceTest {
     private CommentReadService commentReadService;
 
     @Autowired
-    private CommentRepository commentRepository;
-
-    @Autowired
     private PostRepository postRepository;
-
-
-    @BeforeEach
-    void setUp() {
-        commentRepository.deleteAll();
-    }
 
     @Test
     void read_success() {
