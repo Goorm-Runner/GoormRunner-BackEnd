@@ -42,7 +42,7 @@ jobs:
         run: ./gradlew test
         id: gradle_test
         env:
-          SPRING_PROFILES_ACTIVE: prod
+          SPRING_PROFILES_ACTIVE: test
 
       - name: 테스트 실패한 곳 체크 🫠
         uses: mikepenz/action-junit-report@v3
