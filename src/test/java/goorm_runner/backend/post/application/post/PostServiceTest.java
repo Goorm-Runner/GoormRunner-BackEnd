@@ -1,7 +1,7 @@
 package goorm_runner.backend.post.application.post;
 
-import goorm_runner.backend.post.application.post.exception.PostException;
 import goorm_runner.backend.post.domain.PostRepository;
+import goorm_runner.backend.post.domain.exception.PostException;
 import goorm_runner.backend.post.domain.model.Category;
 import goorm_runner.backend.post.domain.model.Post;
 import goorm_runner.backend.post.presentation.post.dto.PostCreateRequest;

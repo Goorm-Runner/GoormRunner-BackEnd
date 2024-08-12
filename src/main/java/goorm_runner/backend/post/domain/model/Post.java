@@ -1,7 +1,7 @@
 package goorm_runner.backend.post.domain.model;
 
 import goorm_runner.backend.common.BaseTimeEntity;
-import goorm_runner.backend.post.application.post.exception.PostException;
+import goorm_runner.backend.post.domain.exception.PostException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
