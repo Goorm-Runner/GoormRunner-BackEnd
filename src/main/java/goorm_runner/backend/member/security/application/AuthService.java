@@ -50,7 +50,8 @@ public class AuthService {
         Optional<Member> optionalMember = memberRepository.findByLoginId(request.loginId());
         if (optionalMember.isPresent()) {
             Member member = optionalMember.get();
-            if (passwordEncoder.matches(request.password(), member.getPassword())) {
+            boolean memberIsNotDeleted = member.getDeletedAt() == null;
+            if (memberIsNotDeleted && passwordEncoder.matches(request.password(), member.getPassword())) {
                 return jwtTokenProvider.createToken(member.getLoginId(), member.getRole());
             }
         }
