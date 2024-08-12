@@ -11,7 +11,6 @@ public enum ErrorCode {
     INVALID_CATEGORY(HttpStatus.BAD_REQUEST, "유효하지 않은 카테고리입니다."),
     EMPTY_TITLE(HttpStatus.BAD_REQUEST, "제목을 입력해주세요."),
     EMPTY_CONTENT(HttpStatus.BAD_REQUEST, "본문 내용을 입력해주세요."),
-    NOT_POST_AUTHOR(HttpStatus.BAD_REQUEST, "작성자가 아닙니다."),
     MEMBER_ALREADY_JOINED(HttpStatus.BAD_REQUEST, "이미 모집에 참여한 회원입니다."),
     INVALID_TEAM(HttpStatus.BAD_REQUEST, "팀 정보가 필요합니다."),
     INVALID_BALLPARK(HttpStatus.BAD_REQUEST, "구장 정보가 필요합니다."),

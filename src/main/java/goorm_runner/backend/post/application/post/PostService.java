@@ -1,8 +1,5 @@
 package goorm_runner.backend.post.application.post;
 
-import goorm_runner.backend.member.application.exception.MemberException;
-import goorm_runner.backend.member.domain.Member;
-import goorm_runner.backend.member.domain.MemberRepository;
 import goorm_runner.backend.post.application.post.dto.PostCreateResult;
 import goorm_runner.backend.post.application.post.dto.PostUpdateResult;
 import goorm_runner.backend.post.domain.PostRepository;
@@ -13,7 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static goorm_runner.backend.global.ErrorCode.*;
+import static goorm_runner.backend.global.ErrorCode.ACCESS_DENIED;
+import static goorm_runner.backend.global.ErrorCode.POST_NOT_FOUND;
 
 @RequiredArgsConstructor
 @Service
@@ -21,7 +19,6 @@ import static goorm_runner.backend.global.ErrorCode.*;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final MemberRepository memberRepository;
 
     public PostCreateResult create(String title, String content, Long authorId, Category category) {
         Post post = getPost(title, content, authorId, category);
@@ -29,26 +26,29 @@ public class PostService {
         return PostCreateResult.from(saved);
     }
 
-    public PostUpdateResult update(String title, String content, Long postId) {
+    public PostUpdateResult update(String title, String content, Long postId, Long loginId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(POST_NOT_FOUND));
+
+        checkAuthor(loginId, post);
 
         post.update(title, content);
         return PostUpdateResult.from(post);
     }
 
-    public void delete(Long postId, Long authorId) {
+    public void delete(Long postId, Long loginId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(POST_NOT_FOUND));
 
-        Member author = memberRepository.findById(authorId)
-                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
-
-        if (!post.getAuthorId().equals(author.getId())) {
-            throw new PostException(NOT_POST_AUTHOR);
-        }
+        checkAuthor(loginId, post);
 
         post.delete();
+    }
+
+    private void checkAuthor(Long loginId, Post post) {
+        if (!post.getAuthorId().equals(loginId)) {
+            throw new PostException(ACCESS_DENIED);
+        }
     }
 
     private Post getPost(String title, String content, Long authorId, Category category) {

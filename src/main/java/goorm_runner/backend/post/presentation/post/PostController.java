@@ -80,22 +80,25 @@ public class PostController {
 
     @PutMapping("/categories/{ignoredCategoryName}/posts/{postId}")
     public ResponseEntity<PostUpdateResponse> updatePost(
-            @PathVariable String ignoredCategoryName, @PathVariable Long postId, @RequestBody PostUpdateRequest request) {
+            @PathVariable String ignoredCategoryName, @PathVariable Long postId, @RequestBody PostUpdateRequest request,
+            @AuthenticationPrincipal SecurityMember securityMember) {
 
-        PostUpdateResult result = postService.update(request.title(), request.content(), postId);
+        String username = securityMember.getUsername();
+        Long loginId = memberService.findMemberIdByUsername(username);
+
+        PostUpdateResult result = postService.update(request.title(), request.content(), postId, loginId);
         PostUpdateResponse response = PostUpdateResponse.from(result);
 
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/categories/{ignoredCategoryName}/posts/{postId}")
-    public ResponseEntity<Void> deletePost(@PathVariable String ignoredCategoryName,
-                                           @PathVariable Long postId,
+    public ResponseEntity<Void> deletePost(@PathVariable String ignoredCategoryName, @PathVariable Long postId,
                                            @AuthenticationPrincipal SecurityMember securityMember) {
         String username = securityMember.getUsername();
-        Long authorId = memberService.findMemberIdByUsername(username);
+        Long loginId = memberService.findMemberIdByUsername(username);
 
-        postService.delete(postId, authorId);
+        postService.delete(postId, loginId);
         return ResponseEntity.noContent().build();
     }
 
