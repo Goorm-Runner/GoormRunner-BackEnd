@@ -3,6 +3,8 @@ package goorm_runner.backend.post.application.post;
 import goorm_runner.backend.member.application.exception.MemberException;
 import goorm_runner.backend.member.domain.Member;
 import goorm_runner.backend.member.domain.MemberRepository;
+import goorm_runner.backend.post.application.post.dto.PostCreateResult;
+import goorm_runner.backend.post.application.post.dto.PostUpdateResult;
 import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.domain.exception.PostException;
 import goorm_runner.backend.post.domain.model.Category;
@@ -21,18 +23,18 @@ public class PostService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
 
-    public Post create(String title, String content, Long authorId, Category category) {
+    public PostCreateResult create(String title, String content, Long authorId, Category category) {
         Post post = getPost(title, content, authorId, category);
-
-        return postRepository.save(post);
+        Post saved = postRepository.save(post);
+        return PostCreateResult.from(saved);
     }
 
-    public Post update(String title, String content, Long postId) {
+    public PostUpdateResult update(String title, String content, Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(POST_NOT_FOUND));
 
         post.update(title, content);
-        return post;
+        return PostUpdateResult.from(post);
     }
 
     public void delete(Long postId, Long authorId) {

@@ -8,7 +8,6 @@ import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.domain.exception.PostException;
 import goorm_runner.backend.post.domain.model.Category;
 import goorm_runner.backend.post.domain.model.Post;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,11 +39,6 @@ public class PostServiceIntegrationTest {
     @MockBean
     private MemberRepository memberRepository;
 
-    @BeforeEach
-    void setUp() {
-        postRepository.deleteAll();
-    }
-
     @Test
     void delete_success() {
         //given
@@ -53,8 +47,8 @@ public class PostServiceIntegrationTest {
 
         Long authorId = 1L;
 
-        Post post = postService.create(title, content, authorId, Category.GENERAL);
-        Long postId = post.getId();
+        Post post = new Post(authorId, title, content, Category.GENERAL);
+        postRepository.save(post);
 
         Member mockMember = mock(Member.class);
         when(mockMember.getId()).thenReturn(authorId);
@@ -63,7 +57,7 @@ public class PostServiceIntegrationTest {
                 .thenReturn(Optional.of(mockMember));
 
         //when
-        postService.delete(postId, authorId);
+        postService.delete(post.getId(), authorId);
 
         //then
         assertThat(post.getDeletedAt()).isNotNull();
@@ -77,11 +71,11 @@ public class PostServiceIntegrationTest {
 
         Long authorId = 1L;
 
-        Post post = postService.create(title, content, authorId, Category.GENERAL);
-        Long postId = post.getId();
+        Post post = new Post(authorId, title, content, Category.GENERAL);
+        postRepository.save(post);
 
         //then
-        assertThatThrownBy(() -> postService.delete(postId + 1, authorId))
+        assertThatThrownBy(() -> postService.delete(post.getId() + 1, authorId))
                 .isInstanceOf(PostException.class)
                 .hasMessage(ErrorCode.POST_NOT_FOUND.getMessage());
     }
@@ -101,11 +95,13 @@ public class PostServiceIntegrationTest {
         when(memberRepository.findById(any()))
                 .thenReturn(Optional.of(mockMember));
 
-        Post post1 = postService.create(title1, content, authorId, Category.GENERAL);
+        Post post = new Post(authorId, title1, content, Category.GENERAL);
+        postRepository.save(post);
+
         postService.create(title2, content, authorId, Category.GENERAL);
 
         //when
-        postService.delete(post1.getId(), authorId);
+        postService.delete(post.getId(), authorId);
         PageRequest pageRequest = PageRequest.of(0, 10);
         PostReadPageResult result = postReadService.readPage(Category.GENERAL, pageRequest);
 

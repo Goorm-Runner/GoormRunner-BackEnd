@@ -1,9 +1,10 @@
 package goorm_runner.backend.post.application.post;
 
+import goorm_runner.backend.post.application.post.dto.PostCreateResult;
+import goorm_runner.backend.post.application.post.dto.PostUpdateResult;
 import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.domain.exception.PostException;
 import goorm_runner.backend.post.domain.model.Category;
-import goorm_runner.backend.post.domain.model.Post;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,17 +34,14 @@ class PostServiceTest {
         Long authorId = 1L;
 
         //when
-        Post post = postService.create(title, content, authorId, Category.GENERAL);
+        PostCreateResult result = postService.create(title, content, authorId, Category.GENERAL);
 
         //then
         assertAll(
-                () -> assertThat(post.getTitle()).isEqualTo(title),
-                () -> assertThat(post.getContent()).isEqualTo(content),
-                () -> assertThat(post.getAuthorId()).isEqualTo(authorId),
-                () -> assertThat(post.getCategory().name()).isEqualTo(Category.GENERAL.name()),
-                () -> assertThat(post.getCreatedAt()).isNotNull(),
-                () -> assertThat(post.getUpdatedAt()).isNotNull(),
-                () -> assertThat(post.getCreatedAt()).isEqualTo(post.getUpdatedAt())
+                () -> assertThat(result.title()).isEqualTo(title),
+                () -> assertThat(result.content()).isEqualTo(content),
+                () -> assertThat(result.categoryName()).isEqualTo(Category.GENERAL.name()),
+                () -> assertThat(result.createdAt()).isNotNull()
         );
     }
 
@@ -83,20 +81,19 @@ class PostServiceTest {
 
         Long authorId = 1L;
 
-        Post post = postService.create(title, content, authorId, Category.GENERAL);
+        PostCreateResult result = postService.create(title, content, authorId, Category.GENERAL);
 
         //when
         String updatedTitle = "UpdatedTitle";
         String updatedContent = "UpdatedContent";
 
-        Post updated = postService.update(updatedTitle, updatedContent, post.getId());
+        PostUpdateResult updateResult = postService.update(updatedTitle, updatedContent, result.postId());
         postRepository.flush();
 
         //then
         assertAll(
-                () -> assertThat(updated.getTitle()).isEqualTo(updatedTitle),
-                () -> assertThat(updated.getContent()).isEqualTo(updatedContent),
-                () -> assertThat(updated.getUpdatedAt()).isAfter(updated.getCreatedAt())
+                () -> assertThat(updateResult.title()).isEqualTo(updatedTitle),
+                () -> assertThat(updateResult.content()).isEqualTo(updatedContent)
         );
     }
 
@@ -108,14 +105,14 @@ class PostServiceTest {
 
         Long authorId = 1L;
 
-        Post post = postService.create(title, content, authorId, Category.GENERAL);
+        PostCreateResult result = postService.create(title, content, authorId, Category.GENERAL);
 
         //when
         String updatedTitle = "UpdatedTitle";
         String updatedContent = "UpdatedContent";
 
         //then
-        assertThatThrownBy(() -> postService.update(updatedTitle, updatedContent, post.getId() + 1))
+        assertThatThrownBy(() -> postService.update(updatedTitle, updatedContent, result.postId() + 1))
                 .isInstanceOf(PostException.class)
                 .hasMessage(POST_NOT_FOUND.getMessage());
     }
@@ -128,14 +125,14 @@ class PostServiceTest {
 
         Long authorId = 1L;
 
-        Post post = postService.create(title, content, authorId, Category.GENERAL);
+        PostCreateResult result = postService.create(title, content, authorId, Category.GENERAL);
 
         //when
         String emptyTitle = "";
         String updatedContent = "UpdatedContent";
 
         //then
-        assertThatThrownBy(() -> postService.update(emptyTitle, updatedContent, post.getId()))
+        assertThatThrownBy(() -> postService.update(emptyTitle, updatedContent, result.postId()))
                 .isInstanceOf(PostException.class)
                 .hasMessage(EMPTY_TITLE.getMessage());
     }
@@ -148,14 +145,14 @@ class PostServiceTest {
 
         Long authorId = 1L;
 
-        Post post = postService.create(title, content, authorId, Category.GENERAL);
+        PostCreateResult result = postService.create(title, content, authorId, Category.GENERAL);
 
         //when
         String emptyTitle = "UpdatedTitle";
         String updatedContent = "";
 
         //then
-        assertThatThrownBy(() -> postService.update(emptyTitle, updatedContent, post.getId()))
+        assertThatThrownBy(() -> postService.update(emptyTitle, updatedContent, result.postId()))
                 .isInstanceOf(PostException.class)
                 .hasMessage(EMPTY_CONTENT.getMessage());
     }

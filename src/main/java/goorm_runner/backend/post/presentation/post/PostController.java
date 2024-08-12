@@ -5,7 +5,9 @@ import goorm_runner.backend.member.application.MemberService;
 import goorm_runner.backend.member.security.SecurityMember;
 import goorm_runner.backend.post.application.post.PostReadService;
 import goorm_runner.backend.post.application.post.PostService;
+import goorm_runner.backend.post.application.post.dto.PostCreateResult;
 import goorm_runner.backend.post.application.post.dto.PostReadPageResult;
+import goorm_runner.backend.post.application.post.dto.PostUpdateResult;
 import goorm_runner.backend.post.domain.PostQueryRepository;
 import goorm_runner.backend.post.domain.exception.PostException;
 import goorm_runner.backend.post.domain.model.Category;
@@ -43,8 +45,9 @@ public class PostController {
         Long authorId = memberService.findMemberIdByUsername(username);
 
         Category category = toCategory(categoryName.toUpperCase());
-        Post post = postService.create(request.title(), request.content(), authorId, category);
-        PostCreateResponse response = getCreateResponse(post);
+
+        PostCreateResult result = postService.create(request.title(), request.content(), authorId, category);
+        PostCreateResponse response = PostCreateResponse.from(result);
 
         URI location = newUri(response);
 
@@ -52,14 +55,14 @@ public class PostController {
                 .body(response);
     }
 
-    @GetMapping("/categories/{categoryName}/posts/{postId}")
-    public ResponseEntity<PostReadResponse> readPost(@PathVariable String categoryName, @PathVariable Long postId) {
+    @GetMapping("/categories/{ignoredCategoryName}/posts/{postId}")
+    public ResponseEntity<PostReadResponse> readPost(@PathVariable String ignoredCategoryName, @PathVariable Long postId) {
 
         Post post = postQueryRepository.findById(postId)
                 .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
 
         int likes = postLikeService.countPostLikes(postId);
-        PostReadResponse response = getReadResponse(categoryName.toUpperCase(), post, likes);
+        PostReadResponse response = PostReadResponse.of(post, likes);
 
         return ResponseEntity.ok(response);
     }
@@ -75,12 +78,12 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/categories/{categoryName}/posts/{postId}")
+    @PutMapping("/categories/{ignoredCategoryName}/posts/{postId}")
     public ResponseEntity<PostUpdateResponse> updatePost(
-            @PathVariable String categoryName, @PathVariable Long postId, @RequestBody PostUpdateRequest request) {
+            @PathVariable String ignoredCategoryName, @PathVariable Long postId, @RequestBody PostUpdateRequest request) {
 
-        Post post = postService.update(request.title(), request.content(), postId);
-        PostUpdateResponse response = getUpdateResponse(categoryName.toUpperCase(), postId, post);
+        PostUpdateResult result = postService.update(request.title(), request.content(), postId);
+        PostUpdateResponse response = PostUpdateResponse.from(result);
 
         return ResponseEntity.ok(response);
     }
@@ -102,39 +105,6 @@ public class PostController {
         } catch (IllegalArgumentException e) {
             throw new PostException(INVALID_CATEGORY);
         }
-    }
-
-    private PostCreateResponse getCreateResponse(Post post) {
-        return PostCreateResponse.builder()
-                .categoryName(post.getCategory().name())
-                .postId(post.getId())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .createdAt(post.getCreatedAt().toString())
-                .build();
-    }
-
-    private PostReadResponse getReadResponse(String categoryName, Post post, int likes) {
-        return PostReadResponse.builder()
-                .categoryName(categoryName)
-                .postId(post.getId())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .likeCount(likes)
-                .createdAt(post.getCreatedAt())
-                .updatedAt(post.getUpdatedAt())
-                .build();
-    }
-
-    private PostUpdateResponse getUpdateResponse(String categoryName, Long postId, Post post) {
-        return PostUpdateResponse.builder()
-                .categoryName(categoryName)
-                .postId(postId)
-                .title(post.getTitle())
-                .content(post.getContent())
-                .createdAt(post.getCreatedAt())
-                .updatedAt(post.getUpdatedAt())
-                .build();
     }
 
     private URI newUri(PostCreateResponse response) {
