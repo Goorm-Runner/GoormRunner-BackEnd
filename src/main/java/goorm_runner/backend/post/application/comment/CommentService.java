@@ -1,7 +1,10 @@
 package goorm_runner.backend.post.application.comment;
 
 import goorm_runner.backend.global.ErrorCode;
+import goorm_runner.backend.post.application.comment.dto.CommentCreateResult;
+import goorm_runner.backend.post.application.post.exception.PostException;
 import goorm_runner.backend.post.domain.CommentRepository;
+import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.domain.exception.CommentException;
 import goorm_runner.backend.post.domain.model.Comment;
 import goorm_runner.backend.post.domain.model.Post;
@@ -14,12 +17,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class CommentService {
 
+    private final PostRepository postRepository;
     private final CommentRepository commentRepository;
 
-    public Comment create(Long authorId, Post post, String content) {
+    public CommentCreateResult create(Long authorId, Long postId, String content) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
+
         Comment comment = post.addComment(authorId, content);
         commentRepository.save(comment);
-        return comment;
+        return new CommentCreateResult(post.getId(), comment.getId(), comment.getContent(), comment.getCreatedAt().toString());
     }
 
     public Comment update(Post post, Long commentId, String content) {

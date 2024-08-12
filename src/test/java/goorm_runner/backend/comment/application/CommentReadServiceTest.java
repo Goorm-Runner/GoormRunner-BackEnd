@@ -2,6 +2,7 @@ package goorm_runner.backend.comment.application;
 
 import goorm_runner.backend.post.application.comment.CommentReadService;
 import goorm_runner.backend.post.application.comment.CommentService;
+import goorm_runner.backend.post.application.comment.dto.CommentCreateResult;
 import goorm_runner.backend.post.domain.CommentRepository;
 import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.domain.model.Category;
@@ -59,20 +60,16 @@ class CommentReadServiceTest {
         when(postRepository.findById(any()))
                 .thenReturn(Optional.of(post));
 
-        Comment comment = commentService.create(authorId, post, content);
+        CommentCreateResult result = commentService.create(authorId, postId, content);
 
         //when
-        Comment findComment = commentReadService.read(comment.getId());
+        Comment findComment = commentReadService.read(result.commentId());
 
         //then
         assertAll(
-                () -> assertThat(findComment.getId()).isEqualTo(comment.getId()),
-                () -> assertThat(findComment.getPost().getId()).isEqualTo(comment.getPost().getId()),
-                () -> assertThat(findComment.getAuthorId()).isEqualTo(comment.getAuthorId()),
-                () -> assertThat(findComment.getContent()).isEqualTo(comment.getContent()),
-                () -> assertThat(findComment.getCreatedAt()).isEqualTo(comment.getCreatedAt()),
-                () -> assertThat(findComment.getUpdatedAt()).isEqualTo(comment.getUpdatedAt()),
-                () -> assertThat(findComment.getDeletedAt()).isEqualTo(comment.getDeletedAt())
+                () -> assertThat(findComment.getPost().getId()).isEqualTo(result.postId()),
+                () -> assertThat(findComment.getContent()).isEqualTo(result.content()),
+                () -> assertThat(findComment.getCreatedAt()).isEqualTo(result.createdAt())
         );
     }
 
@@ -88,7 +85,7 @@ class CommentReadServiceTest {
         when(postRepository.findById(any()))
                 .thenReturn(Optional.of(post));
 
-        commentService.create(authorId, post, content);
+        commentService.create(authorId, postId, content);
 
         //when
         PageRequest pageRequest = PageRequest.of(0, 10);

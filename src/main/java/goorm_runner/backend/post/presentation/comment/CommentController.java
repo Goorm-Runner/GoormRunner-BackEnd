@@ -6,6 +6,7 @@ import goorm_runner.backend.member.application.MemberService;
 import goorm_runner.backend.member.security.SecurityMember;
 import goorm_runner.backend.post.application.comment.CommentReadService;
 import goorm_runner.backend.post.application.comment.CommentService;
+import goorm_runner.backend.post.application.comment.dto.CommentCreateResult;
 import goorm_runner.backend.post.application.post.PostReadService;
 import goorm_runner.backend.post.application.post.PostService;
 import goorm_runner.backend.post.application.post.exception.PostException;
@@ -45,9 +46,8 @@ public class CommentController {
         String username = securityMember.getUsername();
         Long authorId = memberService.findMemberIdByUsername(username);
 
-        Post post = postReadService.readPost(postId);
-        Comment comment = commentService.create(authorId, post, request.content());
-        CommentCreateResponse response = CommentCreateResponse.from(comment);
+        CommentCreateResult result = commentService.create(authorId, postId, request.content());
+        CommentCreateResponse response = new CommentCreateResponse(result.postId(), result.commentId(), result.content(), result.createdAt());
 
         URI location = newUri(response);
 

@@ -56,4 +56,16 @@ public class Comment extends BaseTimeEntity {
             throw new CommentException(ErrorCode.EMPTY_CONTENT);
         }
     }
+
+    @Override
+    public String toString() {
+        return "Comment{" +
+                "id=" + id +
+                ", authorId=" + authorId +
+                ", content='" + content + '\'' +
+                ", createdAt=" + getCreatedAt() +
+                ", updatedAt=" + getUpdatedAt() +
+                ", deletedAt=" + deletedAt +
+                '}';
+    }
 }

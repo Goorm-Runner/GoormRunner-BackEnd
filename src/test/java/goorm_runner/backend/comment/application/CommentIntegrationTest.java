@@ -2,10 +2,10 @@ package goorm_runner.backend.comment.application;
 
 import goorm_runner.backend.post.application.comment.CommentReadService;
 import goorm_runner.backend.post.application.comment.CommentService;
+import goorm_runner.backend.post.application.comment.dto.CommentCreateResult;
 import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.domain.exception.CommentException;
 import goorm_runner.backend.post.domain.model.Category;
-import goorm_runner.backend.post.domain.model.Comment;
 import goorm_runner.backend.post.domain.model.Post;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
@@ -49,15 +49,15 @@ public class CommentIntegrationTest {
         when(postRepository.findById(any()))
                 .thenReturn(Optional.of(post));
 
-        Comment comment = commentService.create(authorId, post, content);
+        CommentCreateResult result = commentService.create(authorId, post.getId(), content);
 
         //when
-        commentService.delete(post, comment.getId());
+        commentService.delete(post, result.commentId());
         em.flush();
         em.clear();
 
         //then
-        assertThatThrownBy(() -> commentReadService.read(comment.getId()))
+        assertThatThrownBy(() -> commentReadService.read(result.commentId()))
                 .isInstanceOf(CommentException.class);
     }
 }

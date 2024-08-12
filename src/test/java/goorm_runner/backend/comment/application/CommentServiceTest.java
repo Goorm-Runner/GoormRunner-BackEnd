@@ -1,6 +1,7 @@
 package goorm_runner.backend.comment.application;
 
 import goorm_runner.backend.post.application.comment.CommentService;
+import goorm_runner.backend.post.application.comment.dto.CommentCreateResult;
 import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.domain.exception.CommentException;
 import goorm_runner.backend.post.domain.model.Category;
@@ -11,17 +12,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @Transactional
 @SpringBootTest
@@ -33,7 +28,7 @@ class CommentServiceTest {
     @Autowired
     private EntityManager em;
 
-    @MockBean
+    @Autowired
     private PostRepository postRepository;
 
     @BeforeEach
@@ -45,25 +40,20 @@ class CommentServiceTest {
     void save_success() {
         //given
         Long authorId = 1L;
-        Long postId = 1L;
         String content = "lorem ipsum";
 
         Post post = new Post(1L, "title", "content", Category.GENERAL);
-        ReflectionTestUtils.setField(post, "id", 1L);
-        when(postRepository.findById(any())).thenReturn(Optional.of(post));
+        postRepository.save(post);
 
         //when
-        Comment comment = commentService.create(authorId, post, content);
+        CommentCreateResult result = commentService.create(authorId, post.getId(), content);
 
         //then
         assertAll(
-                () -> assertThat(comment.getAuthorId()).isEqualTo(authorId),
-                () -> assertThat(comment.getPost().getId()).isEqualTo(postId),
-                () -> assertThat(comment.getContent()).isEqualTo(content),
-                () -> assertThat(comment.getCreatedAt()).isNotNull(),
-                () -> assertThat(comment.getUpdatedAt()).isNotNull(),
-                () -> assertThat(comment.getCreatedAt()).isEqualTo(comment.getUpdatedAt()),
-                () -> assertThat(comment.getDeletedAt()).isNull()
+                () -> assertThat(result.postId()).isEqualTo(post.getId()),
+                () -> assertThat(result.commentId()).isNotNull(),
+                () -> assertThat(result.content()).isEqualTo(content),
+                () -> assertThat(result.createdAt()).isNotNull()
         );
     }
     
@@ -73,13 +63,11 @@ class CommentServiceTest {
         Long authorId = 1L;
         String content = "";
 
-        Post post = new Post(1L, "title", "content", Category.GENERAL);
+        Post post = new Post(authorId, "title", "content", Category.GENERAL);
+        postRepository.save(post);
 
-        //when
-        when(postRepository.findById(any())).thenReturn(Optional.of(post));
-
-        //then
-        assertThatThrownBy(() -> commentService.create(authorId, post, content))
+        //when-then
+        assertThatThrownBy(() -> commentService.create(authorId, post.getId(), content))
                 .isInstanceOf(CommentException.class);
     }
 
@@ -87,18 +75,16 @@ class CommentServiceTest {
     void update_success() {
         //given
         Long authorId = 1L;
-        Long postId = 1L;
         String content = "lorem ipsum";
 
         Post post = new Post(1L, "title", "content", Category.GENERAL);
-        ReflectionTestUtils.setField(post, "id", postId);
-        when(postRepository.findById(any())).thenReturn(Optional.of(post));
+        postRepository.save(post);
 
-        Comment comment = commentService.create(authorId, post, content);
+        CommentCreateResult result = commentService.create(authorId, post.getId(), content);
 
         //when
         String updatedContent = "updated";
-        Comment updatedComment = commentService.update(post, comment.getId(), updatedContent);
+        Comment updatedComment = commentService.update(post, result.commentId(), updatedContent);
         em.flush();
         em.clear();
 
@@ -113,18 +99,16 @@ class CommentServiceTest {
     void update_with_empty_content_exception() {
         //given
         Long authorId = 1L;
-        Long postId = 1L;
         String content = "lorem ipsum";
 
-        Post post = new Post(1L, "title", "content", Category.GENERAL);
-        ReflectionTestUtils.setField(post, "id", postId);
-        when(postRepository.findById(any())).thenReturn(Optional.of(post));
+        Post post = new Post(authorId, "title", "content", Category.GENERAL);
+        postRepository.save(post);
 
-        Comment comment = commentService.create(authorId, post, content);
+        CommentCreateResult result = commentService.create(authorId, post.getId(), content);
 
         //when-then
         String emptyContent = "";
-        assertThatThrownBy(() -> commentService.update(post, comment.getId(), emptyContent))
+        assertThatThrownBy(() -> commentService.update(post, result.commentId(), emptyContent))
                 .isInstanceOf(CommentException.class);
 
     }
