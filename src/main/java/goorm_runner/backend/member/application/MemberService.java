@@ -20,4 +20,12 @@ public class MemberService {
         return member.getId();
     }
 
+    public void deleteMemberById(Long memberId){
+        Member member = memberRepository.findByIdAndDeletedAtIsNull(memberId)
+                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+
+        member.delete();
+        memberRepository.save(member);
+    }
+
 }

@@ -70,5 +70,9 @@ public class Member {
     public void addMemberAuthority(MemberAuthority memberAuthority) {
         memberAuthorities.add(memberAuthority);
     }
+
+    public void delete() {
+        this.deletedAt = LocalDateTime.now();
+    }
 }
 

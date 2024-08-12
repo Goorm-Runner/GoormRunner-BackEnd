@@ -23,8 +23,8 @@ public class MemberGathering {
     @JoinColumn(name = "guest_id")
     private Member guest;
 
-    @Column(nullable = false)
-    private boolean approved = false;
+//    @Column(nullable = false)
+//    private boolean approved = false;
 
     @Builder
     public MemberGathering(Gathering gathering, Member guest) {
@@ -32,7 +32,7 @@ public class MemberGathering {
         this.guest = guest;
     }
 
-    public void approve() {
-        approved = true;
-    }
+//    public void approve() {
+//        approved = true;
+//    }
 }

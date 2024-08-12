@@ -2,16 +2,18 @@ package goorm_runner.backend.recruitment.application;
 
 import goorm_runner.backend.ballpark.domain.Ballpark;
 import goorm_runner.backend.ballpark.domain.BallparkRepository;
+import goorm_runner.backend.global.ErrorCode;
 import goorm_runner.backend.member.domain.Member;
 import goorm_runner.backend.member.domain.MemberRepository;
+import goorm_runner.backend.recruitment.application.exception.RecruitmentException;
 import goorm_runner.backend.recruitment.domain.*;
 import goorm_runner.backend.recruitment.dto.RecruitmentRequest;
 import goorm_runner.backend.recruitment.dto.RecruitmentResponse;
 import goorm_runner.backend.team.domain.Team;
 import goorm_runner.backend.team.domain.TeamRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +39,7 @@ public class RecruitmentService {
     public RecruitmentResponse createRecruitment(RecruitmentRequest request, Long authorId) {
 
         if (authorId == null) {
-            throw new IllegalArgumentException("Author ID is null");
+            throw new RecruitmentException(ErrorCode.UNAUTHORIZED_ACCESS);
         }
 
         Member host = findByIdEntity(memberRepository, authorId, "Host");
@@ -47,6 +49,8 @@ public class RecruitmentService {
 
         Team team = findByIdEntity(teamRepository, request.getTeamId(), "Team");
         Ballpark ballpark = findByIdEntity(ballparkRepository, request.getBallparkId(), "Ballpark");
+
+        validateRecruitment(request, team, ballpark);
 
         Recruitment recruitment = Recruitment.builder()
                 .gathering(gathering)
@@ -61,7 +65,21 @@ public class RecruitmentService {
 
         recruitmentRepository.save(recruitment);
 
+        MemberGathering memberGathering = MemberGathering.builder()
+                .gathering(gathering)
+                .guest(host)
+                .build();
+        memberGatheringRepository.save(memberGathering);
+
         return creativeRecruitmentResponse(recruitment);
+    }
+
+    public List<RecruitmentResponse> findByTeamAndBallpark(Long teamId, Long ballparkId) {
+        Specification<Recruitment> spec = RecruitmentSpecifications.byTeamAndBallpark(teamId, ballparkId);
+
+        return recruitmentRepository.findAll(spec).stream()
+                .map(this::creativeRecruitmentResponse)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -78,7 +96,7 @@ public class RecruitmentService {
      */
     public RecruitmentResponse findRecruitmentById(Long recruitmentId) {
         Recruitment recruitment = recruitmentRepository.findByIdAndDeletedAtIsNull(recruitmentId)
-                .orElseThrow(() -> new EntityNotFoundException("Recruitment not found with id " + recruitmentId));
+                .orElseThrow(() -> new RecruitmentException(ErrorCode.RECRUITMENT_NOT_FOUND));
 
         return creativeRecruitmentResponse(recruitment);
     }
@@ -109,8 +127,10 @@ public class RecruitmentService {
         Recruitment recruitment = findRecruitmentByIdEntity(recruitmentId);
 
         if (!recruitment.getGathering().getHost().getId().equals(authorId)) {
-            throw new SecurityException("You are not authorized to update this recruitment.");
+            throw new RecruitmentException(ErrorCode.UNAUTHORIZED_ACCESS);
         }
+
+        validateRecruitment(request, recruitment.getTeam(), recruitment.getBallpark());
 
         recruitment.update(
                 request.getTitle(),
@@ -134,11 +154,11 @@ public class RecruitmentService {
         Member member = findByIdEntity(memberRepository, memberId, "Member");
 
         if (isMemberAlreadyJoined(recruitment, member)) {
-            throw new IllegalStateException("Member already joined this recruitment.");
+            throw new RecruitmentException(ErrorCode.MEMBER_ALREADY_JOINED);
         }
 
         if (isRecruitmentFull(recruitment)) {
-            throw new IllegalStateException("Recruitment is already full.");
+            throw new RecruitmentException(ErrorCode.RECRUITMENT_FULL);
         }
 
         Gathering gathering = recruitment.getGathering();
@@ -160,13 +180,13 @@ public class RecruitmentService {
         Member host = findByIdEntity(memberRepository, hostId, "Host");
 
         if (!recruitment.getGathering().getHost().equals(host)) {
-            throw new SecurityException("You are not authorized to approve this participation.");
+            throw new RecruitmentException(ErrorCode.UNAUTHORIZED_ACCESS);
         }
 
         MemberGathering memberGathering = memberGatheringRepository.findByGatheringAndGuestId(recruitment.getGathering(), memberId)
-                .orElseThrow(() -> new EntityNotFoundException("Participation request not found."));
+                .orElseThrow(() -> new RecruitmentException(ErrorCode.PARTICIPATION_REQUEST_NOT_FOUND));
 
-        memberGathering.approve();
+//        memberGathering.approve();
         memberGatheringRepository.save(memberGathering);
     }
 
@@ -179,7 +199,7 @@ public class RecruitmentService {
         Member host = findByIdEntity(memberRepository, hostId, "Host");
 
         if (!recruitment.getGathering().getHost().equals(host)) {
-            throw new SecurityException("You are not authorized to delete this recruitment.");
+            throw new RecruitmentException(ErrorCode.UNAUTHORIZED_ACCESS);
         }
 
         recruitment.delete();
@@ -195,7 +215,7 @@ public class RecruitmentService {
         Member member = findByIdEntity(memberRepository, memberId, "Member");
 
         MemberGathering memberGathering = memberGatheringRepository.findByGatheringAndGuestId(recruitment.getGathering(), member.getId())
-                .orElseThrow(() -> new EntityNotFoundException("You have not joined this recruitment."));
+                .orElseThrow(() -> new RecruitmentException(ErrorCode.PARTICIPATION_REQUEST_NOT_FOUND));
 
         memberGatheringRepository.delete(memberGathering);
     }
@@ -220,7 +240,7 @@ public class RecruitmentService {
      */
     private Recruitment findRecruitmentByIdEntity(Long recruitmentId) {
         return recruitmentRepository.findByIdAndDeletedAtIsNull(recruitmentId)
-                .orElseThrow(() -> new EntityNotFoundException("Recruitment not found with id " + recruitmentId));
+                .orElseThrow(() -> new RecruitmentException(ErrorCode.RECRUITMENT_NOT_FOUND));
     }
 
     /**
@@ -241,6 +261,30 @@ public class RecruitmentService {
 
     private <T> T findByIdEntity(JpaRepository<T, Long> repository, Long id, String entityName) {
         return repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(entityName + " not found with id " + id));
+                .orElseThrow(() -> new RecruitmentException(ErrorCode.RECRUITMENT_NOT_FOUND));
+    }
+
+    private void validateRecruitment(RecruitmentRequest request, Team team, Ballpark ballpark) {
+        if (team == null) {
+            throw new RecruitmentException(ErrorCode.INVALID_TEAM);
+        }
+        if (ballpark == null) {
+            throw new RecruitmentException(ErrorCode.INVALID_BALLPARK);
+        }
+        if (request.getTitle() == null || request.getTitle().isEmpty()) {
+            throw new RecruitmentException(ErrorCode.RECRUITMENT_EMPTY_TITLE);
+        }
+        if (request.getContent() == null || request.getContent().isEmpty()) {
+            throw new RecruitmentException(ErrorCode.RECRUITMENT_EMPTY_CONTENT);
+        }
+        if (request.getAddress() == null || request.getAddress().isEmpty()) {
+            throw new RecruitmentException(ErrorCode.EMPTY_ADDRESS);
+        }
+        if (request.getMeetTime() == null) {
+            throw new RecruitmentException(ErrorCode.INVALID_MEET_TIME);
+        }
+        if (request.getMaxParticipants() <= 1) {
+            throw new RecruitmentException(ErrorCode.INVALID_MAX_PARTICIPANTS);
+        }
     }
 }

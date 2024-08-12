@@ -30,8 +30,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/members/signup").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/recruitment/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/categories/{categoryName}/posts/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/likes/posts/{postId}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/recruitment/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
