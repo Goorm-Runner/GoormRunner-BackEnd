@@ -72,7 +72,7 @@ public class PostController {
                 .map(post -> PostOverview.from(post, postService.getAuthorName(post.getId()), postLikeService.countPostLikes(post.getId())))
                 .toList();
 
-        PageMetaData pageMetaData = PageMetaData.of(posts);
+        PageMetaData pageMetaData = PageMetaData.from(posts);
 
         PostReadPageResponse response = new PostReadPageResponse(overviews, pageMetaData);
         return ResponseEntity.ok(response);

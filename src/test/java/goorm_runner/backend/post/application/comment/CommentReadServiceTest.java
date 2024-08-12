@@ -1,6 +1,14 @@
 package goorm_runner.backend.post.application.comment;
 
+import goorm_runner.backend.global.PageMetaData;
+import goorm_runner.backend.member.domain.Member;
+import goorm_runner.backend.member.domain.MemberRepository;
+import goorm_runner.backend.member.domain.Role;
+import goorm_runner.backend.member.domain.Sex;
 import goorm_runner.backend.post.application.comment.dto.CommentCreateResult;
+import goorm_runner.backend.post.application.comment.dto.CommentPageResult;
+import goorm_runner.backend.post.application.comment.dto.CommentReadResult;
+import goorm_runner.backend.post.application.comment.dto.CommentResultOverview;
 import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.domain.model.Category;
 import goorm_runner.backend.post.domain.model.Comment;
@@ -12,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,6 +39,9 @@ class CommentReadServiceTest {
     @Autowired
     private PostRepository postRepository;
 
+    @Autowired
+    private MemberRepository memberRepository;
+
     @Test
     void read_success() {
         //given
@@ -42,40 +54,56 @@ class CommentReadServiceTest {
         CommentCreateResult result = commentService.create(authorId, post.getId(), content);
 
         //when
-        Comment findComment = commentReadService.read(result.commentId());
+        CommentReadResult commentReadResult = commentReadService.read(result.commentId());
 
         //then
         assertAll(
-                () -> assertThat(findComment.getPost().getId()).isEqualTo(result.postId()),
-                () -> assertThat(findComment.getContent()).isEqualTo(result.content()),
-                () -> assertThat(findComment.getCreatedAt()).isEqualTo(result.createdAt())
+                () -> assertThat(commentReadResult.commentId()).isEqualTo(result.commentId()),
+                () -> assertThat(commentReadResult.content()).isEqualTo(result.content())
         );
     }
 
     @Test
     void read_page_success() {
         //given
-        Long authorId = 1L;
+        String loginId = "loginId";
+        String nickname = "username";
+        String password = "password";
+
+        Member member = memberRepository.save(
+                Member.builder()
+                        .loginId(loginId)
+                        .nickname(nickname)
+                        .password(password)
+                        .role(Role.USER)
+                        .sex(Sex.MALE)
+                        .birth(LocalDate.now())
+                        .build()
+        );
+
+        Long authorId = member.getId();
         String content = "lorem ipsum";
 
-        Post post = new Post(1L, "title", "content", Category.GENERAL);
+        Post post = new Post(member.getId(), "title", "content", Category.GENERAL);
         postRepository.save(post);
 
         commentService.create(authorId, post.getId(), content);
 
         //when
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<Comment> page = commentReadService.readPage(post.getId(), pageRequest);
+        CommentPageResult commentPageResult = commentReadService.readPage(post.getId(), pageRequest);
 
         //then
-        List<Comment> contents = page.getContent();
+        List<CommentResultOverview> overviews = commentPageResult.overviews();
+        PageMetaData pageMetaData = commentPageResult.pageMetaData();
         assertAll(
-                () -> assertThat(contents.size()).isEqualTo(1),
-                () -> assertThat(page.getTotalPages()).isEqualTo(1),
-                () -> assertThat(page.getNumber()).isEqualTo(0),
-                () -> assertThat(page.getTotalPages()).isEqualTo(1),
-                () -> assertThat(page.isFirst()).isTrue(),
-                () -> assertThat(page.hasNext()).isFalse()
+                () -> assertThat(overviews.size()).isEqualTo(1),
+                () -> assertThat(pageMetaData.number()).isEqualTo(0),
+                () -> assertThat(pageMetaData.size()).isEqualTo(10),
+                () -> assertThat(pageMetaData.isFirst()).isTrue(),
+                () -> assertThat(pageMetaData.isLast()).isTrue(),
+                () -> assertThat(pageMetaData.hasPrevious()).isFalse(),
+                () -> assertThat(pageMetaData.hasNext()).isFalse()
         );
     }
 

@@ -1,12 +1,13 @@
 package goorm_runner.backend.post.presentation.comment;
 
 import goorm_runner.backend.global.ErrorCode;
-import goorm_runner.backend.global.PageMetaData;
 import goorm_runner.backend.member.application.MemberService;
 import goorm_runner.backend.member.security.SecurityMember;
 import goorm_runner.backend.post.application.comment.CommentReadService;
 import goorm_runner.backend.post.application.comment.CommentService;
 import goorm_runner.backend.post.application.comment.dto.CommentCreateResult;
+import goorm_runner.backend.post.application.comment.dto.CommentPageResult;
+import goorm_runner.backend.post.application.comment.dto.CommentReadResult;
 import goorm_runner.backend.post.application.post.PostReadService;
 import goorm_runner.backend.post.application.post.PostService;
 import goorm_runner.backend.post.application.post.exception.PostException;
@@ -15,7 +16,6 @@ import goorm_runner.backend.post.domain.model.Comment;
 import goorm_runner.backend.post.domain.model.Post;
 import goorm_runner.backend.post.presentation.comment.dto.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -33,7 +32,6 @@ public class CommentController {
     private final MemberService memberService;
     private final CommentService commentService;
     private final CommentReadService commentReadService;
-    private final PostService postService;
     private final PostReadService postReadService;
 
     @PostMapping("/categories/{ignoredCategoryName}/posts/{postId}/comments")
@@ -61,8 +59,8 @@ public class CommentController {
 
         validatePostExisting(postId);
 
-        Comment comment = commentReadService.read(commentId);
-        CommentReadResponse response = CommentReadResponse.from(comment);
+        CommentReadResult result = commentReadService.read(commentId);
+        CommentReadResponse response = CommentReadResponse.from(result);
 
         return ResponseEntity.ok(response);
     }
@@ -73,15 +71,9 @@ public class CommentController {
 
         validatePostExisting(postId);
 
-        Page<Comment> comments = commentReadService.readPage(postId, PageRequest.of(pageNumber, pageSize));
+        CommentPageResult commentPageResult = commentReadService.readPage(postId, PageRequest.of(pageNumber, pageSize));
 
-        List<CommentOverview> commentOverviews = comments.stream()
-                .map(comment -> CommentOverview.of(postId, comment, postService.getAuthorName(postId)))
-                .toList();
-
-        PageMetaData pageMetaData = PageMetaData.of(comments);
-
-        CommentPageResponse response = new CommentPageResponse(commentOverviews, pageMetaData);
+        CommentPageResponse response = CommentPageResponse.from(commentPageResult);
 
         return ResponseEntity.ok(response);
     }

@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 public record PageMetaData(int number, int size, boolean isFirst, boolean isLast, boolean hasNext,
                            boolean hasPrevious) {
 
-    public static PageMetaData of(Page<?> page) {
+    public static PageMetaData from(Page<?> page) {
         return PageMetaData.builder()
                 .number(page.getNumber())
                 .size(page.getSize())
