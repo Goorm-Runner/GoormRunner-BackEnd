@@ -53,7 +53,7 @@ public class PostServiceIntegrationTest {
         Long postId = post.getId();
 
         //when
-        postService.delete(postId);
+        postService.delete(postId, authorId);
 
         //then
         assertThat(post.getDeletedAt()).isNotNull();
@@ -71,7 +71,7 @@ public class PostServiceIntegrationTest {
         Long postId = post.getId();
 
         //then
-        assertThatThrownBy(() -> postService.delete(postId + 1))
+        assertThatThrownBy(() -> postService.delete(postId + 1, authorId))
                 .isInstanceOf(PostException.class)
                 .hasMessage(ErrorCode.POST_NOT_FOUND.getMessage());
     }
@@ -89,7 +89,7 @@ public class PostServiceIntegrationTest {
         Long postId = post.getId();
 
         //when
-        postService.delete(postId);
+        postService.delete(postId, authorId);
         entityManager.flush();
         entityManager.clear();
 
@@ -112,7 +112,7 @@ public class PostServiceIntegrationTest {
         postService.create(title2, content, authorId, Category.GENERAL);
 
         //when
-        postService.delete(post1.getId());
+        postService.delete(post1.getId(), authorId);
         PageRequest pageRequest = PageRequest.of(0, 10);
         Page<Post> posts = postReadService.readPage(Category.GENERAL, pageRequest);
 

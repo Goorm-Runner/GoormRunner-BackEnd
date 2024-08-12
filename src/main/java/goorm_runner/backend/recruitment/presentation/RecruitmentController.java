@@ -9,8 +9,8 @@ import goorm_runner.backend.recruitment.dto.RecruitmentRequest;
 import goorm_runner.backend.recruitment.dto.RecruitmentResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,24 +31,28 @@ public class RecruitmentController {
     public ResponseEntity<RecruitmentResponse> createRecruitment(
             @RequestBody RecruitmentRequest request,
             @AuthenticationPrincipal SecurityMember securityMember) {
-        if (securityMember == null) {
-            throw new AccessDeniedException("Authentication failed");
-        }
 
         String username = securityMember.getUsername();
         Long authorId = memberService.findMemberIdByUsername(username);
-        log.info("Create Member ID {}", authorId);
 
         RecruitmentResponse response = recruitmentService.createRecruitment(request, authorId);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     /**
      * 모든 모집 글을 조회한다.
      */
-    @GetMapping
+//    @GetMapping
     public ResponseEntity<List<RecruitmentResponse>> getAllRecruitments() {
         List<RecruitmentResponse> recruitments = recruitmentService.findAllRecruitments();
+        return ResponseEntity.ok(recruitments);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<RecruitmentResponse>> getRecruitments(
+            @RequestParam(required = false) Long teamId,
+            @RequestParam(required = false) Long ballparkId) {
+        List<RecruitmentResponse> recruitments = recruitmentService.findByTeamAndBallpark(teamId, ballparkId);
         return ResponseEntity.ok(recruitments);
     }
 
@@ -73,7 +77,7 @@ public class RecruitmentController {
     /**
      * 특정 팀의 모집 글을 조회한다.
      */
-    @GetMapping("/team/{teamId}")
+//    @GetMapping("/team/{teamId}")
     public ResponseEntity<List<RecruitmentResponse>> getRecruitmentsByTeam(@PathVariable Long teamId) {
         List<RecruitmentResponse> recruitments = recruitmentService.findRecruitmentsByTeam(teamId);
         return ResponseEntity.ok(recruitments);
@@ -87,10 +91,6 @@ public class RecruitmentController {
             @PathVariable Long recruitmentId,
             @RequestBody RecruitmentRequest request,
             @AuthenticationPrincipal SecurityMember securityMember) {
-
-        if (securityMember == null) {
-            throw new AccessDeniedException("Authentication failed");
-        }
 
         String username = securityMember.getUsername();
         Long authorId = memberService.findMemberIdByUsername(username);
@@ -118,7 +118,7 @@ public class RecruitmentController {
     /**
      * 글 작성자가 참여 요청을 승인한다.
      */
-    @PostMapping("/{recruitmentId}/approve")
+//    @PostMapping("/{recruitmentId}/approve")
     public ResponseEntity<Void> approveParticipation(
             @PathVariable Long recruitmentId,
             @RequestBody ApproveRequest approveRequest,
@@ -128,13 +128,13 @@ public class RecruitmentController {
         Long hostId = memberService.findMemberIdByUsername(username);
 
         recruitmentService.approveParticipation(recruitmentId, approveRequest.getMemberId(), hostId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     /**
      * 회원이 참여를 취소한다.
      */
-    @DeleteMapping("/{recruitmentId}/cancel")
+//    @DeleteMapping("/{recruitmentId}/cancel")
     public ResponseEntity<Void> cancelParticipation(
             @PathVariable Long recruitmentId,
             @AuthenticationPrincipal SecurityMember securityMember) {
@@ -143,7 +143,7 @@ public class RecruitmentController {
         Long memberId = memberService.findMemberIdByUsername(username);
 
         recruitmentService.cancelParticipation(recruitmentId, memberId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     /**
@@ -158,6 +158,6 @@ public class RecruitmentController {
         Long memberId = memberService.findMemberIdByUsername(username);
 
         recruitmentService.deleteRecruitment(recruitmentId, memberId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
