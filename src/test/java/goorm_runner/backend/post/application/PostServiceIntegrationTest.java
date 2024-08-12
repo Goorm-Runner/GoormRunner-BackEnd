@@ -1,24 +1,31 @@
 package goorm_runner.backend.post.application;
 
 import goorm_runner.backend.global.ErrorCode;
+import goorm_runner.backend.member.domain.Member;
+import goorm_runner.backend.member.domain.MemberRepository;
 import goorm_runner.backend.post.application.post.PostReadService;
 import goorm_runner.backend.post.application.post.PostService;
 import goorm_runner.backend.post.application.post.exception.PostException;
 import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.post.domain.model.Category;
 import goorm_runner.backend.post.domain.model.Post;
-import goorm_runner.backend.post.presentation.post.dto.PostCreateRequest;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @Transactional
@@ -36,6 +43,9 @@ public class PostServiceIntegrationTest {
     @Autowired
     private PostRepository postRepository;
 
+    @MockBean
+    private MemberRepository memberRepository;
+
     @BeforeEach
     void setUp() {
         postRepository.deleteAll();
@@ -51,6 +61,12 @@ public class PostServiceIntegrationTest {
 
         Post post = postService.create(title, content, authorId, Category.GENERAL);
         Long postId = post.getId();
+
+        Member mockMember = mock(Member.class);
+        when(mockMember.getId()).thenReturn(authorId);
+
+        when(memberRepository.findById(any()))
+                .thenReturn(Optional.of(mockMember));
 
         //when
         postService.delete(postId, authorId);
@@ -81,9 +97,14 @@ public class PostServiceIntegrationTest {
         //given
         String title = "Example title";
         String content = "<h1>Example</h1> Insert content here.";
-        PostCreateRequest createRequest = new PostCreateRequest(title, content);
 
         Long authorId = 1L;
+
+        Member mockMember = mock(Member.class);
+        when(mockMember.getId()).thenReturn(authorId);
+
+        when(memberRepository.findById(any()))
+                .thenReturn(Optional.of(mockMember));
 
         Post post = postService.create(title, content, authorId, Category.GENERAL);
         Long postId = post.getId();
@@ -107,6 +128,12 @@ public class PostServiceIntegrationTest {
         String content = "<h1>Example</h1> Insert content here.";
 
         Long authorId = 1L;
+
+        Member mockMember = mock(Member.class);
+        when(mockMember.getId()).thenReturn(authorId);
+
+        when(memberRepository.findById(any()))
+                .thenReturn(Optional.of(mockMember));
 
         Post post1 = postService.create(title1, content, authorId, Category.GENERAL);
         postService.create(title2, content, authorId, Category.GENERAL);

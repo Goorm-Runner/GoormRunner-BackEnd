@@ -1,7 +1,6 @@
 package goorm_runner.backend.postlike.application;
 
 import goorm_runner.backend.global.ErrorCode;
-
 import goorm_runner.backend.post.domain.PostRepository;
 import goorm_runner.backend.postlike.application.exception.PostLikeException;
 import goorm_runner.backend.postlike.domain.PostLike;

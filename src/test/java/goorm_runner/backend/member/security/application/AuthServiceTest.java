@@ -1,8 +1,6 @@
 package goorm_runner.backend.member.security.application;
 
-import goorm_runner.backend.member.domain.Member;
-import goorm_runner.backend.member.domain.Role;
-import goorm_runner.backend.member.domain.Sex;
+import goorm_runner.backend.member.domain.*;
 import goorm_runner.backend.member.security.dto.LoginRequest;
 import goorm_runner.backend.member.security.dto.MemberSignupRequest;
 import org.junit.jupiter.api.Test;
@@ -21,6 +19,9 @@ class AuthServiceTest {
     @Autowired
     private AuthService authService;
 
+    @Autowired
+    private AuthorityRepository authorityRepository;
+
     @Test
     void signup_success() {
         //given
@@ -31,6 +32,9 @@ class AuthServiceTest {
         String sex = "male";
         String birth = "2024-07-30";
         MemberSignupRequest request = new MemberSignupRequest(loginId, nickname, password, role, sex, birth);
+
+        Authority authority = new Authority(1L, AuthorityType.ROLE_USER);
+        authorityRepository.save(authority);
 
         //when
         Member member = authService.signup(request);
@@ -55,6 +59,9 @@ class AuthServiceTest {
         String role = "user";
         String sex = "male";
         String birth = "2024-07-30";
+
+        Authority authority = new Authority(1L, AuthorityType.ROLE_USER);
+        authorityRepository.save(authority);
 
         authService.signup(new MemberSignupRequest(loginId, nickname, password, role, sex, birth));
 

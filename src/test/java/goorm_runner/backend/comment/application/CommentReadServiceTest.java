@@ -12,19 +12,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @Transactional
 @SpringBootTest
@@ -39,7 +34,7 @@ class CommentReadServiceTest {
     @Autowired
     private CommentRepository commentRepository;
 
-    @MockBean
+    @Autowired
     private PostRepository postRepository;
 
 
@@ -52,15 +47,12 @@ class CommentReadServiceTest {
     void read_success() {
         //given
         Long authorId = 1L;
-        Long postId = 1L;
         String content = "lorem ipsum";
 
         Post post = new Post(1L, "title", "content", Category.GENERAL);
-        ReflectionTestUtils.setField(post, "id", postId);
-        when(postRepository.findById(any()))
-                .thenReturn(Optional.of(post));
+        postRepository.save(post);
 
-        CommentCreateResult result = commentService.create(authorId, postId, content);
+        CommentCreateResult result = commentService.create(authorId, post.getId(), content);
 
         //when
         Comment findComment = commentReadService.read(result.commentId());
@@ -77,19 +69,16 @@ class CommentReadServiceTest {
     void read_page_success() {
         //given
         Long authorId = 1L;
-        Long postId = 1L;
         String content = "lorem ipsum";
 
         Post post = new Post(1L, "title", "content", Category.GENERAL);
-        ReflectionTestUtils.setField(post, "id", 1L);
-        when(postRepository.findById(any()))
-                .thenReturn(Optional.of(post));
+        postRepository.save(post);
 
-        commentService.create(authorId, postId, content);
+        commentService.create(authorId, post.getId(), content);
 
         //when
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<Comment> page = commentReadService.readPage(postId, pageRequest);
+        Page<Comment> page = commentReadService.readPage(post.getId(), pageRequest);
 
         //then
         List<Comment> contents = page.getContent();
