@@ -11,8 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static goorm_runner.backend.global.ErrorCode.MEMBER_NOT_FOUND;
-import static goorm_runner.backend.global.ErrorCode.POST_NOT_FOUND;
+import static goorm_runner.backend.global.ErrorCode.*;
 
 @RequiredArgsConstructor
 @Service
@@ -36,9 +35,17 @@ public class PostService {
         return post;
     }
 
-    public void delete(Long postId) {
+    public void delete(Long postId, Long authorId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(POST_NOT_FOUND));
+
+        Member author = memberRepository.findById(authorId)
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
+
+        if (!post.getAuthorId().equals(author.getId())) {
+            throw new PostException(NOT_POST_AUTHOR);
+        }
+
         post.delete();
     }
 
