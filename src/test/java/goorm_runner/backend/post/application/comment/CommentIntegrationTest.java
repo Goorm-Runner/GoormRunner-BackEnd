@@ -41,7 +41,7 @@ public class CommentIntegrationTest {
         CommentCreateResult result = commentService.create(authorId, post.getId(), content);
 
         //when
-        commentService.delete(post, result.commentId());
+        commentService.delete(post, result.commentId(), authorId);
         em.flush();
         em.clear();
 

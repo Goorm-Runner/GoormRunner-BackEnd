@@ -87,7 +87,7 @@ class PostServiceTest {
         String updatedTitle = "UpdatedTitle";
         String updatedContent = "UpdatedContent";
 
-        PostUpdateResult updateResult = postService.update(updatedTitle, updatedContent, result.postId());
+        PostUpdateResult updateResult = postService.update(updatedTitle, updatedContent, result.postId(), authorId);
         postRepository.flush();
 
         //then
@@ -112,7 +112,7 @@ class PostServiceTest {
         String updatedContent = "UpdatedContent";
 
         //then
-        assertThatThrownBy(() -> postService.update(updatedTitle, updatedContent, result.postId() + 1))
+        assertThatThrownBy(() -> postService.update(updatedTitle, updatedContent, result.postId() + 1, authorId))
                 .isInstanceOf(PostException.class)
                 .hasMessage(POST_NOT_FOUND.getMessage());
     }
@@ -132,7 +132,7 @@ class PostServiceTest {
         String updatedContent = "UpdatedContent";
 
         //then
-        assertThatThrownBy(() -> postService.update(emptyTitle, updatedContent, result.postId()))
+        assertThatThrownBy(() -> postService.update(emptyTitle, updatedContent, result.postId(), authorId))
                 .isInstanceOf(PostException.class)
                 .hasMessage(EMPTY_TITLE.getMessage());
     }
@@ -152,7 +152,7 @@ class PostServiceTest {
         String updatedContent = "";
 
         //then
-        assertThatThrownBy(() -> postService.update(emptyTitle, updatedContent, result.postId()))
+        assertThatThrownBy(() -> postService.update(emptyTitle, updatedContent, result.postId(), authorId))
                 .isInstanceOf(PostException.class)
                 .hasMessage(EMPTY_CONTENT.getMessage());
     }

@@ -83,7 +83,7 @@ class CommentServiceTest {
 
         //when
         String updatedContent = "updated";
-        CommentUpdateResult updateResult = commentService.update(post, result.commentId(), updatedContent);
+        CommentUpdateResult updateResult = commentService.update(post, result.commentId(), updatedContent, authorId);
         em.flush();
         em.clear();
 
@@ -104,7 +104,7 @@ class CommentServiceTest {
 
         //when-then
         String emptyContent = "";
-        assertThatThrownBy(() -> commentService.update(post, result.commentId(), emptyContent))
+        assertThatThrownBy(() -> commentService.update(post, result.commentId(), emptyContent, authorId))
                 .isInstanceOf(CommentException.class);
 
     }
