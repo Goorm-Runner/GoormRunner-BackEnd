@@ -65,10 +65,8 @@ public class Post extends BaseTimeEntity {
         deletedAt = LocalDateTime.now();
     }
 
-    public Comment addComment(Long authorId, String content) {
-        Comment comment = new Comment(this, authorId, content);
-        comments.add(comment);
-        return comment;
+    public void addComment(Comment comment) {
+        this.comments.add(comment);
     }
 
     private void validateTitleAndContent(String title, String content) {

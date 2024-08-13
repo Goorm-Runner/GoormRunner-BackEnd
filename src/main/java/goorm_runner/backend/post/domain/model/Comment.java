@@ -35,7 +35,7 @@ public class Comment extends BaseTimeEntity {
 
     private LocalDateTime deletedAt;
 
-    protected Comment(Post post, Long authorId, String content) {
+    public Comment(Post post, Long authorId, String content) {
         validateNotEmptyContent(content);
         this.post = post;
         this.authorId = authorId;

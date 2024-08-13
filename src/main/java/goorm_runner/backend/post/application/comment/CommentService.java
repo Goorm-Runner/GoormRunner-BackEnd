@@ -27,9 +27,11 @@ public class CommentService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
 
-        Comment comment = post.addComment(authorId, content);
+        Comment comment = new Comment(post, authorId, content);
+        post.addComment(comment);
+
         commentRepository.save(comment);
-        return new CommentCreateResult(post.getId(), comment.getId(), comment.getContent(), comment.getCreatedAt().toString());
+        return CommentCreateResult.from(comment);
     }
 
     public CommentUpdateResult update(Post post, Long commentId, String content, Long loginId) {
