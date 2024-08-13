@@ -77,9 +77,9 @@ public class MarketController {
                 .map(MarketOverview::from)
                 .toList();
 
-        ResponseMetaData responseMetaData = ResponseMetaData.of(markets);
+        MarketResponseMetaData marketResponseMetaData = MarketResponseMetaData.of(markets);
 
-        MarketReadPageResponse response = new MarketReadPageResponse(overviews, responseMetaData);
+        MarketReadPageResponse response = new MarketReadPageResponse(overviews, marketResponseMetaData);
         return ResponseEntity.ok(response);
     }
 

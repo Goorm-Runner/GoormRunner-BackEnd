@@ -5,7 +5,7 @@ import goorm_runner.backend.post.dto.ResponseMetaData;
 
 import java.util.List;
 
-public record MarketReadPageResponse(List<MarketOverview> overviews, ResponseMetaData responseMetaData) {
+public record MarketReadPageResponse(List<MarketOverview> overviews, MarketResponseMetaData responseMetaData) {
     @Override
     public List<MarketOverview> overviews() {
         return List.copyOf(overviews);
