@@ -1,12 +1,12 @@
 package goorm_runner.backend.market.presentation;
 
+import goorm_runner.backend.global.PageMetaData;
 import goorm_runner.backend.market.application.MarketReadService;
 import goorm_runner.backend.market.application.MarketService;
 import goorm_runner.backend.market.domain.Market;
 import goorm_runner.backend.market.dto.*;
 import goorm_runner.backend.member.application.MemberService;
 import goorm_runner.backend.member.security.SecurityMember;
-import goorm_runner.backend.post.dto.ResponseMetaData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -77,9 +77,9 @@ public class MarketController {
                 .map(MarketOverview::from)
                 .toList();
 
-        MarketResponseMetaData marketResponseMetaData = MarketResponseMetaData.of(markets);
+        PageMetaData responseMetaData = PageMetaData.from(markets);
 
-        MarketReadPageResponse response = new MarketReadPageResponse(overviews, marketResponseMetaData);
+        MarketReadPageResponse response = new MarketReadPageResponse(overviews, responseMetaData);
         return ResponseEntity.ok(response);
     }
 

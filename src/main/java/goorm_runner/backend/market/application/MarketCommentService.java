@@ -1,8 +1,8 @@
 package goorm_runner.backend.market.application;
 
+import goorm_runner.backend.market.domain.Market;
 import goorm_runner.backend.market.domain.MarketComment;
 import goorm_runner.backend.market.domain.MarketCommentRepository;
-import goorm_runner.backend.market.domain.Market;
 import goorm_runner.backend.market.domain.MarketRepository;
 import goorm_runner.backend.market.dto.MarketCommentCreateRequest;
 import goorm_runner.backend.market.dto.MarketCommentUpdateRequest;

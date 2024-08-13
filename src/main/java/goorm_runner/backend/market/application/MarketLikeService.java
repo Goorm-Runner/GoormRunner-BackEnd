@@ -1,11 +1,11 @@
 package goorm_runner.backend.market.application;
 
+import goorm_runner.backend.market.domain.Market;
 import goorm_runner.backend.market.domain.MarketLike;
 import goorm_runner.backend.market.domain.MarketLikeRepository;
-import goorm_runner.backend.market.domain.Market;
 import goorm_runner.backend.market.domain.MarketRepository;
-import goorm_runner.backend.member.domain.MemberRepository;
 import goorm_runner.backend.member.domain.Member;
+import goorm_runner.backend.member.domain.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

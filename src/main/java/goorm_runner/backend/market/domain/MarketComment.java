@@ -9,12 +9,11 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "Comment")
 public class MarketComment extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
+    @Column(name = "market_comment_id", nullable = false)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
