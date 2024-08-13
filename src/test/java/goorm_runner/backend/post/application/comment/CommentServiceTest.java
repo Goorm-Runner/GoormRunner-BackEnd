@@ -41,7 +41,7 @@ class CommentServiceTest {
         Long authorId = 1L;
         String content = "lorem ipsum";
 
-        Post post = new Post(1L, "title", "content", Category.GENERAL);
+        Post post = new Post(authorId, "title", "content", Category.GENERAL);
         postRepository.save(post);
 
         //when

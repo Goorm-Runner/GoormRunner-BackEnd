@@ -1,14 +1,8 @@
 package goorm_runner.backend.market.dto;
 
-import goorm_runner.backend.post.dto.ResponseMetaData;
-
+import goorm_runner.backend.global.PageMetaData;
 
 import java.util.List;
 
-public record MarketReadPageResponse(List<MarketOverview> overviews, ResponseMetaData responseMetaData) {
-    @Override
-    public List<MarketOverview> overviews() {
-        return List.copyOf(overviews);
-    }
-
+public record MarketReadPageResponse(List<MarketOverview> overviews, PageMetaData metaData) {
 }

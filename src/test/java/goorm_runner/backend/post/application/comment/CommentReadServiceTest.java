@@ -43,13 +43,28 @@ class CommentReadServiceTest {
     @Test
     void read_success() {
         //given
-        Long authorId = 1L;
-        String content = "lorem ipsum";
+        String loginId = "loginId";
+        String nickname = "username";
+        String password = "password";
 
-        Post post = new Post(1L, "title", "content", Category.GENERAL);
+        Member member = memberRepository.save(
+                Member.builder()
+                        .loginId(loginId)
+                        .nickname(nickname)
+                        .password(password)
+                        .role(Role.USER)
+                        .sex(Sex.MALE)
+                        .birth(LocalDate.now())
+                        .build()
+        );
+
+        memberRepository.save(member);
+
+        Post post = new Post(member.getId(), "title", "content", Category.GENERAL);
         postRepository.save(post);
+        postRepository.flush();
 
-        CommentCreateResult result = commentService.create(authorId, post.getId(), content);
+        CommentCreateResult result = commentService.create(member.getId(), post.getId(), "content");
 
         //when
         CommentReadResult commentReadResult = commentReadService.read(result.commentId());

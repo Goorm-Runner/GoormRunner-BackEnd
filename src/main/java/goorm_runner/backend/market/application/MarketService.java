@@ -1,11 +1,11 @@
 package goorm_runner.backend.market.application;
 
+import goorm_runner.backend.market.domain.Market;
 import goorm_runner.backend.market.domain.MarketCategory;
+import goorm_runner.backend.market.domain.MarketRepository;
 import goorm_runner.backend.market.domain.MarketStatus;
 import goorm_runner.backend.market.dto.MarketCreateRequest;
-import goorm_runner.backend.market.domain.Market;
 import goorm_runner.backend.market.dto.MarketUpdateRequest;
-import goorm_runner.backend.market.domain.MarketRepository;
 import goorm_runner.backend.market.exception.MarketNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
