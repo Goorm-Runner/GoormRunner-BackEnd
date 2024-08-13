@@ -56,7 +56,7 @@ nohup java -jar /home/ec2-user/build/libs/$JAR_NAME \
     --AWS_S3_BUCKET_NAME=$AWS_S3_BUCKET_NAME \
     --JWT_SECRET=$JWT_SECRET \
     --ADMIN_NAME=$ADMIN_NAME \
-    --ADMIN_PASSWORD=$ADMIN_PASSWORD \
+    --ADMIN_PASSWORD="$ADMIN_PASSWORD" \
     > /home/ec2-user/application.log 2> /home/ec2-user/error.log &
 
 # 새로운 프로세스 ID 캡처
