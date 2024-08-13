@@ -30,7 +30,7 @@ public class MarketCommentController {
             @RequestBody MarketCommentCreateRequest request) {
 
         String username = securityMember.getUsername();
-        Long memberId = memberService.getMemberIdByUsername(username);
+        Long memberId = memberService.findMemberIdByUsername(username);
 
         MarketComment comment = commentService.createComment(request, marketId, memberId);
         MarketCommentResponse response = toResponse(comment);
