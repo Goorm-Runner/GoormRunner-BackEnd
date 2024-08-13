@@ -2,10 +2,11 @@ package goorm_runner.backend.market.domain;
 
 import goorm_runner.backend.common.BaseTimeEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -13,14 +14,13 @@ import java.util.List;
 
 @Entity
 @Getter
-@NoArgsConstructor
-@Table(name = "Market")
-@Where(clause = "deleted_at IS NULL")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLRestriction("deleted_at IS NULL")
 public class Market extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
+    @Column(name = "market_id", nullable = false)
     private Long id;
 
     @Column(name = "member_id", nullable = false)
